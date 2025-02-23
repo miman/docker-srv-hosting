@@ -1,0 +1,41 @@
+services:
+   nextcloud:
+      image: nextcloud
+      container_name: nextcloud
+      ports:
+         - "4520:80"
+      volumes:
+         - nextcloud_data:/var/www/html
+         # - nextcloud_data/config:/var/www/html/config
+      environment:
+         - POSTGRES_HOST=db
+         - POSTGRES_USER=nextcloud
+         - POSTGRES_PASSWORD=1_mimanop
+         - POSTGRES_DB=nextcloud
+         - REDIS_HOST=redis
+         - REDIS_PORT=6379
+         - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.CHANGEME.duckdns.org
+      depends_on:
+         - db
+         - redis
+
+   db:
+      image: postgres
+      container_name: nextcloud-db
+      environment:
+         - POSTGRES_USER=nextcloud
+         - POSTGRES_PASSWORD=1_mimanop
+         - POSTGRES_DB=nextcloud
+      volumes:
+         - nextcloud_config:/var/lib/postgresql/data
+
+   redis:
+      image: redis
+      container_name: nextcloud-redis
+      volumes:
+         - redis_data:/var/lib/redis
+
+volumes:
+   nextcloud_data:
+   nextcloud_config:
+   redis_data:
