@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+   nginxproxymgr:
+      image: "jc21/nginx-proxy-manager:latest"
+      container_name: reverse_proxy
+      restart: unless-stopped
+      ports:
+         - "84:80"
+         - "81:81"
+         - "5443:443"
+      volumes:
+         - ./letsencrypt:/data
+         - ./letsencrypt:/etc/letsencrypt
