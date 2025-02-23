@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Create a volume for the the Docker container
-docker volume create reverse-proxy
-
 # Run the Docker compose file
 docker-compose down
 docker-compose pull
