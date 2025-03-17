@@ -4,9 +4,9 @@ services:
       container_name: reverse_proxy
       restart: unless-stopped
       ports:
-         - "84:80"
-         - "81:81"
-         - "5443:443"
+         - "80:80" # HTTP
+         - "81:81" # Web UI
+         - "443:443" # HTTPS
       volumes:
          - reverse-proxy:/data
          - reverse-proxy:/etc/letsencrypt
