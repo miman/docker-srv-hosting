@@ -1,0 +1,36 @@
+# docker-compose.yml for Portainer on Synology NAS
+#
+# This file defines the Portainer container and its associated volumes and ports.
+#
+# Pre-requisites:
+# - Ensure that the folders docker/portainer/data are created on your NAS
+#
+# Create a project in Synology Container manager and use this file to deploy Portainer.
+
+version: "3.9"
+
+services:
+   portainer:
+      image: portainer/portainer-ce:latest # The Docker image for Portainer Community Edition.
+      container_name: portainer # Assigns a readable name to the container.
+      restart:
+         always # Ensures the container restarts automatically if it stops,
+         # or if the Docker daemon/NAS reboots.
+      ports:
+         - "8000:8000" # Port for the Portainer Edge Agent (optional, but good to have).
+           # Maps host port 8000 to container port 8000.
+         - "9000:9000" # Main Portainer web UI port.
+           # Maps host port 9000 to container port 9000.
+      volumes:
+         # Mount the Docker socket from the host into the container.
+         # This allows Portainer to manage your Docker daemon.
+         # This path is standard for Synology NAS.
+         - /var/run/docker.sock:/var/run/docker.sock
+
+         # Mount a local volume for Portainer's persistent data.
+         # This ensures your Portainer configuration, users, and settings are saved
+         # even if the container is recreated.
+         # IMPORTANT: Adjust '/volume1/docker/portainer_data' to your actual
+         # desired path on your Synology NAS. For example, if your docker shared
+         # folder is on volume2, it might be '/volume2/docker/portainer_data'.
+         - /volume1/docker/portainer/data:/data
