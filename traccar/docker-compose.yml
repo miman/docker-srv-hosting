@@ -1,0 +1,20 @@
+services:
+   traccar:
+      image: traccar/traccar
+      ports:
+         - "8082:8082" # Web interface
+         - "5055:5055/udp" # GPS device ports (for iOS Traccar Client App)
+         - "5055:5055/tcp" # GPS device ports (for iOS Traccar Client App)
+         # - "5000-5150:5000-5150/udp" # GPS device ports (adjust as needed)
+         # - "5000-5150:5000-5150/tcp" # GPS device ports (adjust as needed)
+      volumes:
+         - traccar_data:/opt/traccar
+         # - traccar_data:/opt/traccar/data
+         # - ./traccar.xml:/opt/traccar/conf/traccar.xml #Optional, to override default config.
+      # restart: unless-stopped
+      environment:
+         - TZ=Your_Timezone # Replace with your timezone (e.g., Europe/London)
+      #network_mode: host #Alternatively, for easier port access.
+
+volumes:
+   traccar_data:
