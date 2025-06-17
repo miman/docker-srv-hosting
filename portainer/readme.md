@@ -10,4 +10,4 @@ If you have multiple docker servers you want to manage from Portainer, you can u
 
 ## Synology
 
-Under the folder **synology** there is a script tuned for use on a Synology NAS.
+Under the folder **{prj-root}synology-nas/portainer** there is a script tuned for use on a Synology NAS.

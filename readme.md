@@ -8,7 +8,7 @@ These sub-project contains docker-compose files used to host servers on your hom
 
 ## Tool
 
-These are the tools that can be installed withi this project
+These are the tools that can be installed with this project
 
 -  Home Assistant
 -  Nextcloud
