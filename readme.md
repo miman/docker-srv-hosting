@@ -1,21 +1,28 @@
 # Home Server Hosting
 
-These sub-project contains docker-compose files used to host servers on your home server(s) to:
+These sub-projects contain docker-compose files used to host servers on your home server(s) to:
 
 -  Avoid paying for cloud services
--  To keep your data private
--  To have services that can run even with no Internet
+-  Keep your data private
+-  Run services even with no Internet
 
-## Tool
+## Services
 
-These are the tools that can be installed with this project
+These are the main services that can be installed with this project:
 
 -  Home Assistant
 -  Nextcloud
 -  Ollama LLM server
 -  Ollama Open WebUI
--  NGinx Reverse Proxy
+-  Nginx Reverse Proxy
+-  Headscale
+-  Glance Dashboard
+-  Immich
+-  Portainer
+-  Traccar
+-  Vaultwarden
+-  Linux-in-Docker (local-linux)
 
 ## Synology
 
-There is also a folder containing script if you want to run the containers on a Synology NAS
+There is also a folder containing scripts if you want to run the containers on a Synology NAS
