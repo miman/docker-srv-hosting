@@ -2,7 +2,7 @@ services:
    traccar:
       image: traccar/traccar
       ports:
-         - "8082:8082" # Web interface
+         - "4411:8082" # Web interface
          - "5055:5055/udp" # GPS device ports (for iOS Traccar Client App)
          - "5055:5055/tcp" # GPS device ports (for iOS Traccar Client App)
          # - "5000-5150:5000-5150/udp" # GPS device ports (adjust as needed)
