@@ -14,6 +14,7 @@ This document lists the default ports used by each service installed via Docker 
 | Portainer        | 8000, 9000        | 8000, 9000   | Portainer web UI & Edge Agent |
 | Traccar          | 8082              | 4411         | Traccar web UI                |
 | Vaultwarden      | 80                | 4410         | Vaultwarden web UI            |
+| Docmost          | 3000              | 4412         | Docmost documentation server  |
 
 **Note:**
 

@@ -2,3 +2,4 @@ glance-dashboard/glance
 immich/.env
 immich/library
 immich/postgres
+docmost/docmost

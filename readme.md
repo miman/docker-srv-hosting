@@ -22,6 +22,7 @@ These are the main services that can be installed with this project:
 -  Traccar
 -  Vaultwarden
 -  Linux-in-Docker (local-linux)
+-  Docmost
 
 ## Synology
 
