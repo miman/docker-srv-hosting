@@ -18,7 +18,7 @@ These sub-projects contain docker-compose files used to host servers on your hom
 | Headscale           | Self-hosted Tailscale secure network server (like VPN) |
 | Glance Dashboard    | Customizable dashboard/monitoring                      |
 | Immich              | Self-hosted photo & video backup                       |
-| Portainer           | Docker management UI                                   |
+| Portainer           | Docker management srv OR Agent                         |
 | Traccar             | GPS tracking platform                                  |
 | Vaultwarden         | Self-hosted password manager                           |
 | Linux-in-Docker     | Lightweight Linux desktop in Docker with Web UI        |
