@@ -8,25 +8,21 @@ These sub-projects contain docker-compose files used to host servers on your hom
 
 ## Services
 
-These are the services that can be installed with this project:
-
--  Home Assistant
--  Nextcloud
--  Ollama LLM server
--  Ollama Open WebUI
--  Nginx Reverse Proxy
--  Headscale
--  Glance Dashboard
--  Immich
--  Portainer
--  Traccar
--  Vaultwarden
--  Linux-in-Docker (local-linux)
--  Docmost
-
-### Ports / service
-
-To see more info & what ports that are used for each service look under [docs/docker-ports.md](docs/docker-ports.md)
+| Service             | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| Home Assistant      | Home automation platform                               |
+| Nextcloud           | File sync and collaboration suite                      |
+| Ollama LLM server   | Local LLM (AI) server                                  |
+| Ollama Open WebUI   | Web interface for Ollama LLM                           |
+| Nginx Reverse Proxy | Reverse proxy for web services                         |
+| Headscale           | Self-hosted Tailscale secure network server (like VPN) |
+| Glance Dashboard    | Customizable dashboard/monitoring                      |
+| Immich              | Self-hosted photo & video backup                       |
+| Portainer           | Docker management UI                                   |
+| Traccar             | GPS tracking platform                                  |
+| Vaultwarden         | Self-hosted password manager                           |
+| Linux-in-Docker     | Lightweight Linux desktop in Docker with Web UI        |
+| Docmost             | Self-hosted documentation/wiki platform                |
 
 ## Synology
 
