@@ -8,7 +8,7 @@ These sub-projects contain docker-compose files used to host servers on your hom
 
 ## Services
 
-These are the main services that can be installed with this project:
+These are the services that can be installed with this project:
 
 -  Home Assistant
 -  Nextcloud
@@ -23,6 +23,10 @@ These are the main services that can be installed with this project:
 -  Vaultwarden
 -  Linux-in-Docker (local-linux)
 -  Docmost
+
+### Ports / service
+
+To see more info & what ports that are used for each service look under [docs/docker-ports.md](docs/docker-ports.md)
 
 ## Synology
 
