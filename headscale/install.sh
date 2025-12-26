@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Ask user for the Headscale version to use, default to 0.26.1 if not provided
-read -p "Enter the Headscale version to use [default: 0.26.1]: " HS_VERSION
-HS_VERSION=${HS_VERSION:-0.26.1}
+read -p "Enter the Headscale version to use [default: 0.27.1]: " HS_VERSION
+HS_VERSION=${HS_VERSION:-0.27.1}
 
 read -p "Enter your domain name: " DOMAIN_NAME
 DOMAIN_NAME=${DOMAIN_NAME}

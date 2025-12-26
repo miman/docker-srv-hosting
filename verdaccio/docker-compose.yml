@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+  verdaccio:
+    image: verdaccio/verdaccio:latest
+    container_name: verdaccio-npm-cache
+    restart: unless-stopped
+    ports:
+      # Port 4873 är standardporten för Verdaccio
+      - "4873:4873"
+    environment:
+      # Sätter startläget till produktionsläge (bättre prestanda)
+      - NODE_ENV=production
+    volumes:
+      # 1. Konfigurationsfilen (för att behålla dina proxy- och användarinställningar)
+      - /volume1/docker/verdaccio/conf:/verdaccio/conf
+      
+      # 2. Databas/Cache (här sparas alla cachade NPM-paket)
+      - /volume1/docker/verdaccio/storage:/verdaccio/storage
+      
+      # 3. Loggfiler
+      - /volume1/docker/verdaccio/log:/verdaccio/log

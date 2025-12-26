@@ -10,6 +10,6 @@ docker-compose down -v --rmi all
 REM ==============================================
 
 REM Remove the volume used by the Docker container
-docker volume rm nextcloud_nextcloud_config
+docker volume rm nextcloud_nextcloud_db
 docker volume rm nextcloud_nextcloud_data
 docker volume rm nextcloud_redis_data

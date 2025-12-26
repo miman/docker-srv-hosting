@@ -2,6 +2,8 @@
 
 In some cases you may not want to expose port 80 & 443 to be accessible from the internet to get a certificate.
 
+If so then do the following steps to get you Nginx Proxy Manager to work with the4 DuckDns HTTPS certificate.
+
 Here are the steps to use a DuckDns certificate using the token.
 
 ## Steps
@@ -11,6 +13,8 @@ Here are the steps to use a DuckDns certificate using the token.
 1. Create an account or Login to DuckDns
 2. Create a domain by entering you sub domain name and click "add domain" button (in this example we will use example.duckdns.org)
 3. Add the IP address to your server
+   * Local IP if you only want to access ti in your local network (or over a VPN)
+   * External IP if you want to be able to access it from the outside
 
 ### Configure Nginx Proxy Manager
 

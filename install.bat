@@ -17,6 +17,7 @@ for %%S in (%SERVICES%) do (
   if /I "%%S"=="traccar" set "PROMPT=Traccar"
   if /I "%%S"=="vaultwarden" set "PROMPT=Vaultwarden"
   if /I "%%S"=="docmost" set "PROMPT=Docmost"
+  if /I "%%S"=="registry" set "PROMPT=Registry"
   set /p answer=Do you want to install %PROMPT% (y/N)? 
   if /i "%answer%" EQU "Y" (
     echo Installing %PROMPT% as a Docker container...

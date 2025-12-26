@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+   nextcloud-aio-mastercontainer:
+      image: nextcloud/all-in-one:latest
+      container_name: nextcloud-aio-mastercontainer
+      restart: always
+      volumes:
+         - nextcloud_aio_mastercontainer:/mnt/docker-aio-config # Keep this line as is
+         - /var/run/docker.sock:/var/run/docker.sock:ro # Keep this line as is
+
+      ports:
+         # Expose only the AIO admin interface port (8080) on your Nextcloud AIO host.
+         # DO NOT expose 80, 443, or 8443 here, as your reverse proxy handles them.
+         - 4504:8080
+
+      environment:
+         # CRITICAL: Tell AIO's internal Apache to listen on a specific port for your proxy.
+         # You can choose any unused port, 11000 is a common default for this.
+         - APACHE_PORT=11000
+
+         # CRITICAL: Binds the internal Apache to all interfaces within the container,
+         # allowing the external reverse proxy to connect.
+         - APACHE_IP_BINDING=0.0.0.0
+
+         # CRITICAL: Inform Nextcloud about its final external URL.
+         # Replace 'your.nextcloud.domain.com' with your actual domain.
+         - NEXTCLOUD_URL=https://nextcloud.thorhem.duckdns.org/
+         # https://your.nextcloud.domain.com/
+
+         # CRITICAL for multi-host setups (or if your proxy uses a different Docker network):
+         # Tell Nextcloud to trust your reverse proxy's internal IP address.
+         # Replace 'your.reverse.proxy.ip' with the actual IP of your Nginx Proxy Manager host.
+         - NEXTCLOUD_TRUSTED_PROXIES=192.168.68.122:81
+
+         # OPTIONAL: You might temporarily add this if the AIO setup complains about
+         # domain validation failing. Remove it after successful initial setup.
+         # - SKIP_DOMAIN_VALIDATION=true
+
+volumes:
+   nextcloud_aio_mastercontainer:
+      name: nextcloud_aio_mastercontainer # Keep this line as is
