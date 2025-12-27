@@ -14,6 +14,11 @@ echo "Removing old container if it exists..."
 # 2>/dev/null hides the error message if the container doesn't exist yet.
 docker rm -f local-linux 2>/dev/null || true
 
+# The following lines can be removed from the docker run command below if you don't want to test tailscale on the machine:
+#  --privileged \
+#  --cap-add=NET_ADMIN \
+#  --device /dev/net/tun:/dev/net/tun \
+
 docker run -d \
   --name=local-linux \
   -p 3000:3000 \
