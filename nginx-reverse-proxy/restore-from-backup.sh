@@ -1,7 +1,7 @@
 # This file restores nginx-proxy configuration from a backup location
 
 # Define DOCKER_FOLDER if not already set (e.g., for direct execution)
-source ../scripts/ensure-DOCKER_FOLDER.sh
+source ../scripts/read-config.sh
 
 # Go to backup folder
 cd ../backup/nginx-pm

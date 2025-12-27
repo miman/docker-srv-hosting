@@ -2,13 +2,17 @@
 set -e
 
 # Ensure DOCKER_FOLDER is set
-source ../scripts/ensure-DOCKER_FOLDER.sh
+source ../scripts/read-config.sh
 
 # Set the config path based on DOCKER_FOLDER
 CONFIG_PATH="$DOCKER_FOLDER/linux-in-docker"
 mkdir -p "$CONFIG_PATH"
 echo "Using $CONFIG_PATH for container's /config volume."
 
+echo "Removing old container if it exists..."
+# -f stops it if it's running and removes it in one go. 
+# 2>/dev/null hides the error message if the container doesn't exist yet.
+docker rm -f local-linux 2>/dev/null || true
 
 docker run -d \
   --name=local-linux \
@@ -21,6 +25,9 @@ docker run -d \
   -v "$CONFIG_PATH:/config" \
   --shm-size="1gb" \
   --restart unless-stopped \
+  --privileged \
+  --cap-add=NET_ADMIN \
+  --device /dev/net/tun:/dev/net/tun \
   lscr.io/linuxserver/webtop:ubuntu-xfce
 
 echo "Linux-in-Docker (webtop) is being installed."

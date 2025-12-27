@@ -3,7 +3,7 @@
 set -e
 
 # Ensure DOCKER_FOLDER is set
-source ../scripts/ensure-DOCKER_FOLDER.sh
+source ../scripts/read-config.sh
 
 # Ensure the docker network "local-ai-network" exists
 if ! docker network ls --filter name=local-ai-network --format '{{.Name}}' | grep -q "^local-ai-network$"; then

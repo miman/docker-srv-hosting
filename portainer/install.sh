@@ -2,7 +2,7 @@
 set -e
 
 # Ensure DOCKER_FOLDER is set
-source ../scripts/ensure-DOCKER_FOLDER.sh
+source ../scripts/read-config.sh
 
 # Set the Portainer data root based on DOCKER_FOLDER
 export PORTAINER_DATA_ROOT="$DOCKER_FOLDER/portainer"

@@ -6,7 +6,7 @@
 set -e
 
 # Define DOCKER_FOLDER if not already set (e.g., for direct execution)
-source ../scripts/ensure-DOCKER_FOLDER.sh
+source ../scripts/read-config.sh
 
 echo "Restoring Headscal config using DOCKER_FOLDER: ${DOCKER_FOLDER}"
 

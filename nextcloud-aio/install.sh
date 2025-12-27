@@ -2,7 +2,7 @@
 set -e
 
 # Ensure DOCKER_FOLDER is set
-source ../scripts/ensure-DOCKER_FOLDER.sh
+source ../scripts/read-config.sh
 
 # NOTE: The nextcloud-aio/docker-compose.yml is not modified to use DOCKER_FOLDER
 # due to explicit warnings in the file to keep the volume configuration as is.

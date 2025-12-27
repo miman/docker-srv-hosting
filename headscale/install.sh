@@ -26,7 +26,7 @@ read -p "Enter your domain name: " DOMAIN_NAME
 DOMAIN_NAME=${DOMAIN_NAME}
 
 # Ensure DOCKER_FOLDER is set
-source ../scripts/ensure-DOCKER_FOLDER.sh
+source ../scripts/read-config.sh
 
 # Create a .env file for docker-compose variable substitution
 cat > .env <<EOF

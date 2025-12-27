@@ -8,9 +8,30 @@ These sub-projects contain docker-compose files used to host servers on your hom
 
 ## Prerequisites
 
-to ensure that all **.sh** files are executable on a Linux machine you need to:
-1. run **chmod +x scripts/ensure-executable.sh**
-2. run **scripts/ensure-executable.sh**
+to ensure that all **.sh** files are executable on a Linux machine you need to run the following
+```
+cd scripts
+chmod +x ensure-executable.sh
+./ensure-executable.sh
+cd ..
+```
+
+Then you should run the following which:
+* sets common environment variables
+* installs docker
+* installs tailscale client
+
+```
+./install-core.sh
+```
+
+## Usage
+
+To install the different services you just run, this will ask you for which services you want to install
+```
+./install.sh
+```
+It will use the common env settings you set in the install-core script
 
 ## Services
 

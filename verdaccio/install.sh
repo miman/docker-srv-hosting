@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Ensure DOCKER_FOLDER is set
-source ../scripts/ensure-DOCKER_FOLDER.sh
+source ../scripts/read-config.sh
 
 # Run the Docker compose file
 docker compose down

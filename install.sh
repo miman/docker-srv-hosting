@@ -31,7 +31,7 @@ prompt_install() {
 }
 
 # Ensure DOCKER_FOLDER is set
-source ./scripts/ensure-DOCKER_FOLDER.sh
+source ./scripts/read-config.sh
 
 # Ask for Portainer Agent
 read -p "Do you want to install Portainer Agent (y/N)? " answer

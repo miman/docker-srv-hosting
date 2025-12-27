@@ -55,10 +55,38 @@ if [[ ! "$DOCKER_ROOT" = /* ]]; then
 fi
 
 
+# Store DOCKER_ROOT in config file
 echo "{\"docker_root\": \"$DOCKER_ROOT\"}" > "$CONFIG_FILE"
 export DOCKER_FOLDER="$DOCKER_ROOT" # Export for sub-scripts
 mkdir -p "$DOCKER_FOLDER"
 print_success "Docker root folder set to: $DOCKER_FOLDER"
+
+# 1.5 Configure Base DNS Name
+print_info "Configuring base DNS name..."
+BASE_DNS_NAME=""
+if [ -f "$CONFIG_FILE" ]; then
+    # Ensure jq is installed
+    if ! command -v jq &> /dev/null; then
+        print_info "jq not found, installing..."
+        sudo apt-get update && sudo apt-get install -y jq
+    fi
+    BASE_DNS_NAME=$(jq -r '.base_dns_name // ""' "$CONFIG_FILE") # Use // "" to handle null/missing key
+fi
+
+# Set a default if not found or empty
+if [ -z "$BASE_DNS_NAME" ]; then
+    BASE_DNS_NAME="yourdomain.duckdns.org" # Example default
+fi
+
+read -p "Enter the base DNS name (e.g., yourdomain.duckdns.org) [default: $BASE_DNS_NAME]: " USER_INPUT_BASE_DNS_NAME
+if [ -n "$USER_INPUT_BASE_DNS_NAME" ]; then
+    BASE_DNS_NAME="$USER_INPUT_BASE_DNS_NAME"
+fi
+
+# Update config.json with BASE_DNS_NAME using jq
+jq --arg dns "$BASE_DNS_NAME" '.base_dns_name = $dns' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+export BASE_DNS_NAME="$BASE_DNS_NAME" # Export for sub-scripts
+print_success "Base DNS name set to: $BASE_DNS_NAME"
 
 # 2. Update and upgrade OS
 print_info "=======================> Updating and upgrading OS..."

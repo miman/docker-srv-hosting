@@ -2,7 +2,7 @@
 set -e
 
 # Ensure DOCKER_FOLDER is set
-source ../scripts/ensure-DOCKER_FOLDER.sh
+source ../scripts/read-config.sh
 
 # Define and create the data directory for Glance
 GLANCE_DATA_DIR="$DOCKER_FOLDER/glance-dashboard"

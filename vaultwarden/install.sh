@@ -2,7 +2,7 @@
 set -e
 
 # Ensure DOCKER_FOLDER is set
-source ../scripts/ensure-DOCKER_FOLDER.sh
+source ../scripts/read-config.sh
 
 # Set the config path based on DOCKER_FOLDER
 CONFIG_PATH="$DOCKER_FOLDER/vaultwarden"
