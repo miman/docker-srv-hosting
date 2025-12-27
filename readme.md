@@ -27,6 +27,17 @@ Then you should run the following which:
 
 ## Usage
 
+### Use config from previous installations
+
+Some services has support for inporting config from installations done on previous machines.
+
+For these you need to go into the specific folders & run the scripts named **restore-from-backup.sh**
+
+This is supported for:
+* headscale
+* nginx-reverse-proxy
+
+### Install services
 To install the different services you just run, this will ask you for which services you want to install
 ```
 ./install.sh
