@@ -7,4 +7,4 @@ It is only used in case you want to copy an old configuration of an application 
 The backups should be in these folder names
 
 * nginx-pm
-* 
+* headscale

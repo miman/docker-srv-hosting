@@ -31,7 +31,9 @@ Then you should run the following which:
 
 Some services has support for inporting config from installations done on previous machines.
 
-For these you need to go into the specific folders & run the scripts named **restore-from-backup.sh**
+For these you need to:
+1. Copy your config folders to the **backup** folder in this project (see the readme in that folder)
+2. go into the specific folders & run the scripts named **restore-from-backup.sh**
 
 This is supported for:
 * headscale
