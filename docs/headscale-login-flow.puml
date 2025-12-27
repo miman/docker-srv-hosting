@@ -1,0 +1,23 @@
+	
+@startuml
+  actor client as client
+  participant  Modem as modem
+  participant  "Mesh Router" as mesh
+  participant  "External Nginx" as ext_nginx
+  participant  "Internal Nginx" as int_nginx
+  participant  "Headscale" as headscale
+  participant  "Service X" as servicex
+
+  client -> modem : Connect to Headscale Network @ https://headscale.mydomain.duckdns.org
+  modem -> mesh : Forward request
+  mesh -> ext_nginx : Forward request
+  ext_nginx -> headscale : Forward request
+  headscale --> client : Connect Ok, new IP = 100.x.y.z
+  alt client is now connected & communicates over Headscal network as client with IP 100.x.y.z
+    client -> headscale : Request Service X @ https://servicex.my_internal_domain.duckdns.org:45443 /n sent over 41641
+    headscale -> int_nginx : Forward request
+    int_nginx -> servicex : HTTPS termination & \n Forward request to http://192.168.68.122:1234
+    servicex --> client : Service X Response
+  end
+
+@enduml

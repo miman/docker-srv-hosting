@@ -1,5 +1,9 @@
 #!/bin/bash
 # filepath: /c:/code/mt/docker-local-ai/ollama/install.sh
+set -e
+
+# Ensure DOCKER_FOLDER is set
+source ../scripts/ensure-DOCKER_FOLDER.sh
 
 # Ensure the docker network "local-ai-network" exists
 if ! docker network ls --filter name=local-ai-network --format '{{.Name}}' | grep -q "^local-ai-network$"; then

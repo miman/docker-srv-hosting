@@ -5,12 +5,6 @@ services:
       ports:
          - "8123:8123"
       volumes:
-         - home-assistant:/config
+         - ${DOCKER_FOLDER}/home-assistant:/config
          - /etc/localtime:/etc/localtime:ro
          - /run/dbus:/run/dbus:ro
-      restart: unless-stopped
-      privileged: true
-
-# We create a specific volume for the Docker container to store the files related to this container
-volumes:
-   home-assistant:

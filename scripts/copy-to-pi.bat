@@ -1,0 +1,1 @@
+scp -r ".." miman@192.168.68.120:/home/miman/code/docker_srv_hosting/

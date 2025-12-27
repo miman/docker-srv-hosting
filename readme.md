@@ -6,6 +6,12 @@ These sub-projects contain docker-compose files used to host servers on your hom
 -  Keep your data private
 -  Run services even with no Internet
 
+## Prerequisites
+
+to ensure that all **.sh** files are executable on a Linux machine you need to:
+1. run **chmod +x scripts/ensure-executable.sh**
+2. run **scripts/ensure-executable.sh**
+
 ## Services
 
 | Service             | Description                                            |

@@ -3,3 +3,7 @@ immich/.env
 immich/library
 immich/postgres
 docmost/docmost
+
+backup/*
+!backup/readme.md
+

@@ -1,4 +1,22 @@
 #!/bin/bash
+set -e
+
+# --- Check for local Tailscale client and reconfigure port ---
+# This is to avoid a port conflict if a local tailscale client is running,
+# as Headscale also uses port 41641 for coordination.
+if command -v tailscale >/dev/null 2>&1; then
+  echo "Tailscale client is installed. Checking for port configuration..."
+  if [ -f /etc/default/tailscaled ]; then
+    echo "Changing local tailscaled port to 41642 to avoid conflict with Headscale..."
+    # Change to use another port than 41641 for the local client
+    sudo sed -i 's/^#*PORT=.*/PORT="41642"/' /etc/default/tailscaled
+    sudo systemctl restart tailscaled
+    echo "Local tailscaled client restarted on new port."
+  else
+    echo "/etc/default/tailscaled not found. No changes needs to be done"
+  fi
+fi
+# --- End of Tailscale check ---
 
 # Ask user for the Headscale version to use, default to 0.26.1 if not provided
 read -p "Enter the Headscale version to use [default: 0.27.1]: " HS_VERSION
@@ -7,37 +25,40 @@ HS_VERSION=${HS_VERSION:-0.27.1}
 read -p "Enter your domain name: " DOMAIN_NAME
 DOMAIN_NAME=${DOMAIN_NAME}
 
-# Set HEADSCALE_PATH to the absolute path of the current directory
-HEADSCALE_PATH=$(pwd)
+# Ensure DOCKER_FOLDER is set
+source ../scripts/ensure-DOCKER_FOLDER.sh
 
 # Create a .env file for docker-compose variable substitution
 cat > .env <<EOF
 HS_VERSION=${HS_VERSION}
 DOMAIN_NAME=${DOMAIN_NAME}
-HEADSCALE_PATH=${HEADSCALE_PATH}
 EOF
 
+HEADSCALE_DATA_PATH="$DOCKER_FOLDER/headscale"
+
 # Create a directory on the Docker host to store headscale's configuration and the SQLite database:
-mkdir -p ./headscale/{config,lib,run}
+mkdir -p "$HEADSCALE_DATA_PATH"/{config,lib,run}
+
+CONFIG_FILE="$HEADSCALE_DATA_PATH/config/config.yaml"
 
 # Download the example configuration for your chosen version and save it as: $(pwd)/config/config.yaml. Adjust the configuration to suit your local environment. 
-wget -O ./headscale/config/config.yaml https://raw.githubusercontent.com/juanfont/headscale/v${HS_VERSION}/config-example.yaml
+wget -O "$CONFIG_FILE" https://raw.githubusercontent.com/juanfont/headscale/v${HS_VERSION}/config-example.yaml
 
 # Replace server_url in the config file with the provided domain name
-sed -i "s|server_url: http://127.0.0.1:8080|server_url: https://${DOMAIN_NAME}|" ./headscale/config/config.yaml
+sed -i "s|server_url: http://127.0.0.1:8080|server_url: https://${DOMAIN_NAME}|" "$CONFIG_FILE"
 # Replace listen_addr in the config file
-sed -i "s|listen_addr: 127.0.0.1:8080|listen_addr: 0.0.0.0:8080|" ./headscale/config/config.yaml
+sed -i "s|listen_addr: 127.0.0.1:8080|listen_addr: 0.0.0.0:8080|" "$CONFIG_FILE"
 # Replace metrics_listen_addr in the config file
-sed -i "s|metrics_listen_addr: 127.0.0.1:9090|metrics_listen_addr: 0.0.0.0:9090|" ./headscale/config/config.yaml
+sed -i "s|metrics_listen_addr: 127.0.0.1:9090|metrics_listen_addr: 0.0.0.0:9090|" "$CONFIG_FILE"
 
 # Prompt user to adjust the configuration before continuing
 echo
-echo "Please adjust the configuration in ./headscale/config/config.yaml to suit your local environment."
+echo "Please adjust the configuration in $CONFIG_FILE to suit your local environment."
 read -p "Press Enter to continue after you have finished editing the configuration file..."
 
 echo "HS_VERSION=${HS_VERSION}"
 echo "DOMAIN_NAME=${DOMAIN_NAME}"
-echo "HEADSCALE_PATH=${HEADSCALE_PATH}"
+echo "Headscale data path: $HEADSCALE_DATA_PATH"
 # Run the Docker compose file
 docker compose down
 docker compose pull

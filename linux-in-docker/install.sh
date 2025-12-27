@@ -1,9 +1,14 @@
 #!/bin/bash
+set -e
 
-read -p "Enter the absolute path to the config folder to use for /config: " CONFIG_PATH
+# Ensure DOCKER_FOLDER is set
+source ../scripts/ensure-DOCKER_FOLDER.sh
 
-# Replace backslashes with forward slashes for Docker compatibility (optional, for WSL or Docker Desktop)
-CONFIG_PATH="${CONFIG_PATH//\\/\/}"
+# Set the config path based on DOCKER_FOLDER
+CONFIG_PATH="$DOCKER_FOLDER/linux-in-docker"
+mkdir -p "$CONFIG_PATH"
+echo "Using $CONFIG_PATH for container's /config volume."
+
 
 docker run -d \
   --name=local-linux \
@@ -17,3 +22,6 @@ docker run -d \
   --shm-size="1gb" \
   --restart unless-stopped \
   lscr.io/linuxserver/webtop:ubuntu-xfce
+
+echo "Linux-in-Docker (webtop) is being installed."
+echo "You can access it at http://<your-ip>:3000"

@@ -1,5 +1,3 @@
-version: '3.1'
-
 services:
   verdaccio:
     image: verdaccio/verdaccio:latest
@@ -13,10 +11,10 @@ services:
       - NODE_ENV=production
     volumes:
       # 1. Konfigurationsfilen (för att behålla dina proxy- och användarinställningar)
-      - /volume1/docker/verdaccio/conf:/verdaccio/conf
+      - ${DOCKER_FOLDER}/verdaccio/conf:/verdaccio/conf
       
       # 2. Databas/Cache (här sparas alla cachade NPM-paket)
-      - /volume1/docker/verdaccio/storage:/verdaccio/storage
+      - ${DOCKER_FOLDER}/verdaccio/storage:/verdaccio/storage
       
       # 3. Loggfiler
-      - /volume1/docker/verdaccio/log:/verdaccio/log
+      - ${DOCKER_FOLDER}/verdaccio/log:/verdaccio/log

@@ -1,25 +1,25 @@
-version: "3.9"
 services:
    headscale:
       container_name: headscale
       volumes:
-         # Please set ${HEADSCALE_PATH} to the absolute path
-         # of the previously created headscale directory.
-         - ${HEADSCALE_PATH}/headscale/config:/etc/headscale
-         - ${HEADSCALE_PATH}/headscale/lib:/var/lib/headscale
-         - ${HEADSCALE_PATH}/headscale/run:/var/run/headscale
+         - ${DOCKER_FOLDER}/headscale/config:/etc/headscale
+         - ${DOCKER_FOLDER}/headscale/lib:/var/lib/headscale
+         - ${DOCKER_FOLDER}/headscale/run:/var/run/headscale
       ports:
-         - 8080:8080
-         - 9090:9090
+         - "8080:8080"   # For NPM to talk to
+         - "3478:3478/udp" # STUN (Helps direct connections)
+         - "41641:41641/udp" # Optional: For DERP relaying    
       image: headscale/headscale:${HS_VERSION}
       command: serve
       restart: unless-stopped
+      environment:
+         - TZ=Europe/Stockholm
 
-   headscale-ui:
-      image: ghcr.io/gurucomputing/headscale-ui:latest
-      pull_policy: always
-      container_name: headscale-ui
-      restart: unless-stopped
-      ports:
-         - 4502:8080
+   # headscale-ui:
+   #    image: ghcr.io/gurucomputing/headscale-ui:latest
+   #    pull_policy: always
+   #    container_name: headscale-ui
+   #    restart: unless-stopped
+   #    ports:
+   #       - 4502:8080
 # Optionally, you can use ${DOMAIN_NAME} in environment or labels if needed

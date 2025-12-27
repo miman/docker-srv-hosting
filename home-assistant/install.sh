@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Ensure DOCKER_FOLDER is set
+source ../scripts/ensure-DOCKER_FOLDER.sh
+
 # Run the Docker compose file
 docker-compose down
 docker-compose pull

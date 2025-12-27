@@ -6,7 +6,7 @@ services:
       ports:
          - "4520:80"
       volumes:
-         - nextcloud_data:/var/www/html
+         - ${DOCKER_FOLDER}/nextcloud/data:/var/www/html
       environment:
          - POSTGRES_HOST=${POSTGRES_HOST}
          - POSTGRES_USER=${POSTGRES_USER}
@@ -32,14 +32,14 @@ services:
          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
          - POSTGRES_DB=${POSTGRES_DB}
       volumes:
-         - nextcloud_db:/var/lib/postgresql
+         - ${DOCKER_FOLDER}/nextcloud/db:/var/lib/postgresql
 
    redis:
       image: redis:8.4.0
       container_name: nextcloud-redis
       restart: unless-stopped
       volumes:
-         - redis_data:/var/lib/redis
+         - ${DOCKER_FOLDER}/nextcloud/redis:/var/lib/redis
 
    collabora:
       image: collabora/code:latest
@@ -52,9 +52,3 @@ services:
          - extra_params=--o:ssl.enable=false --o:ssl.termination=true
       ports:
          - "9980:9980"
-
-
-volumes:
-   nextcloud_data:
-   nextcloud_db:
-   redis_data:
