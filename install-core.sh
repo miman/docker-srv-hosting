@@ -94,31 +94,16 @@ sudo apt-get update
 sudo apt-get upgrade -y
 print_success "=======================> OS is up to date."
 
-# 3. Install Docker
-print_info "=======================> Installing Docker..."
-if ! command -v docker &> /dev/null; then
-    sudo apt-get install -y ca-certificates curl gnupg lsb-release
-    sudo mkdir -m 0755 -p /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt-get update
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    sudo usermod -aG docker $USER
-    print_success "Docker installed successfully. You may need to log out and back in for group changes to take effect."
-else
-    print_info "Docker is already installed."
-fi
+# 3. Make scripts executable
+print_info "=======================> Making scripts executable..."
+chmod +x ./scripts/install-docker.sh
+chmod +x ./scripts/install-tailscale-client.sh
 
-# 4. Install Tailscale
-print_info "=======================> Installing Tailscale..."
-if ! command -v tailscale &> /dev/null; then
-    curl -fsSL https://tailscale.com/install.sh | sh
-    print_success "Tailscale installed successfully."
-else
-    print_info "Tailscale is already installed."
-fi
+# 4. Install Docker
+./scripts/install-docker.sh
+
+# 5. Install Tailscale
+./scripts/install-tailscale-client.sh
 
 echo -e "\n\n"
 print_success "All core installations are complete!"
