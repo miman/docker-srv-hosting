@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Ensure DOCKER_FOLDER is set
+source ../scripts/read-config.sh
+
 # --- Check for local Tailscale client and reconfigure port ---
 # This is to avoid a port conflict if a local tailscale client is running,
 # as Headscale also uses port 41641 for coordination.
@@ -22,16 +25,19 @@ fi
 read -p "Enter the Headscale version to use [default: 0.27.1]: " HS_VERSION
 HS_VERSION=${HS_VERSION:-0.27.1}
 
-read -p "Enter your domain name: " DOMAIN_NAME
-DOMAIN_NAME=${DOMAIN_NAME}
+if [ -z "${BASE_DNS_NAME}" ]; then
+  read -p "Enter your domain name: " BASE_DNS_NAME
+fi
 
 # Ensure DOCKER_FOLDER is set
 source ../scripts/read-config.sh
 
 # Create a .env file for docker-compose variable substitution
+echo "Generating .env file for Headscale..."
+
 cat > .env <<EOF
 HS_VERSION=${HS_VERSION}
-DOMAIN_NAME=${DOMAIN_NAME}
+DOMAIN_NAME=${BASE_DNS_NAME}
 EOF
 
 HEADSCALE_DATA_PATH="$DOCKER_FOLDER/headscale"
@@ -45,7 +51,7 @@ CONFIG_FILE="$HEADSCALE_DATA_PATH/config/config.yaml"
 wget -O "$CONFIG_FILE" https://raw.githubusercontent.com/juanfont/headscale/v${HS_VERSION}/config-example.yaml
 
 # Replace server_url in the config file with the provided domain name
-sed -i "s|server_url: http://127.0.0.1:8080|server_url: https://${DOMAIN_NAME}|" "$CONFIG_FILE"
+sed -i "s|server_url: http://127.0.0.1:8080|server_url: https://${BASE_DNS_NAME}|" "$CONFIG_FILE"
 # Replace listen_addr in the config file
 sed -i "s|listen_addr: 127.0.0.1:8080|listen_addr: 0.0.0.0:8080|" "$CONFIG_FILE"
 # Replace metrics_listen_addr in the config file
@@ -57,12 +63,23 @@ echo "Please adjust the configuration in $CONFIG_FILE to suit your local environ
 read -p "Press Enter to continue after you have finished editing the configuration file..."
 
 echo "HS_VERSION=${HS_VERSION}"
-echo "DOMAIN_NAME=${DOMAIN_NAME}"
+echo "DOMAIN_NAME=${BASE_DNS_NAME}"
 echo "Headscale data path: $HEADSCALE_DATA_PATH"
 # Run the Docker compose file
 docker compose down
 docker compose pull
 docker compose up -d
 
-echo "Headscale has been installed and is accessible on http://localhost:8080"
+echo "Headscale has been installed and is accessible on http://${BASE_DNS_NAME}:8080"
 echo "For more information on how to continue, see: https://headscale.net/stable/setup/install/container/#configure-and-run-headscale"
+
+# Prompt to install Headplane UI
+echo
+read -p "Do you want to install Headplane UI (a web interface for Headscale)? (y/n) [default: n]: " INSTALL_HEADPLANE
+INSTALL_HEADPLANE=${INSTALL_HEADPLANE:-n}
+
+if [[ "$INSTALL_HEADPLANE" =~ ^[Yy]$ ]]; then
+    echo "Starting Headplane installation..."
+    cd headplane
+    ./install.sh
+fi
