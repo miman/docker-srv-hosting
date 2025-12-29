@@ -34,9 +34,9 @@ fi
 
 
 # Run the Docker compose file
-docker-compose down
-docker-compose pull
-docker-compose up -d
+docker compose down
+docker compose pull
+docker compose up -d
 
 echo "Immich has been installed."
 echo "You can access it at http://<your-ip>:2283"

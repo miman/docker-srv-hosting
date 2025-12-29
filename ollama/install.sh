@@ -27,13 +27,13 @@ fi
 read -p "Do you want to install the Ollama UI (y/N)? " answer
 echo "Deploying Docker container..."
 if [[ "$answer" =~ [Yy]$ ]]; then
-  docker-compose down
-  docker-compose pull
-  docker-compose $COMPOSE_PART up -d --force-recreate --build
+  docker compose down
+  docker compose pull
+  docker compose $COMPOSE_PART up -d --force-recreate --build
 else
-  docker-compose down
-  docker-compose pull ollama-container
-  docker-compose $COMPOSE_PART up -d --force-recreate --build ollama-container
+  docker compose down
+  docker compose pull ollama-container
+  docker compose $COMPOSE_PART up -d --force-recreate --build ollama-container
 fi
 
 echo "Ollama has been installed and is accessible on http://localhost:4512"
