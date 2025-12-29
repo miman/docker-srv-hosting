@@ -1,8 +1,13 @@
 #!/bin/bash
+set -e
 
-read -p "Enter the absolute path to the config folder to use for Vaultwarden data: " CONFIG_PATH
-# Replace backslashes with forward slashes for Docker compatibility
-CONFIG_PATH="${CONFIG_PATH//\\/\/}"
+# Ensure DOCKER_FOLDER is set
+source ../scripts/read-config.sh
+
+# Set the config path based on DOCKER_FOLDER
+CONFIG_PATH="$DOCKER_FOLDER/vaultwarden"
+mkdir -p "$CONFIG_PATH"
+echo "Using $CONFIG_PATH for Vaultwarden data."
 
 read -p "Enter the domain for Vaultwarden (e.g. https://vw.domain.tld), or leave blank for none: " DOMAIN
 

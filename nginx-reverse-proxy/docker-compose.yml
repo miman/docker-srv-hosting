@@ -8,8 +8,5 @@ services:
          - "81:81" # Web UI
          - "443:443" # HTTPS
       volumes:
-         - reverse-proxy:/data
-         - reverse-proxy:/etc/letsencrypt
-
-volumes:
-   reverse-proxy:
+         - ${DOCKER_FOLDER}/nginx-pm/data:/data
+         - ${DOCKER_FOLDER}/nginx-pm/letsencrypt:/etc/letsencrypt

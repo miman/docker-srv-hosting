@@ -1,5 +1,9 @@
 #!/bin/bash
 # filepath: /c:/code/mt/docker-local-ai/ollama/install.sh
+set -e
+
+# Ensure DOCKER_FOLDER is set
+source ../scripts/read-config.sh
 
 # Ensure the docker network "local-ai-network" exists
 if ! docker network ls --filter name=local-ai-network --format '{{.Name}}' | grep -q "^local-ai-network$"; then
@@ -23,13 +27,13 @@ fi
 read -p "Do you want to install the Ollama UI (y/N)? " answer
 echo "Deploying Docker container..."
 if [[ "$answer" =~ [Yy]$ ]]; then
-  docker-compose down
-  docker-compose pull
-  docker-compose $COMPOSE_PART up -d --force-recreate --build
+  docker compose down
+  docker compose pull
+  docker compose $COMPOSE_PART up -d --force-recreate --build
 else
-  docker-compose down
-  docker-compose pull ollama-container
-  docker-compose $COMPOSE_PART up -d --force-recreate --build ollama-container
+  docker compose down
+  docker compose pull ollama-container
+  docker compose $COMPOSE_PART up -d --force-recreate --build ollama-container
 fi
 
 echo "Ollama has been installed and is accessible on http://localhost:4512"
