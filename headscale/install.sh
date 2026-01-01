@@ -65,6 +65,10 @@ read -p "Press Enter to continue after you have finished editing the configurati
 echo "HS_VERSION=${HS_VERSION}"
 echo "DOMAIN_NAME=${BASE_DNS_NAME}"
 echo "Headscale data path: $HEADSCALE_DATA_PATH"
+# Ensure the headscale-net network exists
+docker network inspect headscale-net >/dev/null 2>&1 || \
+    docker network create headscale-net
+
 # Run the Docker compose file
 docker compose down
 docker compose pull

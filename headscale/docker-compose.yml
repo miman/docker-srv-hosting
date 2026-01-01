@@ -14,5 +14,9 @@ services:
       restart: unless-stopped
       environment:
          - TZ=Europe/Stockholm
+      networks:
+         - headscale-net
 
-# Optionally, you can use ${DOMAIN_NAME} in environment or labels if needed
+networks:
+  headscale-net:
+    external: true

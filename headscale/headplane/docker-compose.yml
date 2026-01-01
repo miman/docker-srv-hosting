@@ -14,3 +14,9 @@ services:
          - HP_SERVER_COOKIE_SECURE=false
          - HP_HEADSCALE_CONFIG_STRICT=false
       restart: unless-stopped
+      networks:
+         - headscale-net
+
+networks:
+  headscale-net:
+    external: true

@@ -34,6 +34,10 @@ server:
 EOF
 fi
 
+# Ensure the headscale-net network exists
+docker network inspect headscale-net >/dev/null 2>&1 || \
+    docker network create headscale-net
+
 # Pull & start the container
 echo "Deploying Headplane..."
 docker compose down
