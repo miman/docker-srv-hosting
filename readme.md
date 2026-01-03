@@ -50,19 +50,21 @@ It will use the common env settings you set in the install-core script
 
 | Service             | Description                                            |
 | ------------------- | ------------------------------------------------------ |
-| Home Assistant      | Home automation platform                               |
-| Nextcloud           | File sync and collaboration suite                      |
-| Ollama LLM server   | Local LLM (AI) server                                  |
-| Ollama Open WebUI   | Web interface for Ollama LLM                           |
-| Nginx Reverse Proxy | Reverse proxy for web services                         |
-| Headscale           | Self-hosted Tailscale secure network server (like VPN) |
-| Glance Dashboard    | Customizable dashboard/monitoring                      |
-| Immich              | Self-hosted photo & video backup                       |
-| Portainer           | Docker management srv OR Agent                         |
-| Traccar             | GPS tracking platform                                  |
-| Vaultwarden         | Self-hosted password manager                           |
+| [Docmost](https://docmost.com/)             | Self-hosted documentation/wiki platform                |
+| [Glance Dashboard](https://github.com/glanceapp/glance)    | Customizable dashboard/monitoring                      |
+| [Headscale](https://headscale.net/stable/)           | Self-hosted Tailscale secure network server (like VPN) |
+| [Home Assistant](https://www.home-assistant.io/)      | Home automation platform                               |
+| [Immich](https://immich.app/)              | Self-hosted photo & video backup                       |
 | Linux-in-Docker     | Lightweight Linux desktop in Docker with Web UI        |
-| Docmost             | Self-hosted documentation/wiki platform                |
+| [Nextcloud](https://nextcloud.com/)           | File sync and collaboration suite                      |
+| [Nginx Reverse Proxy](https://nginxproxymanager.com/) | Reverse proxy for web services                         |
+| [Ollama LLM server](https://ollama.com/)   | Local LLM (AI) server                                  |
+| [Open WebUI for Ollama](https://github.com/open-webui/open-webui)   | Web interface for Ollama LLM                           |
+| [Portainer](https://portainer.io/)           | Docker management srv OR Agent                         |
+| Registry           | Local Docker registry                         |
+| [Traccar](https://traccar.org/)             | GPS tracking platform                                  |
+| [Vaultwarden](https://github.com/dani-garcia/vaultwarden)         | Self-hosted password manager                           |
+| [Verdaccio](https://www.verdaccio.org/)         | Local NPM registry                           |
 
 ### Overview
 
@@ -70,4 +72,4 @@ It will use the common env settings you set in the install-core script
 
 ## Synology
 
-There is also a folder containing scripts if you want to run the containers on a Synology NAS
+There is also a folder (**synology-nas**) containing scripts if you want to run the containers on a Synology NAS
