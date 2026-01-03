@@ -47,20 +47,32 @@ mkdir -p "$HEADSCALE_DATA_PATH"/{config,lib,run}
 
 CONFIG_FILE="$HEADSCALE_DATA_PATH/config/config.yaml"
 
-# Download the example configuration for your chosen version and save it as: $(pwd)/config/config.yaml. Adjust the configuration to suit your local environment. 
-wget -O "$CONFIG_FILE" https://raw.githubusercontent.com/juanfont/headscale/v${HS_VERSION}/config-example.yaml
+# Check if config already exists
+SHOULD_UPDATE_CONFIG="y"
+if [ -f "$CONFIG_FILE" ]; then
+    read -p "Config file $CONFIG_FILE already exists. Do you want to update/overwrite it? (y/n) [default: n]: " UPDATE_CONFIG
+    UPDATE_CONFIG=${UPDATE_CONFIG:-n}
+    if [[ ! "$UPDATE_CONFIG" =~ ^[Yy]$ ]]; then
+        SHOULD_UPDATE_CONFIG="n"
+    fi
+fi
 
-# Replace server_url in the config file with the provided domain name
-sed -i "s|server_url: http://127.0.0.1:8080|server_url: https://${BASE_DNS_NAME}|" "$CONFIG_FILE"
-# Replace listen_addr in the config file
-sed -i "s|listen_addr: 127.0.0.1:8080|listen_addr: 0.0.0.0:8080|" "$CONFIG_FILE"
-# Replace metrics_listen_addr in the config file
-sed -i "s|metrics_listen_addr: 127.0.0.1:9090|metrics_listen_addr: 0.0.0.0:9090|" "$CONFIG_FILE"
+if [ "$SHOULD_UPDATE_CONFIG" = "y" ]; then
+    # Download the example configuration for your chosen version and save it as: $(pwd)/config/config.yaml. Adjust the configuration to suit your local environment. 
+    wget -O "$CONFIG_FILE" https://raw.githubusercontent.com/juanfont/headscale/v${HS_VERSION}/config-example.yaml
 
-# Prompt user to adjust the configuration before continuing
-echo
-echo "Please adjust the configuration in $CONFIG_FILE to suit your local environment."
-read -p "Press Enter to continue after you have finished editing the configuration file..."
+    # Replace server_url in the config file with the provided domain name
+    sed -i "s|server_url: http://127.0.0.1:8080|server_url: https://headscale.${BASE_DNS_NAME}|" "$CONFIG_FILE"
+    # Replace listen_addr in the config file
+    sed -i "s|listen_addr: 127.0.0.1:8080|listen_addr: 0.0.0.0:8080|" "$CONFIG_FILE"
+    # Replace metrics_listen_addr in the config file
+    sed -i "s|metrics_listen_addr: 127.0.0.1:9090|metrics_listen_addr: 0.0.0.0:9090|" "$CONFIG_FILE"
+
+    # Prompt user to adjust the configuration before continuing
+    echo
+    echo "Please adjust the configuration in $CONFIG_FILE to suit your local environment."
+    read -p "Press Enter to continue after you have finished editing the configuration file..."
+fi
 
 echo "HS_VERSION=${HS_VERSION}"
 echo "DOMAIN_NAME=${BASE_DNS_NAME}"
