@@ -64,6 +64,10 @@ It will use the common env settings you set in the install-core script
 | Linux-in-Docker     | Lightweight Linux desktop in Docker with Web UI        |
 | Docmost             | Self-hosted documentation/wiki platform                |
 
+### Overview
+
+![deployemnt](docs/overview.drawio.svg)
+
 ## Synology
 
 There is also a folder containing scripts if you want to run the containers on a Synology NAS
