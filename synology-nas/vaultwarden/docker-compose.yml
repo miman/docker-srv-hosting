@@ -1,0 +1,15 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      # Replace with your domain (e.g., https://vw.domain.tld)
+      # If you don't have one yet, you can comment this line out
+      - DOMAIN=https://vaultwarden.thorhem.duckdns.org
+    volumes:
+      # This points to the folder on your Synology
+      # Ensure this path matches your actual folder structure
+      - /volume1/docker/vaultwarden:/data
+    ports:
+      - 4410:80

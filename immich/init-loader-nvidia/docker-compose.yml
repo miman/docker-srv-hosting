@@ -1,0 +1,16 @@
+services:
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    image: ghcr.io/immich-app/immich-machine-learning:release-cuda
+    ports:
+      - "3003:3003"
+    environment:
+      - DEVICE=cuda  # Detta tvingar mjukvaran att välja grafikkortet
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
