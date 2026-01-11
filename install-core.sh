@@ -1,4 +1,11 @@
 #!/bin/bash
+# This script initializes the core environment for the docker-srv-hosting stack.
+# It performs the following tasks:
+# 1. Sets up the Docker root directory and base DNS name in a local config file.
+# 2. Updates and upgrades the system's package list.
+# 3. Installs Docker and the Tailscale client.
+# 4. Sources the main install.sh script to allow for application-specific setups.
+
 set -e
 
 # --- Configuration ---
@@ -41,7 +48,10 @@ if [ -z "$DOCKER_ROOT" ]; then
     DOCKER_ROOT=$DEFAULT_DOCKER_ROOT
 fi
 
-read -p "Enter the Docker config root folder [default: $DOCKER_ROOT]: " USER_INPUT_DOCKER_ROOT
+if [ -z "$USER_INPUT_DOCKER_ROOT" ] && [ -z "$DOCKER_ROOT_PRESET" ]; then # Check for preset env var or interactive
+    read -p "Enter the Docker config root folder [default: $DOCKER_ROOT]: " USER_INPUT_DOCKER_ROOT
+fi
+
 if [ -n "$USER_INPUT_DOCKER_ROOT" ]; then
     # Expand path if it starts with ~
     USER_INPUT_DOCKER_ROOT="${USER_INPUT_DOCKER_ROOT/#\~/$HOME}"
@@ -78,7 +88,14 @@ if [ -z "$BASE_DNS_NAME" ]; then
     BASE_DNS_NAME="yourdomain.duckdns.org" # Example default
 fi
 
-read -p "Enter the base DNS name (e.g., yourdomain.duckdns.org) [default: $BASE_DNS_NAME]: " USER_INPUT_BASE_DNS_NAME
+if [ -z "$USER_INPUT_BASE_DNS_NAME" ]; then
+     # Only prompt if not already set via config or env
+     # We check if it equals the default literal, which implies it wasn't customized
+    if [ "$BASE_DNS_NAME" == "yourdomain.duckdns.org" ] || [ -z "$BASE_DNS_NAME" ]; then
+         read -p "Enter the base DNS name (e.g., yourdomain.duckdns.org) [default: $BASE_DNS_NAME]: " USER_INPUT_BASE_DNS_NAME
+    fi
+fi
+
 if [ -n "$USER_INPUT_BASE_DNS_NAME" ]; then
     BASE_DNS_NAME="$USER_INPUT_BASE_DNS_NAME"
 fi
@@ -111,4 +128,8 @@ print_info "Remember to log out and back in for Docker group changes to apply."
 print_info "You may need to run 'tailscale up' to connect your machine to your Tailnet."
 
 print_info "You will now be prompted to install any applications you want to use."
-source ./install.sh
+if [ "${SKIP_SERVICES}" != "true" ]; then
+    source ./install-services.sh
+else
+    print_info "Skipping interactive service selection (handled by parent script)."
+fi
