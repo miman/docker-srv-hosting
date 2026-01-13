@@ -73,11 +73,17 @@ function run_configuration_phase() {
         check_jq
         EXISTING_DOCKER_ROOT=$(get_config_val "docker_root")
         EXISTING_DNS=$(get_config_val "base_dns_name")
+        EXISTING_BACKUP_MODE=$(get_config_val "backup_mode" || echo "none")
+        EXISTING_BACKUP_PATH=$(get_config_val "backup_path" || echo "")
+        EXISTING_BACKUP_TIME=$(get_config_val "backup_time" || echo "03:00")
         
         if [ -n "$EXISTING_DOCKER_ROOT" ] && [ "$EXISTING_DOCKER_ROOT" != "null" ]; then
             echo "Existing configuration found:"
             echo "  Docker Root: $EXISTING_DOCKER_ROOT"
             echo "  Base DNS:    $EXISTING_DNS"
+            if [ "$EXISTING_BACKUP_MODE" != "none" ] && [ "$EXISTING_BACKUP_MODE" != "null" ]; then
+                 echo "  Backup:      $EXISTING_BACKUP_MODE -> $EXISTING_BACKUP_PATH (@ $EXISTING_BACKUP_TIME)"
+            fi
             echo ""
             read -p "Do you want to use this configuration? [Y/n] " use_existing
             if [[ "$use_existing" =~ ^[Nn]$ ]]; then
@@ -86,8 +92,9 @@ function run_configuration_phase() {
                  EXISTING_CONFIG=true
                  DOCKER_ROOT="$EXISTING_DOCKER_ROOT"
                  BASE_DNS_NAME="$EXISTING_DNS"
-                 BACKUP_MODE=$(get_config_val "backup_mode" || echo "none")
-                 BACKUP_PATH=$(get_config_val "backup_path" || echo "")
+                 BACKUP_MODE="$EXISTING_BACKUP_MODE"
+                 BACKUP_PATH="$EXISTING_BACKUP_PATH"
+                 BACKUP_TIME="$EXISTING_BACKUP_TIME"
             fi
         fi
     fi
@@ -100,15 +107,71 @@ function run_configuration_phase() {
 
         read -p "Enter the base DNS name (e.g., yourdomain.duckdns.org): " BASE_DNS_NAME
         
-        # ... (Backup config logic could be here if needed) ...
+        # --- Backup Configuration ---
+        BACKUP_MODE="none"
+        BACKUP_PATH=""
+        BACKUP_TIME="03:00"
+
+        read -p "Do you want to enable automatic backups? [y/N] " ENABLE_BACKUP
+        if [[ "$ENABLE_BACKUP" =~ ^[Yy]$ ]]; then
+            echo ""
+            echo "Select Backup Destination Type:"
+            echo "1) Dedicated Disk (Will be formatted!)"
+            echo "2) Local Folder"
+            read -p "Enter choice [1/2]: " BACKUP_TYPE_CHOICE
+            
+            if [ "$BACKUP_TYPE_CHOICE" == "1" ]; then
+                BACKUP_MODE="disk"
+                echo ""
+                echo "Available Block Devices:"
+                # Try to list disks, fallback if lsblk not found
+                if command -v lsblk &> /dev/null; then
+                    lsblk -dpn -o NAME,SIZE,MODEL,TYPE | grep -E 'disk|part' || echo "No suitable devices found."
+                else
+                     echo "lsblk not found. Please enter device path manually."
+                fi
+                echo ""
+                read -p "Enter the full path of the device to use (e.g., /dev/sdb): " BACKUP_DEVICE
+                
+                # Check blocks
+                if [ ! -b "$BACKUP_DEVICE" ]; then
+                    print_error "Device $BACKUP_DEVICE not found or not a block device. Disabling backup."
+                    BACKUP_MODE="none"
+                else
+                    read -p "Enter mount point for backup drive [default: /mnt/backup-drive]: " BACKUP_MOUNT
+                    BACKUP_PATH="${BACKUP_MOUNT:-/mnt/backup-drive}"
+                    
+                    # Prepare the disk immediately
+                    print_info "Preparing backup disk (requires sudo)..."
+                    sudo ./scripts/backup-utils.sh setup_disk "$BACKUP_DEVICE" "$BACKUP_PATH"
+                fi
+            elif [ "$BACKUP_TYPE_CHOICE" == "2" ]; then
+                BACKUP_MODE="folder"
+                read -p "Enter the backup directory path [default: $HOME/backups]: " BACKUP_FOLDER
+                BACKUP_PATH="${BACKUP_FOLDER:-$HOME/backups}"
+                BACKUP_PATH="${BACKUP_PATH/#\~/$HOME}"
+                mkdir -p "$BACKUP_PATH"
+            else
+                print_warning "Invalid choice. Disabling backup."
+            fi
+            
+            if [ "$BACKUP_MODE" != "none" ]; then
+                read -p "Enter daily backup time (HH:MM) [default: 03:00]: " USER_TIME
+                BACKUP_TIME="${USER_TIME:-03:00}"
+                print_success "Backup enabled: $BACKUP_MODE -> $BACKUP_PATH at $BACKUP_TIME"
+            fi
+        fi
 
         check_jq
+        # Initialize with empty backups array if creating new
         jq -n \
           --arg dr "$DOCKER_ROOT" \
           --arg dns "$BASE_DNS_NAME" \
-          --arg bm "none" \
-          --arg bp "" \
-          '{docker_root: $dr, base_dns_name: $dns, backup_mode: $bm, backup_path: $bp}' > "$CONFIG_FILE"
+          --arg bm "$BACKUP_MODE" \
+          --arg bp "$BACKUP_PATH" \
+          --arg bt "$BACKUP_TIME" \
+          --argjson bk "[]" \
+          '{docker_root: $dr, base_dns_name: $dns, backup_mode: $bm, backup_path: $bp, backup_time: $bt, backups: $bk}' > "$CONFIG_FILE"
         print_success "Configuration saved."
     fi
 }
@@ -133,6 +196,9 @@ function run_service_installation_phase() {
     echo "Docker Root: $DOCKER_ROOT"
     echo "Base DNS:    $BASE_DNS_NAME"
     echo "Services:    ${SERVICES_TO_INSTALL[*]}"
+    if [ "$BACKUP_MODE" != "none" ]; then
+        echo "Backup:      $BACKUP_MODE -> $BACKUP_PATH (@ $BACKUP_TIME)"
+    fi
     echo ""
     read -p "Press Enter to start installation..."
 
@@ -144,7 +210,10 @@ function run_service_installation_phase() {
     print_info "Installing Services..."
     export DOCKER_FOLDER="$DOCKER_ROOT"
     export BASE_DNS_NAME="$BASE_DNS_NAME"
-        
+    
+    # Capture current repo root to call scripts absolutely
+    REPO_ROOT=$(pwd)
+
     for SERVICE_DIR in "${SERVICES_TO_INSTALL[@]}"; do
         print_info "Installing $SERVICE_DIR..."
         if [ -d "$SERVICE_DIR" ]; then
@@ -158,11 +227,31 @@ function run_service_installation_phase() {
             else
                 print_warning "No install script found in $SERVICE_DIR"
             fi
+            
+            # Configure Backup for this Service if enabled
+            if [ "$BACKUP_MODE" != "none" ]; then
+                 # Construct absolute path to the likely data location in DOCKER_ROOT
+                 TARGET_DATA_DIR="$DOCKER_ROOT/$SERVICE_DIR"
+                 
+                 if [ -d "$TARGET_DATA_DIR" ]; then
+                      print_info "Configuring backup for $SERVICE_DIR..."
+                      sudo "$REPO_ROOT/scripts/backup-utils.sh" configure_service "$TARGET_DATA_DIR" "$BACKUP_PATH"
+                 else
+                      print_warning "Could not locate service data at $TARGET_DATA_DIR for backup configuration."
+                 fi
+            fi
+
             cd - > /dev/null
         else
             print_error "Directory $SERVICE_DIR not found!"
         fi
     done
+    
+    # Finalize Backup Schedule
+    if [ "$BACKUP_MODE" != "none" ]; then
+        print_info "Finalizing backup schedule..."
+        sudo "$REPO_ROOT/scripts/backup-utils.sh" finalize "$BACKUP_TIME"
+    fi
 
     print_success "Service installation complete!"
 }

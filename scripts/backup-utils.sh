@@ -152,28 +152,104 @@ function configure_service_backup() {
     chmod +x "$backup_script_path"
     print_success "Created backup script for $service_name"
     
-    # Add to Master Backup
-    mkdir -p "$(dirname "$MASTER_BACKUP_SCRIPT")"
-    if [ ! -f "$MASTER_BACKUP_SCRIPT" ]; then
-        echo "#!/bin/bash" > "$MASTER_BACKUP_SCRIPT"
-        echo "echo 'Starting Master Backup...'" >> "$MASTER_BACKUP_SCRIPT"
-        echo "mkdir -p $backup_root" >> "$MASTER_BACKUP_SCRIPT"
-        chmod +x "$MASTER_BACKUP_SCRIPT"
+    # Update config.json with this service backup
+    # Structure: { name: "service", script_path: "...", data_path: "..." }
+    local config_file="$HOME/.hsc/config.json"
+    
+    # Ensure config file exists
+    if [ ! -f "$config_file" ]; then
+         print_warning "Config file not found at $config_file. Skipping backup registration."
+         return
     fi
     
-    if ! grep -q "$backup_script_path" "$MASTER_BACKUP_SCRIPT"; then
-        echo "$backup_script_path" >> "$MASTER_BACKUP_SCRIPT"
-    fi
+    # We use a temporary file to avoid partial writes
+    local tmp_file=$(mktemp)
+    
+    # Use jq to update or append the entry. 
+    # We filter out existing entry for this service name if it exists, then add the new one.
+    jq --arg name "$service_name" \
+       --arg script "$backup_script_path" \
+       --arg data "$service_abs_path" \
+       '.backups = [.backups[] | select(.name != $name)] + [{name: $name, script_path: $script, data_path: $data}]' \
+       "$config_file" > "$tmp_file" && mv "$tmp_file" "$config_file"
+       
+    print_success "Registered $service_name in backup configuration."
 }
 
 function finalize_backup() {
-    local mode=$1
-    local path=$2
+    local schedule_time=$1
+
+    if [ -z "$schedule_time" ]; then
+        schedule_time="03:00"
+    fi
     
-    # Setup Cron
-    local cron_schedule="0 3 * * * $PWD/$MASTER_BACKUP_SCRIPT >> /var/log/master_backup.log 2>&1"
+    # Generate the Dynamic Master Backup Script
+    mkdir -p "$(dirname "$MASTER_BACKUP_SCRIPT")"
+    
+    cat > "$MASTER_BACKUP_SCRIPT" <<EOF
+#!/bin/bash
+# Master Backup Script - Dynamically runs backups from config.json
+
+CONFIG_FILE="\$HOME/.hsc/config.json"
+LOG_FILE="/var/log/master_backup.log"
+
+if [ ! -f "\$CONFIG_FILE" ]; then
+    echo "Config file not found: \$CONFIG_FILE"
+    exit 1
+fi
+
+if ! command -v jq &> /dev/null; then
+    echo "jq is required but not found."
+    exit 1
+fi
+
+echo "=========================================="
+echo "Starting Master Backup at \$(date)"
+echo "=========================================="
+
+# Read backup entries and iterate
+# We read row by row
+jq -c '.backups[]' "\$CONFIG_FILE" | while read -r entry; do
+    NAME=\$(echo "\$entry" | jq -r '.name')
+    SCRIPT=\$(echo "\$entry" | jq -r '.script_path')
+    DATA=\$(echo "\$entry" | jq -r '.data_path')
+    
+    echo "--- Backing up \$NAME ---"
+    
+    if [ -f "\$SCRIPT" ]; then
+        # Execute the backup script
+        # Note: If the backup script was generated with hardcoded paths, it uses them.
+        # If we wanted to override, we'd pass args here.
+        if "\$SCRIPT"; then
+             echo "SUCCESS: \$NAME backup completed."
+        else
+             echo "ERROR: \$NAME backup failed."
+        fi
+    else
+        echo "WARNING: Backup script not found for \$NAME at \$SCRIPT"
+    fi
+    echo ""
+done
+
+echo "Master Backup Completed at \$(date)"
+echo "=========================================="
+EOF
+
+    chmod +x "$MASTER_BACKUP_SCRIPT"
+    print_success "Master backup script updated at $PWD/$MASTER_BACKUP_SCRIPT"
+
+    # Convert HH:MM to Cron (assuming daily)
+    local hour=$(echo "$schedule_time" | cut -d: -f1)
+    local min=$(echo "$schedule_time" | cut -d: -f2)
+    
+    # Remove leading zeros
+    hour=$((10#$hour))
+    min=$((10#$min))
+    
+    local cron_schedule="$min $hour * * * $PWD/$MASTER_BACKUP_SCRIPT >> /var/log/master_backup.log 2>&1"
+    
     (crontab -l 2>/dev/null | grep -v "$MASTER_BACKUP_SCRIPT"; echo "$cron_schedule") | crontab -
-    print_success "Backup scheduled daily at 03:00."
+    print_success "Backup scheduled daily at $schedule_time ($min $hour * * *)."
 }
 
 # --- CLI Dispatch ---

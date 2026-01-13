@@ -52,16 +52,23 @@ chmod +x ./scripts/install-tailscale-client.sh
 ./scripts/install-docker.sh
 
 # 5. Install Tailscale
-./scripts/install-tailscale-client.sh
+read -p "Do you want to install the Tailscale client? (only relevant if you plan to use Tailscale or Headscale) [y/N] " INSTALL_TS
+if [[ "$INSTALL_TS" =~ ^[Yy]$ ]]; then
+    ./scripts/install-tailscale-client.sh
+    print_info "You may need to run 'tailscale up' to connect your machine to your Tailnet."
+else
+    print_info "Skipping Tailscale installation."
+fi
 
 echo -e "\n\n"
 print_success "All core installations are complete!"
-print_info "Remember to log out and back in for Docker group changes to apply."
-print_info "You may need to run 'tailscale up' to connect your machine to your Tailnet."
-
-print_info "You will now be prompted to install any applications you want to use."
-if [ "${SKIP_SERVICES}" != "true" ]; then
-    source ./install-services.sh
-else
-    print_info "Skipping interactive service selection (handled by parent script)."
-fi
+print_warning "------------------------------------------------------------------"
+print_warning " IMPORTANT: You must now log out and log back in."
+print_warning "------------------------------------------------------------------"
+print_info "This is required for Docker permissions to apply correctly."
+print_info "After logging back in, run 'install.sh' again to install services."
+echo ""
+read -n 1 -s -r -p "Press any key to log out now..."
+echo ""
+logout
+exit 0
