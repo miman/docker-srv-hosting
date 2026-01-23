@@ -12,6 +12,9 @@ else
   echo "The network local-ai-network already exists."
 fi
 
+# Ensure data directory exists
+mkdir -p "$DOCKER_FOLDER/ollama"
+
 # Prompt for Ollama UI installation
 read -p "Do you have an Nvidia GPU you want to use with Ollama (y/N)?  " answerNvidia
 echo "Deploying Docker container..."

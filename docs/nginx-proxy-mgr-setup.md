@@ -1,5 +1,7 @@
 # NGINX Proxy Manager (NPM) Setup
 
+This page descibes how to configure NGINX Proxy Manager (NPM) to reverse proxy internal and external services.
+
 ## Needs
 - Use human-readable DNS names (e.g., `hass.internal.example.com`) to access internal services.
 - Automate HTTPS (SSL/TLS) termination for all internal and external services.
@@ -26,16 +28,25 @@ cd nginx-reverse-proxy
 ```
 *The default login for a fresh NPM installation is usually `admin@example.com` / `changeme`.*
 
-### 3. Generate a Wildcard SSL Certificate
-To enable HTTPS for all subdomains without creating individual certificates:
-1.  Go to the **SSL Certificates** tab in NPM.
-2.  Click **Add SSL Certificate** > **Let's Encrypt**.
-3.  Enter your wildcard domain: `*.internal.duckdns.org` (and optionally the root `internal.duckdns.org`).
-4.  Enable **Use a DNS Challenge** (required for wildcard certificates).
-5.  Select your DNS provider (e.g., DuckDNS, Cloudflare) and provide the necessary API token.
-6.  Agree to the terms and click **Save**.
+### 3. Login to NPM
+Open your browser and navigate to `http://192.168.10.122:81` (or the port you configured during installation).
 
-### 4. Create Proxy Hosts
+Log in with the following username and password: Default username: admin@example.com. Default password: changeme
+
+### 4. Generate a Wildcard SSL Certificate
+To enable HTTPS for all subdomains without creating individual certificates:
+1.  Go to the **Certificates** tab in NPM.
+2.  Click **Add Certificate** > **Let's Encrypt via DNS**.
+3.  Enter your wildcard domain in "Domain Names": `*.internal.duckdns.org`
+4.  Select your DNS provider (e.g., DuckDNS, Cloudflare)
+5. enter your credentials in the **Credentials File Content** field
+  ```
+  dns_duckdns_token={your-token}
+   ```
+6. write 120 in **Propagation Seconds**
+7.  Agree to the terms and click **Save**.
+
+### 5. Create Proxy Hosts
 For each service you want to expose:
 1.  Go to the **Hosts** > **Proxy Hosts** tab.
 2.  **Domain Names:** `service.internal.duckdns.org`

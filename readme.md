@@ -6,45 +6,46 @@ These sub-projects contain docker-compose files used to host servers on your hom
 -  Keep your data private
 -  Run services even with no Internet
 
-## Prerequisites
+## Installation & Setup
 
-to ensure that all **.sh** files are executable on a Linux machine you need to run the following
-```
-cd scripts
-chmod +x ensure-executable.sh
-./ensure-executable.sh
-cd ..
-```
+1. **Start the Installer**
+   Run the main installation script. This serves as a unified entry point for setting up your environment, configuring backups, and installing services.
+   ```bash
+   chmod +x install.sh
+   ./install.sh
+   ```
 
-Then you should run the following which:
-* sets common environment variables
-* installs docker
-* installs tailscale client
+2. **Configuration Steps**
+   The script will guide you through:
+   - **Docker Root**: Where to store your service configuration and data (default: `~/docker_stacks`).
+   - **Base DNS**: Domain for your services (e.g., `example.duckdns.org`).
+   - **Backups**: 
+     - Choose between backing up to a **Dedicated Backup Disk** (formatted automatically) or an **Existing Folder**.
+     - Backups are automatically scheduled (defaults to daily at 03:00 AM).
 
-```
-./install-core.sh
-```
+3. **Service Selection**
+   - You will be presented with a list of available services (e.g., Immich, Home Assistant, Nextcloud).
+   - Select the services you want to install.
 
-## Usage
+### Smart Backups
+This project handles backups automatically for installed services.
+- **Auto-Discovery**: When you install a service via `install.sh`, a dedicated backup script is generated for it in its directory (e.g., `immich/backup.sh`).
+- **Context-Aware**:
+  - Services with Databases (Postgres) get a script that dumps the DB + syncs files.
+  - Other services get a smart Rsync backup.
+- **Master Schedule**: All active services are added to a master backup schedule (`backup/master-backup.sh`).
 
-### Use config from previous installations
+### Adding More Services Later
+Want to install another service later? Just run `./install.sh` again!
+- It detects your existing configuration.
+- It asks if you want to use the existing settings.
+- It skips directly to the service selection menu so you can add new apps quickly.
 
-Some services has support for inporting config from installations done on previous machines.
-
-For these you need to:
-1. Copy your config folders to the **backup** folder in this project (see the readme in that folder)
-2. go into the specific folders & run the scripts named **restore-from-backup.sh**
-
-This is supported for:
-* headscale
-* nginx-reverse-proxy
-
-### Install services
-To install the different services you just run, this will ask you for which services you want to install
-```
-./install.sh
-```
-It will use the common env settings you set in the install-core script
+### Restoring Data (Legacy Support)
+Some services support importing config from previous installations:
+1. Copy your config folders to the local `backup` folder.
+2. Go into the specific service folder & run `restore-from-backup.sh` (if available).
+This is supported for: `headscale`, `nginx-reverse-proxy`.
 
 ## Services
 

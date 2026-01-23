@@ -25,13 +25,6 @@ fi
 read -p "Enter the Headscale version to use [default: 0.27.1]: " HS_VERSION
 HS_VERSION=${HS_VERSION:-0.27.1}
 
-if [ -z "${BASE_DNS_NAME}" ]; then
-  read -p "Enter your domain name: " BASE_DNS_NAME
-fi
-
-# Ensure DOCKER_FOLDER is set
-source ../scripts/read-config.sh
-
 # Create a .env file for docker-compose variable substitution
 echo "Generating .env file for Headscale..."
 
