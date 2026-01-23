@@ -214,6 +214,7 @@ function run_service_installation_phase() {
     # Capture current repo root to call scripts absolutely
     REPO_ROOT=$(pwd)
 
+    export HSC_CONFIG_PATH="$CONFIG_FILE"
     for SERVICE_DIR in "${SERVICES_TO_INSTALL[@]}"; do
         print_info "Installing $SERVICE_DIR..."
         if [ -d "$SERVICE_DIR" ]; then
@@ -233,13 +234,18 @@ function run_service_installation_phase() {
                  # Construct absolute path to the likely data location in DOCKER_ROOT
                  TARGET_DATA_DIR="$DOCKER_ROOT/$SERVICE_DIR"
                  
+                 # Ensure directory exists (might be owned by root if created by docker daemon)
+                 # but we try to create it as user first if it doesn't exist
+                 [ ! -d "$TARGET_DATA_DIR" ] && mkdir -p "$TARGET_DATA_DIR" 2>/dev/null || true
+
                  if [ -d "$TARGET_DATA_DIR" ]; then
                       print_info "Configuring backup for $SERVICE_DIR..."
-                      sudo "$REPO_ROOT/scripts/backup-utils.sh" configure_service "$TARGET_DATA_DIR" "$BACKUP_PATH"
+                      sudo -E "$REPO_ROOT/scripts/backup-utils.sh" configure_service "$TARGET_DATA_DIR" "$BACKUP_PATH"
                  else
                       print_warning "Could not locate service data at $TARGET_DATA_DIR for backup configuration."
                  fi
             fi
+
 
             cd - > /dev/null
         else

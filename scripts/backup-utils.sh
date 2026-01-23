@@ -1,9 +1,27 @@
 #!/bin/bash
 # Backup Utilities for Docker Service Hosting
 
-BACKUP_SCRIPT_TEMPLATE_GENERIC="./scripts/templates/backup-generic.sh"
-BACKUP_SCRIPT_TEMPLATE_POSTGRES="./scripts/templates/backup-postgres.sh"
-MASTER_BACKUP_SCRIPT="backup/master-backup.sh"
+# Determine the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+
+BACKUP_SCRIPT_TEMPLATE_GENERIC="$REPO_ROOT/scripts/templates/backup-generic.sh"
+BACKUP_SCRIPT_TEMPLATE_POSTGRES="$REPO_ROOT/scripts/templates/backup-postgres.sh"
+# Use absolute path for the master backup script to avoid ambiguity in cron
+MASTER_BACKUP_SCRIPT="$REPO_ROOT/backup/master-backup.sh"
+
+
+# Find the config file path
+if [ -n "$HSC_CONFIG_PATH" ]; then
+    CONFIG_FILE="$HSC_CONFIG_PATH"
+else
+    # Fallback: if run via sudo, SUDO_USER might be set. 
+    # Otherwise use current HOME.
+    TARGET_USER="${SUDO_USER:-$USER}"
+    TARGET_HOME=$(eval echo "~$TARGET_USER")
+    CONFIG_FILE="$TARGET_HOME/.hsc/config.json"
+fi
+
 
 # --- Helper Functions ---
 function print_info() { echo -e "\e[34m[INFO]\e[0m $1"; }
@@ -154,7 +172,8 @@ function configure_service_backup() {
     
     # Update config.json with this service backup
     # Structure: { name: "service", script_path: "...", data_path: "..." }
-    local config_file="$HOME/.hsc/config.json"
+    local config_file="$CONFIG_FILE"
+
     
     # Ensure config file exists
     if [ ! -f "$config_file" ]; then
@@ -190,7 +209,8 @@ function finalize_backup() {
 #!/bin/bash
 # Master Backup Script - Dynamically runs backups from config.json
 
-CONFIG_FILE="\$HOME/.hsc/config.json"
+CONFIG_FILE="$CONFIG_FILE"
+
 LOG_FILE="/var/log/master_backup.log"
 
 if [ ! -f "\$CONFIG_FILE" ]; then
@@ -236,7 +256,7 @@ echo "=========================================="
 EOF
 
     chmod +x "$MASTER_BACKUP_SCRIPT"
-    print_success "Master backup script updated at $PWD/$MASTER_BACKUP_SCRIPT"
+    print_success "Master backup script updated at $MASTER_BACKUP_SCRIPT"
 
     # Convert HH:MM to Cron (assuming daily)
     local hour=$(echo "$schedule_time" | cut -d: -f1)
@@ -246,7 +266,7 @@ EOF
     hour=$((10#$hour))
     min=$((10#$min))
     
-    local cron_schedule="$min $hour * * * $PWD/$MASTER_BACKUP_SCRIPT >> /var/log/master_backup.log 2>&1"
+    local cron_schedule="$min $hour * * * $MASTER_BACKUP_SCRIPT >> /var/log/master_backup.log 2>&1"
     
     (crontab -l 2>/dev/null | grep -v "$MASTER_BACKUP_SCRIPT"; echo "$cron_schedule") | crontab -
     print_success "Backup scheduled daily at $schedule_time ($min $hour * * *)."
