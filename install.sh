@@ -13,6 +13,8 @@ AVAILABLE_SERVICES=(
     "portainer:Portainer"
     "portainer/portainer-agent:Portainer Agent"
     "ollama:Ollama"
+    "open-webui:Open WebUI"
+    "watchtower:Watchtower"
     "docmost:Docmost"
     "glance-dashboard:Glance Dashboard"
     "headscale:Headscale"

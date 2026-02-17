@@ -48,6 +48,7 @@ else
 fi
 
 prompt_install "Ollama" "ollama" "./install.sh"
+prompt_install "open-webui" "open-webui" "./install.sh"
 # prompt_install "Nextcloud" "nextcloud" "./install.sh"
 prompt_install "Nextcloud AIO" "nextcloud-aio" "./install.sh"
 prompt_install "nginx reverse-proxy" "nginx-reverse-proxy" "./install.sh"
@@ -63,3 +64,4 @@ prompt_install "Docmost" "docmost" "./install.sh"
 prompt_install "Linux in Docker" "linux-in-docker" "./install.sh"
 prompt_install "Registry" "registry" "./install.sh"
 prompt_install "Verdaccio" "verdaccio" "./install.sh"
+prompt_install "Watchtower" "watchtower" "./install.sh"
