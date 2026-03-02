@@ -4,6 +4,9 @@ set -e
 # Ensure DOCKER_FOLDER is set
 source ../../scripts/read-config.sh
 
+# Ask if Watchtower should manage this service
+ask_watchtower_label
+
 HEADSCALE_DATA_PATH="$DOCKER_FOLDER/headscale"
 HEADPLANE_CONFIG_DIR="$HEADSCALE_DATA_PATH/headplane-config"
 HEADPLANE_CONFIG_FILE="$HEADPLANE_CONFIG_DIR/config.yaml"

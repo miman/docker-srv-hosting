@@ -4,6 +4,9 @@ set -e
 # Ensure DOCKER_FOLDER is set
 source ../scripts/read-config.sh
 
+# Ask if Watchtower should manage this service
+ask_watchtower_label
+
 # Set the config path based on DOCKER_FOLDER
 CONFIG_PATH="$DOCKER_FOLDER/vaultwarden"
 mkdir -p "$CONFIG_PATH"

@@ -6,6 +6,14 @@
 # This script is intended to be sourced by other scripts, e.g.:
 # source scripts/read-config.sh
 
+# Source Watchtower utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/watchtower-utils.sh" ]; then
+    source "$SCRIPT_DIR/watchtower-utils.sh"
+elif [ -f "$SCRIPT_DIR/scripts/watchtower-utils.sh" ]; then
+    source "$SCRIPT_DIR/scripts/watchtower-utils.sh"
+fi
+
 # Check if DOCKER_FOLDER is set, otherwise read from config
 if [ -z "$DOCKER_FOLDER" ]; then
     CONFIG_FILE="$HOME/.hsc/config.json"

@@ -1,0 +1,4 @@
+services:
+  ollama-container:
+    labels:
+      - com.centurylinklabs.watchtower.enable=true

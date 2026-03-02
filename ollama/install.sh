@@ -5,6 +5,9 @@ set -e
 # Ensure DOCKER_FOLDER is set
 source ../scripts/read-config.sh
 
+# Ask if Watchtower should manage this service
+ask_watchtower_label
+
 # Ensure the docker network "local-ai-network" exists
 if ! docker network ls --filter name=local-ai-network --format '{{.Name}}' | grep -q "^local-ai-network$"; then
   docker network create local-ai-network
@@ -20,9 +23,16 @@ read -p "Do you have an Nvidia GPU you want to use with Ollama (y/N)?  " answerN
 echo "Deploying Docker container..."
 if [[ "$answerNvidia" =~ [Yy]$ ]]; then
   echo "Using Nvidia card in Ollama"
-  COMPOSE_PART=-f docker-compose.yaml -f docker-compose-nvidia.yaml
+  COMPOSE_PART="-f docker-compose.yaml -f docker-compose-nvidia.yaml"
 else
-  COMPOSE_PART=
+  COMPOSE_PART="-f docker-compose.yaml"
+fi
+
+# Include override if it exists
+if [ -f "docker-compose.override.yml" ]; then
+  COMPOSE_PART="$COMPOSE_PART -f docker-compose.override.yml"
+elif [ -f "docker-compose.override.yaml" ]; then
+  COMPOSE_PART="$COMPOSE_PART -f docker-compose.override.yaml"
 fi
 # echo "COMPOSE_PART = $COMPOSE_PART"
 

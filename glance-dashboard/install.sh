@@ -4,6 +4,9 @@ set -e
 # Ensure DOCKER_FOLDER is set
 source ../scripts/read-config.sh
 
+# Ask if Watchtower should manage this service
+ask_watchtower_label
+
 # Define and create the data directory for Glance
 GLANCE_DATA_DIR="$DOCKER_FOLDER/glance-dashboard"
 mkdir -p "$GLANCE_DATA_DIR"

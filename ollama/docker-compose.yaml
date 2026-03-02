@@ -16,4 +16,4 @@ services:
 # We create a specific network for these Docker containers to communicate over called local-ai-network
 networks:
   local-ai-network:
-    external: false
+    external: true

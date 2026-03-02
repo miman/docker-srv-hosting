@@ -4,6 +4,9 @@ set -e
 # Ensure DOCKER_FOLDER is set
 source ../scripts/read-config.sh
 
+# Ask if Watchtower should manage this service
+ask_watchtower_label
+
 # --- Check for local Tailscale client and reconfigure port ---
 # This is to avoid a port conflict if a local tailscale client is running,
 # as Headscale also uses port 41641 for coordination.

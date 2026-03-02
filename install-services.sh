@@ -20,6 +20,8 @@ prompt_install() {
   if [[ "$answer" =~ ^[Yy]$ ]]; then
     echo "Installing ${name} as a Docker container..."
     if cd "$dir"; then
+      # Ask for Watchtower label before running the install script
+      ask_watchtower_label
       $script
       cd ..
     else

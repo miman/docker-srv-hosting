@@ -4,6 +4,9 @@ set -e
 # Ensure DOCKER_FOLDER is set
 source ../scripts/read-config.sh
 
+# Ask if Watchtower should manage this service
+ask_watchtower_label
+
 # Set the Portainer data root based on DOCKER_FOLDER
 export PORTAINER_DATA_ROOT="$DOCKER_FOLDER/portainer"
 mkdir -p "$PORTAINER_DATA_ROOT/data"

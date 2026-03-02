@@ -1,0 +1,17 @@
+{
+  "name": "docker-srv-hosting",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest",
+      "enableNonRootDocker": true
+    }
+  },
+  "runArgs": [
+    "--name",
+    "docker-srv-hosting"
+  ],
+  "containerUser": "root",
+  "remoteUser": "vscode",
+  "postCreateCommand": "echo 'alias ll=\"ls -al\"' >> ~/.bashrc"
+}
