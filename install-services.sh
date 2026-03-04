@@ -51,6 +51,7 @@ fi
 
 prompt_install "Ollama" "ollama" "./install.sh"
 prompt_install "open-webui" "open-webui" "./install.sh"
+prompt_install "SearXNG" "searxng" "./install.sh"
 # prompt_install "Nextcloud" "nextcloud" "./install.sh"
 prompt_install "Nextcloud AIO" "nextcloud-aio" "./install.sh"
 prompt_install "nginx reverse-proxy" "nginx-reverse-proxy" "./install.sh"

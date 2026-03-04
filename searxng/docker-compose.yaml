@@ -1,0 +1,15 @@
+services:
+  searxng:
+    container_name: searxng
+    image: searxng/searxng:latest
+    restart: always
+    ports:
+      - "4520:8080"
+    volumes:
+      - ${DOCKER_FOLDER}/searxng/settings.yml:/etc/searxng/settings.yml
+    networks:
+      - local-ai-network
+
+networks:
+  local-ai-network:
+    external: true

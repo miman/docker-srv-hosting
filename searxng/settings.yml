@@ -1,0 +1,10 @@
+use_default_settings: true
+server:
+  secret_key: "replace-with-your-passw" # Write your wanted password
+  limiter: false # Disable limitations for local use
+  image_proxy: true
+search:
+  formats:
+    - html
+    - json # This is required for Open WebUI to understand the answers
+    

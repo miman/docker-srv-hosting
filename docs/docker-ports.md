@@ -15,6 +15,7 @@ This document lists the default ports used by each service installed via Docker 
 | Traccar          | 8082              | 4411         | Traccar, for geo-tracking of mobile devices                        |
 | Vaultwarden      | 80                | 4410         | Vaultwarden password manager, like Bitwarden                       |
 | Docmost          | 3000              | 4412         | Docmost, for documentation like a Wiki                             |
+| SearXNG          | 8080              | 4520         | SearXNG, a privacy-respecting metasearch engine                    |
 
 **Note:**
 
