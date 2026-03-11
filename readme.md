@@ -58,14 +58,18 @@ This is supported for: `headscale`, `nginx-reverse-proxy`.
 | [Immich](https://immich.app/)              | Self-hosted photo & video backup                       |
 | Linux-in-Docker     | Lightweight Linux desktop in Docker with Web UI        |
 | [Nextcloud](https://nextcloud.com/)           | File sync and collaboration suite                      |
+| Nextcloud AIO       | Easy-to-deploy Nextcloud All-in-One version            |
 | [Nginx Reverse Proxy](https://nginxproxymanager.com/) | Reverse proxy for web services                         |
 | [Ollama LLM server](https://ollama.com/)   | Local LLM (AI) server                                  |
 | [Open WebUI for Ollama](https://github.com/open-webui/open-webui)   | Web interface for Ollama LLM                           |
 | [Portainer](https://portainer.io/)           | Docker management srv OR Agent                         |
 | Registry           | Local Docker registry                         |
+| [SearXNG](https://searxng.github.io/searxng/)   | Privacy-respecting metasearch engine (used for web search in local AI)                  |
+| [Synapse](https://matrix.org/docs/projects/server/synapse) | Matrix homeserver for secure communication (chat/video)  |
 | [Traccar](https://traccar.org/)             | GPS tracking platform                                  |
 | [Vaultwarden](https://github.com/dani-garcia/vaultwarden)         | Self-hosted password manager                           |
 | [Verdaccio](https://www.verdaccio.org/)         | Local NPM registry                           |
+| [Watchtower](https://containrrr.dev/watchtower/) | Automates Docker container image updates               |
 
 ### Overview
 

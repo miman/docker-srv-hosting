@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 REM List of services and their install scripts
-set SERVICES=Ollama open-webui watchtower NextCloud nginx-reverse-proxy home-assistant immich portainer glance-dashboard headscale traccar vaultwarden docmost
+set SERVICES=Ollama open-webui watchtower NextCloud nextcloud-aio nginx-reverse-proxy home-assistant immich portainer glance-dashboard headscale traccar vaultwarden docmost registry verdaccio linux-in-docker searxng synapse
 
 for %%S in (%SERVICES%) do (
   set "FOLDER=%%S"
@@ -12,6 +12,7 @@ for %%S in (%SERVICES%) do (
   if /I "%%S"=="glance-dashboard" set "SERVICE_PROMPT=Glance Dashboard"
   if /I "%%S"=="home-assistant" set "SERVICE_PROMPT=Home Assistant"
   if /I "%%S"=="nextcloud" set "SERVICE_PROMPT=Nextcloud"
+  if /I "%%S"=="nextcloud-aio" set "SERVICE_PROMPT=Nextcloud AIO"
   if /I "%%S"=="ollama" set "SERVICE_PROMPT=Ollama"
   if /I "%%S"=="open-webui" set "SERVICE_PROMPT=Open WebUI"
   if /I "%%S"=="immich" set "SERVICE_PROMPT=Immich"
@@ -23,6 +24,9 @@ for %%S in (%SERVICES%) do (
   if /I "%%S"=="registry" set "SERVICE_PROMPT=Registry"
   if /I "%%S"=="watchtower" set "SERVICE_PROMPT=Watchtower"
   if /I "%%S"=="synapse" set "SERVICE_PROMPT=Synapse"
+  if /I "%%S"=="verdaccio" set "SERVICE_PROMPT=Verdaccio"
+  if /I "%%S"=="linux-in-docker" set "SERVICE_PROMPT=Linux in Docker"
+  if /I "%%S"=="searxng" set "SERVICE_PROMPT=SearXNG"
   
   set /p "answer=Do you want to install !SERVICE_PROMPT! (y/N)? "
   if /i "!answer!" EQU "Y" (

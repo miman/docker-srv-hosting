@@ -18,7 +18,7 @@ Or run it directly using Docker Compose:
 docker compose up -d
 ```
 
-Once running, SearXNG will be accessible at: `http://localhost:4520`
+Once running, SearXNG will be accessible at: `http://localhost:4522`
 
 ---
 

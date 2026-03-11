@@ -23,4 +23,4 @@ echo "Deploying SearXNG Docker container..."
 docker compose down
 docker compose pull
 docker compose up -d --force-recreate --build
-echo "SearXNG has been installed and is accessible on http://localhost:4520"
+echo "SearXNG has been installed and is accessible on http://localhost:4522"

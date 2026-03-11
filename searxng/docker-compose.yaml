@@ -4,7 +4,7 @@ services:
     image: searxng/searxng:latest
     restart: always
     ports:
-      - "4520:8080"
+      - "4522:8080"
     volumes:
       - ${DOCKER_FOLDER}/searxng/settings.yml:/etc/searxng/settings.yml
     networks:
