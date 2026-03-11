@@ -22,6 +22,7 @@ for %%S in (%SERVICES%) do (
   if /I "%%S"=="docmost" set "SERVICE_PROMPT=Docmost"
   if /I "%%S"=="registry" set "SERVICE_PROMPT=Registry"
   if /I "%%S"=="watchtower" set "SERVICE_PROMPT=Watchtower"
+  if /I "%%S"=="synapse" set "SERVICE_PROMPT=Synapse"
   
   set /p "answer=Do you want to install !SERVICE_PROMPT! (y/N)? "
   if /i "!answer!" EQU "Y" (

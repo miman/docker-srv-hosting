@@ -8,3 +8,6 @@ docmost/docmost
 backup/*
 !backup/readme.md
 
+# Local Docker Compose Overrides
+docker-compose.override.yml
+docker-compose.override.yaml
