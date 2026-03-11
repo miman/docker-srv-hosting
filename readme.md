@@ -6,6 +6,31 @@ These sub-projects contain docker-compose files used to host servers on your hom
 -  Keep your data private
 -  Run services even with no Internet
 
+### Core idea of this repo
+The core idea is to automatically setup a local cloud with most services you would use cloud services for, like:
+-  File storage (Nextcloud)
+-  Chat (Synapse)
+-  Password manager (Vaultwarden)
+-  Document storage (Docmost)
+-  Photo/Video storage (Immich)
+-  GPS tracking (Traccar)
+-  Home automation (Home Assistant)
+-  AI (Ollama)
+
+For this to secure & easy to maintain, it can also install these services:
+- Secure network (Headscale)
+- Giving all services a nice URL & enable HTTPS support (Reverse proxy with Nginx Proxy Manager)
+- Docker management (Portainer)
+- Auto-update Docker images (Watchtower)
+
+### Volume folders & Backup
+
+You can decide where the root folder for all volumes should be. This is where all your service data is stored. 
+
+This enables you to recereate teh Docker containers without loosing any data.
+
+You can also select to automatically do backup of the volumes to a dedicated backup disk or an existing folder.
+
 ## Installation & Setup
 
 1. **Start the Installer**
