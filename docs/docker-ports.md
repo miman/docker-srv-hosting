@@ -24,6 +24,7 @@ This document lists the default ports used by each service installed via Docker 
 | Registry UI      | 80                | 6001         | Web UI for the local Docker registry                               |
 | Linux in Docker  | 3000, 3001        | 3000, 3001   | webtop (Ubuntu XFCE) in Docker                                     |
 | Watchtower       | N/A               | N/A          | Automation for Docker container images                              |
+| ComfyUI         | 8188              | 4515         | ComfyUI, a powerful and modular stable diffusion GUI/backend        |
 
 **Note:**
 

@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 REM List of services and their install scripts
-set SERVICES=Ollama open-webui watchtower NextCloud nextcloud-aio nginx-reverse-proxy home-assistant immich portainer glance-dashboard headscale traccar vaultwarden docmost registry verdaccio linux-in-docker searxng synapse
+set SERVICES=Ollama open-webui watchtower NextCloud nextcloud-aio nginx-reverse-proxy home-assistant immich portainer glance-dashboard headscale traccar vaultwarden docmost registry verdaccio linux-in-docker searxng comfy_ui synapse
 
 for %%S in (%SERVICES%) do (
   set "FOLDER=%%S"

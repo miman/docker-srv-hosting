@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Check if we can connect to Docker
 if ! docker info >/dev/null 2>&1; then
@@ -14,15 +15,13 @@ fi
 prompt_install() {
   local name="$1"
   local dir="$2"
-  local script="$3"  # Script to execute in the directory (e.g. ./install.sh)
+  local script="$3"
 
   read -p "Do you want to install ${name} (y/N)? " answer
   if [[ "$answer" =~ ^[Yy]$ ]]; then
     echo "Installing ${name} as a Docker container..."
     if cd "$dir"; then
-      # Ask for Watchtower label before running the install script
-      ask_watchtower_label
-      $script
+      eval "$script"
       cd ..
     else
       echo "Failed to enter directory: ${dir}"
@@ -52,8 +51,8 @@ fi
 prompt_install "Ollama" "ollama" "./install.sh"
 prompt_install "open-webui" "open-webui" "./install.sh"
 prompt_install "SearXNG" "searxng" "./install.sh"
+prompt_install "ComfyUI" "comfy_ui" "./install.sh"
 prompt_install "Synapse" "synapse" "./install.sh"
-# prompt_install "Nextcloud" "nextcloud" "./install.sh"
 prompt_install "Nextcloud AIO" "nextcloud-aio" "./install.sh"
 prompt_install "nginx reverse-proxy" "nginx-reverse-proxy" "./install.sh"
 prompt_install "Home Assistant" "home-assistant" "./install.sh"

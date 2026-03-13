@@ -15,7 +15,7 @@ The core idea is to automatically setup a local cloud with most services you wou
 -  Photo/Video storage (Immich)
 -  GPS tracking (Traccar)
 -  Home automation (Home Assistant)
--  AI (Ollama)
+-  AI (Ollama & ComfyUI)
 
 For this to secure & easy to maintain, it can also install these services:
 - Secure network (Headscale)
@@ -95,6 +95,7 @@ This is supported for: `headscale`, `nginx-reverse-proxy`.
 | [Vaultwarden](https://github.com/dani-garcia/vaultwarden)         | Self-hosted password manager                           |
 | [Verdaccio](https://www.verdaccio.org/)         | Local NPM registry                           |
 | [Watchtower](https://containrrr.dev/watchtower/) | Automates Docker container image updates               |
+| [ComfyUI](https://github.com/comfyanonymous/ComfyUI) | Powerful and modular stable diffusion GUI/backend |
 
 ### Overview
 

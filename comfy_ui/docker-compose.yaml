@@ -1,0 +1,22 @@
+services:
+  comfy-ui:
+    build: .
+    container_name: comfy-ui
+    restart: unless-stopped
+    ports:
+      - "4515:8188"
+    volumes:
+      - ${DOCKER_FOLDER}/comfy_ui/models:/app/models
+      - ${DOCKER_FOLDER}/comfy_ui/custom_nodes:/app/custom_nodes
+      - ${DOCKER_FOLDER}/comfy_ui/input:/app/input
+      - ${DOCKER_FOLDER}/comfy_ui/output:/app/output
+      - ${DOCKER_FOLDER}/comfy_ui/user:/app/user
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    networks:
+      - local-ai-network
+
+networks:
+  local-ai-network:
+    external: true

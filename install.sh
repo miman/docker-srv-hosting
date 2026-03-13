@@ -26,6 +26,7 @@ AVAILABLE_SERVICES=(
     "nginx-reverse-proxy:Nginx Reverse Proxy"
     "registry:Registry"
     "searxng:SearXNG"
+    "comfy_ui:ComfyUI"
     "synapse:Synapse"
     "traccar:Traccar"
     "vaultwarden:Vaultwarden"
