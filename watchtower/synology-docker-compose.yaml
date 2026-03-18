@@ -1,16 +1,34 @@
 services:
   watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
+    image: containrrr/watchtower:latest
+    container_name: containrrr_watchtower
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
+      # Time config (Important for Synology logs)
+      - TZ=Europe/Stockholm
+      # Added delay to not get an error when the ,atrix server is updated
+      - WATCHTOWER_NOTIFICATIONS_DELAY=180
+      
+      # Notification settings
+      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - WATCHTOWER_NOTIFICATION_URL=matrix://${MATRIX_USER}:${MATRIX_PASS}@${MATRIX_HOST}/?rooms=${MATRIX_ROOM_ID}
+      
+      # How often should it look? (Here: Every night at 04:00)
+      - WATCHTOWER_SCHEDULE=0 0 4 * * *
+      
+      # Remove old images after update (Saves space on your NAS!)
       - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_POLL_INTERVAL=86400 
-      - WATCHTOWER_LABEL_ENABLE=true
-    restart: unless-stopped
+      
+      # Optional: Do not update Watchtower itself (to avoid loops)
+      - WATCHTOWER_EXCLUDE_NAMES=containrrr_watchtower
+    
+    # Run as root (required on Synology to reach docker.sock)
+    user: "0:0"
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+        
