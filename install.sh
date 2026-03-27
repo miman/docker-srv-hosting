@@ -169,7 +169,7 @@ function run_configuration_phase() {
         fi
 
         check_jq
-        # Initialize with empty backups array if creating new
+        # Initialize with empty backups array and watchtower_configs if creating new
         jq -n \
           --arg dr "$DOCKER_ROOT" \
           --arg dns "$BASE_DNS_NAME" \
@@ -177,7 +177,7 @@ function run_configuration_phase() {
           --arg bp "$BACKUP_PATH" \
           --arg bt "$BACKUP_TIME" \
           --argjson bk "[]" \
-          '{docker_root: $dr, base_dns_name: $dns, backup_mode: $bm, backup_path: $bp, backup_time: $bt, backups: $bk}' > "$CONFIG_FILE"
+          '{docker_root: $dr, base_dns_name: $dns, backup_mode: $bm, backup_path: $bp, backup_time: $bt, backups: $bk, watchtower_configs: {}}' > "$CONFIG_FILE"
         print_success "Configuration saved."
     fi
 }

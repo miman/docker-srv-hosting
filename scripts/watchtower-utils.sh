@@ -16,29 +16,70 @@ ask_watchtower_label() {
     # Determine project name (folder name)
     local project_name=$(basename "$(pwd)")
     
-    # Check if a container for this project is already running or exists
-    # We check for containers that match the project name exactly or prefixed (project-service-1)
-    if docker ps -a --format '{{.Names}}' | grep -q -E "^(${project_name}|${project_name}-)"; then
-        return 0
+    # Path to the config file
+    local CONFIG_FILE="${HSC_CONFIG_PATH:-$HOME/.hsc/config.json}"
+    
+    local want_watchtower="null"
+    
+    # Try to read existing choice from config
+    if [ -f "$CONFIG_FILE" ] && command -v jq > /dev/null; then
+        local current_choice=$(jq -r ".watchtower_configs[\"$project_name\"]" "$CONFIG_FILE" 2>/dev/null)
+        
+        if [ "$current_choice" != "null" ] && [ -n "$current_choice" ]; then
+            # If we already have a choice, only re-ask if the flag was passed
+            if [ "$HSC_ASK_WATCHTOWER" == "true" ]; then
+                local status_str="DISABLED"
+                [ "$current_choice" == "true" ] && status_str="ENABLED"
+                
+                echo ""
+                read -p "Watchtower is currently ${status_str} for '${project_name}'. Do you want to change this? (y/N) " change_answer
+                if [[ "$change_answer" =~ ^[Yy]$ ]]; then
+                    read -p "Do you want Watchtower to automatically update '${project_name}'? (y/N) " answer
+                    if [[ "$answer" =~ ^[Yy]$ ]]; then
+                        want_watchtower="true"
+                    else
+                        want_watchtower="false"
+                    fi
+                else
+                    want_watchtower="$current_choice"
+                fi
+            else
+                # Default behavior: use the existing choice without asking
+                want_watchtower="$current_choice"
+            fi
+        fi
     fi
 
-    echo ""
-    read -p "Do you want Watchtower to automatically update '${project_name}'? (y/N) " answer
-    if [[ "$answer" =~ ^[Yy]$ ]]; then
+    # If no choice yet (not in config or file missing), ask the question
+    if [ "$want_watchtower" == "null" ]; then
+        echo ""
+        read -p "Do you want Watchtower to automatically update '${project_name}'? (y/N) " answer
+        if [[ "$answer" =~ ^[Yy]$ ]]; then
+            want_watchtower="true"
+        else
+            want_watchtower="false"
+        fi
+    fi
+
+    # Save to config.json
+    if [ -f "$CONFIG_FILE" ] && command -v jq > /dev/null; then
+        # Ensure watchtower_configs object exists
+        if ! jq -e '.watchtower_configs' "$CONFIG_FILE" >/dev/null 2>&1; then
+            local tmp=$(mktemp)
+            jq '. + {watchtower_configs: {}}' "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
+        fi
+        # Save the choice
+        local tmp=$(mktemp)
+        jq ".watchtower_configs[\"$project_name\"] = $want_watchtower" "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
+    fi
+
+    if [ "$want_watchtower" == "true" ]; then
         echo "Enabling Watchtower for ${project_name}..."
-        
-        # Create docker-compose.override.yml
-        # Note: We assume the main service in the compose file has a name related to the project
-        # or we just apply it to all services defined in the override.
-        # However, a simpler override that targets the expected service name is better.
-        # For now, we will create a generic override that the user might need to adjust 
-        # but usually the service name matches the folder name or is common.
         
         # Try to find the first service name in the compose file
         local main_service=$(grep -m 1 "^  [a-zA-Z0-9_-]\+:" "$COMPOSE_FILE" | sed 's/  //;s/://')
         
         if [ -z "$main_service" ]; then
-            # Fallback to project name if we can't parse one
             main_service="$project_name"
         fi
 
@@ -54,5 +95,6 @@ EOF
         echo "Created $OVERRIDE_FILE with Watchtower label."
     else
         echo "Watchtower will not manage ${project_name}."
+        rm -f "docker-compose.override.yml" "docker-compose.override.yaml" 2>/dev/null
     fi
 }

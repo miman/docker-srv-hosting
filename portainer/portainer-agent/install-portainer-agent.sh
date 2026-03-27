@@ -1,13 +1,16 @@
-# Docker run command to install the Portainer Agent
-#
-# This command deploys the Portainer Agent container, making the Docker environment
-# it runs on manageable by a central Portainer Server instance.
+#!/bin/bash
+set -e
 
-docker run -d \
-  -p 9001:9001 \
-  --name portainer_agent \
-  --restart always \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -v /var/lib/docker/volumes:/var/lib/docker/volumes \
-  portainer/agent
-  
+# Ensure DOCKER_FOLDER is set
+source ../../scripts/read-config.sh
+
+# Ask if Watchtower should manage this service
+ask_watchtower_label
+
+echo "Deploying Portainer Agent Docker container..."
+
+docker compose down
+docker compose pull
+docker compose up -d --force-recreate
+
+echo "Portainer Agent has been installed and is accessible on port 9001"

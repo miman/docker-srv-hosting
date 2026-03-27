@@ -52,6 +52,12 @@ You can also select to automatically do backup of the volumes to a dedicated bac
    - You will be presented with a list of available services (e.g., Immich, Home Assistant, Nextcloud).
    - Select the services you want to install.
 
+### Advanced Options
+- **`-askwatchtower`**: By default, the installer remembers your Watchtower preference for each service in `config.json`. If you want to change these settings for already-installed services, run the installer with this flag:
+  ```bash
+  ./install.sh -askwatchtower
+  ```
+
 ### Smart Backups
 This project handles backups automatically for installed services.
 - **Auto-Discovery**: When you install a service via `install.sh`, a dedicated backup script is generated for it in its directory (e.g., `immich/backup.sh`).
