@@ -1,0 +1,26 @@
+services:
+  lyra-engine:
+    image: nv-tlabs/lyra-2.0:latest
+    container_name: lyra_webui
+    # Your 5070 Ti needs the NVIDIA runtime to access CUDA
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    ports:
+      - "7860:7860" # Main Web UI
+      - "8188:8188" # Optional API/Backend access
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
+      # Recommended optimization for 16GB VRAM (5070 Ti)
+      - LYRA_PRECISION=fp4 
+      - USE_FLASH_ATTENTION=1
+    volumes:
+      - ./models:/app/models     # Persistent storage for weights (~50GB)
+      - ./outputs:/app/outputs   # Where your 3D meshes/splats are saved
+    shm_size: '16gb' # Critical for 3D Gaussian Splatting memory handling
+    restart: no
