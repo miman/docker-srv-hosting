@@ -9,7 +9,12 @@ services:
       - WATCHTOWER_POLL_INTERVAL=86400
       - WATCHTOWER_LABEL_ENABLE=true
       - DOCKER_API_VERSION=1.53
+      - WATCHTOWER_HTTP_API_UPDATE=true
+      - WATCHTOWER_HTTP_API_PERIODIC_POLLS=true
+      - WATCHTOWER_HTTP_API_TOKEN=hsc-update-token
       # - WATCHTOWER_DEBUG=true
+    ports:
+      - "127.0.0.1:8080:8080"
     restart: unless-stopped
     logging:
       driver: "json-file"

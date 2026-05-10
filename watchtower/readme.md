@@ -53,3 +53,24 @@ Here is a description on the env variables used in the docker compose file
 |WATCHTOWER_CLEANUP	| When set to true, Watchtower deletes the old image after it pulls the new one. Without this, your hard drive would eventually fill up with multiple versions of the same app. |
 | WATCHTOWER_POLL_INTERVAL	| Defines how often (in seconds) Watchtower checks for updates. 86400 seconds equals exactly 24 hours. |
 |WATCHTOWER_LABEL_ENABLE |	This is a "safety first" setting. When true, Watchtower will only update containers that have a specific Docker label (com.centurylinklabs.watchtower.enable=true). It prevents it from accidentally updating everything on your system. |
+| DOCKER_API_VERSION | Sets the Docker API version. Required for compatibility with some Docker environments. |
+| WATCHTOWER_HTTP_API_UPDATE | Enables the HTTP API for triggering updates manually. |
+| WATCHTOWER_HTTP_API_PERIODIC_POLLS | Ensures that the periodic timer still runs even when the HTTP API is enabled. |
+| WATCHTOWER_HTTP_API_TOKEN | A security token required to authorize requests to the HTTP API. |
+| WATCHTOWER_DEBUG | When enabled, provides verbose logging for troubleshooting. |
+
+## HTTP API & Manual Triggers
+Watchtower is configured with an HTTP API enabled on port `8080` (bound to `localhost`). This allows you to force an update check immediately instead of waiting for the 24-hour timer.
+
+### Trigger Script
+You can use the included script to trigger an update:
+```bash
+./trigger-update.sh
+```
+
+### Automation (Run on Startup)
+To make Watchtower check for updates 3 minutes after every system boot, add the following to your crontab (`crontab -e`):
+```bash
+@reboot sleep 180 && /path/to/watchtower/trigger-update.sh
+```
+
