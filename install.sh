@@ -79,9 +79,12 @@ function run_configuration_phase() {
         check_jq
         EXISTING_DOCKER_ROOT=$(get_config_val "docker_root")
         EXISTING_DNS=$(get_config_val "base_dns_name")
-        EXISTING_BACKUP_MODE=$(get_config_val "backup_mode" || echo "none")
-        EXISTING_BACKUP_PATH=$(get_config_val "backup_path" || echo "")
-        EXISTING_BACKUP_TIME=$(get_config_val "backup_time" || echo "03:00")
+        EXISTING_BACKUP_MODE=$(get_config_val "backup_mode")
+        [ "$EXISTING_BACKUP_MODE" == "null" ] && EXISTING_BACKUP_MODE="none"
+        EXISTING_BACKUP_PATH=$(get_config_val "backup_path")
+        [ "$EXISTING_BACKUP_PATH" == "null" ] && EXISTING_BACKUP_PATH=""
+        EXISTING_BACKUP_TIME=$(get_config_val "backup_time")
+        [ "$EXISTING_BACKUP_TIME" == "null" ] && EXISTING_BACKUP_TIME="03:00"
         
         if [ -n "$EXISTING_DOCKER_ROOT" ] && [ "$EXISTING_DOCKER_ROOT" != "null" ]; then
             echo "Existing configuration found:"

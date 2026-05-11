@@ -108,7 +108,10 @@ function configure_service_backup() {
     # Simple heuristic: check for docker-compose.yml content or directory structure
     # If it has a postgres container, use postgres template.
     # ideally we check specific services known to use postgres.
-    if grep -q "postgres" "$service_dir/docker-compose.yml" 2>/dev/null; then
+    local compose_file="$service_dir/docker-compose.yml"
+    [ ! -f "$compose_file" ] && compose_file="$service_dir/docker-compose.yaml"
+
+    if [ -f "$compose_file" ] && grep -q "postgres" "$compose_file" 2>/dev/null; then
          template="$BACKUP_SCRIPT_TEMPLATE_POSTGRES"
     fi
     
@@ -160,7 +163,7 @@ function configure_service_backup() {
     # DB Specific replacements?
     # We might need to parse docker-compose to find container name.
     # Fallback: prompt or simple "grep"
-    local db_container=$(grep -oE "container_name:.*postgres.*" "$service_dir/docker-compose.yml" | head -n 1 | awk '{print $2}')
+    local db_container=$(grep -oE "container_name:.*postgres.*" "$compose_file" 2>/dev/null | head -n 1 | awk '{print $2}')
     if [ -z "$db_container" ]; then
          # Try to guess based on service name
          db_container="${service_name}_postgres"
@@ -186,10 +189,11 @@ function configure_service_backup() {
     
     # Use jq to update or append the entry. 
     # We filter out existing entry for this service name if it exists, then add the new one.
+    # We also ensure .backups exists by defaulting it to an empty array.
     jq --arg name "$service_name" \
        --arg script "$backup_script_path" \
        --arg data "$service_abs_path" \
-       '.backups = [.backups[] | select(.name != $name)] + [{name: $name, script_path: $script, data_path: $data}]' \
+       '(.backups // []) as $backups | .backups = ([$backups[] | select(.name != $name)] + [{name: $name, script_path: $script, data_path: $data}])' \
        "$config_file" > "$tmp_file" && mv "$tmp_file" "$config_file"
        
     print_success "Registered $service_name in backup configuration."
@@ -198,7 +202,7 @@ function configure_service_backup() {
 function finalize_backup() {
     local schedule_time=$1
 
-    if [ -z "$schedule_time" ]; then
+    if [ -z "$schedule_time" ] || [ "$schedule_time" == "null" ]; then
         schedule_time="03:00"
     fi
     
