@@ -77,7 +77,8 @@ ask_watchtower_label() {
         echo "Enabling Watchtower for ${project_name}..."
         
         # Try to find the first service name in the compose file
-        local main_service=$(grep -m 1 "^  [a-zA-Z0-9_-]\+:" "$COMPOSE_FILE" | sed 's/  //;s/://')
+        # Matches lines starting with whitespace followed by a word and a colon
+        local main_service=$(grep -m 1 "^[[:space:]]\+[a-zA-Z0-9_-]\+:" "$COMPOSE_FILE" | sed 's/^[[:space:]]\+//;s/://')
         
         if [ -z "$main_service" ]; then
             main_service="$project_name"
