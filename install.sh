@@ -18,6 +18,7 @@ AVAILABLE_SERVICES=(
     "docmost:Docmost"
     "glance-dashboard:Glance Dashboard"
     "headscale:Headscale"
+    "netbird:Netbird"
     "home-assistant:Home Assistant"
     "immich:Immich"
     "linux-in-docker:Linux in Docker"

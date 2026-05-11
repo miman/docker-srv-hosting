@@ -18,6 +18,7 @@ for %%S in (%SERVICES%) do (
   if /I "%%S"=="immich" set "SERVICE_PROMPT=Immich"
   if /I "%%S"=="portainer" set "SERVICE_PROMPT=Portainer srv, question for agent will come later"
   if /I "%%S"=="headscale" set "SERVICE_PROMPT=Headscale"
+  if /I "%%S"=="netbird" set "SERVICE_PROMPT=Netbird"
   if /I "%%S"=="traccar" set "SERVICE_PROMPT=Traccar"
   if /I "%%S"=="vaultwarden" set "SERVICE_PROMPT=Vaultwarden"
   if /I "%%S"=="docmost" set "SERVICE_PROMPT=Docmost"
