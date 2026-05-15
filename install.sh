@@ -312,7 +312,7 @@ elif ! command -v docker &> /dev/null; then
     run_configuration_phase
     
     print_info "Running Core Installation (Docker, Tailscale, etc.)..."
-    ./install-core.sh
+    ./scripts/install-core.sh
 
     echo ""
     print_success "Core system setup is complete!"
