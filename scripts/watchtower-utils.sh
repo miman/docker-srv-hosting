@@ -17,15 +17,15 @@ ask_watchtower_label() {
     local project_name=$(basename "$(pwd)")
     
     # Path to the config file
-    local CONFIG_FILE="${HSC_CONFIG_PATH:-$HOME/.hsc/config.json}"
+    local WATCHTOWER_CONFIG_FILE="${HSC_CONFIG_DIR:-$HOME/.hsc}/watchtower_configs.yaml"
     
     local want_watchtower="null"
     
     # Try to read existing choice from config
-    if [ -f "$CONFIG_FILE" ] && command -v jq > /dev/null; then
-        local current_choice=$(jq -r ".watchtower_configs[\"$project_name\"]" "$CONFIG_FILE" 2>/dev/null)
+    if [ -f "$WATCHTOWER_CONFIG_FILE" ]; then
+        local current_choice=$(grep "^${project_name}:" "$WATCHTOWER_CONFIG_FILE" | sed -e "s/^${project_name}:[[:space:]]*//;s/^[ \'\"]*//;s/[ \'\"]*$//")
         
-        if [ "$current_choice" != "null" ] && [ -n "$current_choice" ]; then
+        if [ -n "$current_choice" ] && [ "$current_choice" != "null" ]; then
             # If we already have a choice, only re-ask if the flag was passed
             if [ "$HSC_ASK_WATCHTOWER" == "true" ]; then
                 local status_str="DISABLED"
@@ -61,16 +61,19 @@ ask_watchtower_label() {
         fi
     fi
 
-    # Save to config.json
-    if [ -f "$CONFIG_FILE" ] && command -v jq > /dev/null; then
-        # Ensure watchtower_configs object exists
-        if ! jq -e '.watchtower_configs' "$CONFIG_FILE" >/dev/null 2>&1; then
-            local tmp=$(mktemp)
-            jq '. + {watchtower_configs: {}}' "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
+    # Save to watchtower_configs.yaml
+    if [ -n "$want_watchtower" ] && [ "$want_watchtower" != "null" ]; then
+        mkdir -p "$(dirname "$WATCHTOWER_CONFIG_FILE")"
+        if [ ! -f "$WATCHTOWER_CONFIG_FILE" ]; then
+            touch "$WATCHTOWER_CONFIG_FILE"
         fi
-        # Save the choice
-        local tmp=$(mktemp)
-        jq ".watchtower_configs[\"$project_name\"] = $want_watchtower" "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
+        
+        if grep -q "^${project_name}:" "$WATCHTOWER_CONFIG_FILE"; then
+            local tmp=$(mktemp)
+            sed "s|^${project_name}:.*|${project_name}: ${want_watchtower}|" "$WATCHTOWER_CONFIG_FILE" > "$tmp" && mv "$tmp" "$WATCHTOWER_CONFIG_FILE"
+        else
+            echo "${project_name}: ${want_watchtower}" >> "$WATCHTOWER_CONFIG_FILE"
+        fi
     fi
 
     if [ "$want_watchtower" == "true" ]; then

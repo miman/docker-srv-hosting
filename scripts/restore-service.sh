@@ -18,15 +18,15 @@ BACKUP_SOURCE=$2
 
 if [ -z "$SERVICE_NAME" ]; then
     echo "Usage: ./restore-service.sh <service_name> [backup_source_path]"
-    echo "If [backup_source_path] is omitted, it attempts to read from config.json"
+    echo "If [backup_source_path] is omitted, it attempts to read from config.yaml"
     exit 1
 fi
 
 # 1. Get Backup Path from Config if not provided
-CONFIG_FILE="$HOME/.hsc/config.json"
+CONFIG_FILE="$HOME/.hsc/config.yaml"
 if [ -z "$BACKUP_SOURCE" ]; then
-    if [ -f "$CONFIG_FILE" ] && command -v jq &> /dev/null; then
-        BACKUP_ROOT=$(jq -r '.backup_path' "$CONFIG_FILE")
+    if [ -f "$CONFIG_FILE" ]; then
+        BACKUP_ROOT=$(grep "^backup_path:" "$CONFIG_FILE" | sed -e "s/^backup_path:[[:space:]]*//;s/^[ \'\"]*//;s/[ \'\"]*$//")
         if [ -n "$BACKUP_ROOT" ] && [ "$BACKUP_ROOT" != "null" ]; then
             BACKUP_SOURCE="$BACKUP_ROOT/$SERVICE_NAME"
         fi

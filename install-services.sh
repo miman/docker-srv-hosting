@@ -1,13 +1,22 @@
 #!/bin/bash
 set -e
 
+is_windows=false
+case "$(uname -s)" in
+    CYGWIN*|MINGW*|MSYS*) is_windows=true ;;
+esac
+
 # Check if we can connect to Docker
 if ! docker info >/dev/null 2>&1; then
     echo "Error: Could not connect to the Docker daemon."
     echo "Please ensure Docker is running and that your user has permission to access it."
-    echo "You may need to run this script with 'sudo' or add your user to the 'docker' group:"
-    echo "  sudo usermod -aG \$USER"
-    echo "After adding your user to the group, you must log out and log back in for the changes to take effect."
+    if [ "$is_windows" = false ]; then
+        echo "You may need to run this script with 'sudo' or add your user to the 'docker' group:"
+        echo "  sudo usermod -aG \$USER"
+        echo "After adding your user to the group, you must log out and log back in for the changes to take effect."
+    else
+        echo "Please ensure Docker Desktop is running."
+    fi
     exit 1
 fi
 

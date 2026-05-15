@@ -11,15 +11,16 @@ BACKUP_SCRIPT_TEMPLATE_POSTGRES="$REPO_ROOT/scripts/templates/backup-postgres.sh
 MASTER_BACKUP_SCRIPT="$REPO_ROOT/backup/master-backup.sh"
 
 
-# Find the config file path
 if [ -n "$HSC_CONFIG_PATH" ]; then
     CONFIG_FILE="$HSC_CONFIG_PATH"
+    BACKUPS_FILE="$(dirname "$HSC_CONFIG_PATH")/backups.yaml"
 else
     # Fallback: if run via sudo, SUDO_USER might be set. 
     # Otherwise use current HOME.
     TARGET_USER="${SUDO_USER:-$USER}"
     TARGET_HOME=$(eval echo "~$TARGET_USER")
-    CONFIG_FILE="$TARGET_HOME/.hsc/config.json"
+    CONFIG_FILE="$TARGET_HOME/.hsc/config.yaml"
+    BACKUPS_FILE="$TARGET_HOME/.hsc/backups.yaml"
 fi
 
 
@@ -173,29 +174,24 @@ function configure_service_backup() {
     chmod +x "$backup_script_path"
     print_success "Created backup script for $service_name"
     
-    # Update config.json with this service backup
-    # Structure: { name: "service", script_path: "...", data_path: "..." }
-    local config_file="$CONFIG_FILE"
-
-    
-    # Ensure config file exists
-    if [ ! -f "$config_file" ]; then
-         print_warning "Config file not found at $config_file. Skipping backup registration."
-         return
+    # Update backups.yaml with this service backup
+    if [ ! -f "$BACKUPS_FILE" ]; then
+         touch "$BACKUPS_FILE"
     fi
     
-    # We use a temporary file to avoid partial writes
     local tmp_file=$(mktemp)
     
-    # Use jq to update or append the entry. 
-    # We filter out existing entry for this service name if it exists, then add the new one.
-    # We also ensure .backups exists by defaulting it to an empty array.
-    jq --arg name "$service_name" \
-       --arg script "$backup_script_path" \
-       --arg data "$service_abs_path" \
-       '(.backups // []) as $backups | .backups = ([$backups[] | select(.name != $name)] + [{name: $name, script_path: $script, data_path: $data}])' \
-       "$config_file" > "$tmp_file" && mv "$tmp_file" "$config_file"
-       
+    awk -v name="$service_name" '
+        $0 ~ "^"name":" { skip=1; next }
+        /^[^ ]/ && skip { skip=0 }
+        !skip { print $0 }
+    ' "$BACKUPS_FILE" > "$tmp_file"
+    
+    echo "${service_name}:" >> "$tmp_file"
+    echo "  script_path: \"${backup_script_path}\"" >> "$tmp_file"
+    echo "  data_path: \"${service_abs_path}\"" >> "$tmp_file"
+    
+    mv "$tmp_file" "$BACKUPS_FILE"
     print_success "Registered $service_name in backup configuration."
 }
 
@@ -211,19 +207,14 @@ function finalize_backup() {
     
     cat > "$MASTER_BACKUP_SCRIPT" <<EOF
 #!/bin/bash
-# Master Backup Script - Dynamically runs backups from config.json
+# Master Backup Script - Dynamically runs backups from backups.yaml
 
-CONFIG_FILE="$CONFIG_FILE"
+BACKUPS_FILE="$BACKUPS_FILE"
 
 LOG_FILE="/var/log/master_backup.log"
 
-if [ ! -f "\$CONFIG_FILE" ]; then
-    echo "Config file not found: \$CONFIG_FILE"
-    exit 1
-fi
-
-if ! command -v jq &> /dev/null; then
-    echo "jq is required but not found."
+if [ ! -f "\$BACKUPS_FILE" ]; then
+    echo "Backups file not found: \$BACKUPS_FILE"
     exit 1
 fi
 
@@ -231,29 +222,51 @@ echo "=========================================="
 echo "Starting Master Backup at \$(date)"
 echo "=========================================="
 
-# Read backup entries and iterate
-# We read row by row
-jq -c '.backups[]' "\$CONFIG_FILE" | while read -r entry; do
-    NAME=\$(echo "\$entry" | jq -r '.name')
-    SCRIPT=\$(echo "\$entry" | jq -r '.script_path')
-    DATA=\$(echo "\$entry" | jq -r '.data_path')
-    
-    echo "--- Backing up \$NAME ---"
-    
-    if [ -f "\$SCRIPT" ]; then
-        # Execute the backup script
-        # Note: If the backup script was generated with hardcoded paths, it uses them.
-        # If we wanted to override, we'd pass args here.
-        if "\$SCRIPT"; then
-             echo "SUCCESS: \$NAME backup completed."
+current_service=""
+current_script=""
+current_data=""
+
+while IFS= read -r line || [ -n "\$line" ]; do
+    if [[ \$line =~ ^([a-zA-Z0-9_-]+):$ ]]; then
+        if [ -n "\$current_service" ] && [ -n "\$current_script" ]; then
+            echo "--- Backing up \$current_service ---"
+            if [ -f "\$current_script" ]; then
+                if "\$current_script"; then
+                     echo "SUCCESS: \$current_service backup completed."
+                else
+                     echo "ERROR: \$current_service backup failed."
+                fi
+            else
+                echo "WARNING: Backup script not found for \$current_service at \$current_script"
+            fi
+            echo ""
+        fi
+        
+        current_service="\${BASH_REMATCH[1]}"
+        current_script=""
+        current_data=""
+    elif [[ \$line =~ ^[[:space:]]+script_path:[[:space:]]*\"?(.*)\"?$ ]]; then
+        current_script="\${BASH_REMATCH[1]}"
+        current_script="\${current_script%\"}"
+    elif [[ \$line =~ ^[[:space:]]+data_path:[[:space:]]*\"?(.*)\"?$ ]]; then
+        current_data="\${BASH_REMATCH[1]}"
+        current_data="\${current_data%\"}"
+    fi
+done < "\$BACKUPS_FILE"
+
+if [ -n "\$current_service" ] && [ -n "\$current_script" ]; then
+    echo "--- Backing up \$current_service ---"
+    if [ -f "\$current_script" ]; then
+        if "\$current_script"; then
+             echo "SUCCESS: \$current_service backup completed."
         else
-             echo "ERROR: \$NAME backup failed."
+             echo "ERROR: \$current_service backup failed."
         fi
     else
-        echo "WARNING: Backup script not found for \$NAME at \$SCRIPT"
+        echo "WARNING: Backup script not found for \$current_service at \$current_script"
     fi
     echo ""
-done
+fi
 
 echo "Master Backup Completed at \$(date)"
 echo "=========================================="

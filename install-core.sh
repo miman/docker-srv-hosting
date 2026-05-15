@@ -10,7 +10,7 @@ set -e
 
 # --- Configuration ---
 CONFIG_DIR="$HOME/.hsc"
-CONFIG_FILE="$CONFIG_DIR/config.json"
+CONFIG_FILE="$CONFIG_DIR/config.yaml"
 DEFAULT_DOCKER_ROOT="$HOME/docker_stacks"
 
 # --- Helper Functions ---
@@ -30,34 +30,47 @@ function print_error() {
 # --- Main Logic ---
 
 # 1. Source configuration
-# This script reads from ~/.hsc/config.json and ensures DOCKER_FOLDER and BASE_DNS_NAME are set.
+# This script reads from ~/.hsc/config.yaml and ensures DOCKER_FOLDER and BASE_DNS_NAME are set.
 source ./scripts/read-config.sh
 
 print_success "Docker root folder set to: $DOCKER_FOLDER"
 print_success "Base DNS name set to: $BASE_DNS_NAME"
 
+is_windows=false
+case "$(uname -s)" in
+    CYGWIN*|MINGW*|MSYS*) is_windows=true ;;
+esac
 
 # 2. Update and upgrade OS
-print_info "=======================> Updating and upgrading OS..."
-sudo apt-get update
-sudo apt-get upgrade -y
-print_success "=======================> OS is up to date."
+if [ "$is_windows" = false ]; then
+    print_info "=======================> Updating and upgrading OS..."
+    sudo apt-get update
+    sudo apt-get upgrade -y
+    print_success "=======================> OS is up to date."
+else
+    print_info "=======================> Skipping OS update on Windows Git Bash."
+fi
 
 # 3. Make scripts executable
-print_info "=======================> Making scripts executable..."
-chmod +x ./scripts/install-docker.sh
-chmod +x ./scripts/install-tailscale-client.sh
+if [ "$is_windows" = false ]; then
+    print_info "=======================> Making scripts executable..."
+    chmod +x ./scripts/install-docker.sh
+    chmod +x ./scripts/install-tailscale-client.sh
 
-# 4. Install Docker
-./scripts/install-docker.sh
+    # 4. Install Docker
+    ./scripts/install-docker.sh
 
-# 5. Install Tailscale
-read -p "Do you want to install the Tailscale client? (only relevant if you plan to use Tailscale or Headscale) [y/N] " INSTALL_TS
-if [[ "$INSTALL_TS" =~ ^[Yy]$ ]]; then
-    ./scripts/install-tailscale-client.sh
-    print_info "You may need to run 'tailscale up' to connect your machine to your Tailnet."
+    # 5. Install Tailscale
+    read -p "Do you want to install the Tailscale client? (only relevant if you plan to use Tailscale or Headscale) [y/N] " INSTALL_TS
+    if [[ "$INSTALL_TS" =~ ^[Yy]$ ]]; then
+        ./scripts/install-tailscale-client.sh
+        print_info "You may need to run 'tailscale up' to connect your machine to your Tailnet."
+    else
+        print_info "Skipping Tailscale installation."
+    fi
 else
-    print_info "Skipping Tailscale installation."
+    print_info "=======================> Skipping Docker and Tailscale installation on Windows."
+    print_info "Please ensure Docker Desktop and Tailscale are installed manually."
 fi
 
 echo -e "\n\n"

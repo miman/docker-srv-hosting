@@ -16,7 +16,7 @@ create a shell script "install-clean.sh" that goes from a clean ubuntu srv to ha
 
 # Configuration
 
-The script should ask for the docker config root and store this in the user home folder in a folder called .hsc and in that folder a file called config.json
+The script should ask for the docker config root and store this in the user home folder in a folder called .hsc and in that folder a file called config.yaml
 
 This home folder should be used as root for all docker compose files volumes blocks.
 So for example:
