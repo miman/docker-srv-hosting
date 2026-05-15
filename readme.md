@@ -45,6 +45,10 @@ This enables you to recreate the Docker containers without loosing any data.
 
 You can also select to automatically do backup of the volumes to a dedicated backup disk or an existing folder.
 
+## What should I install ?
+
+See the [what-should-i-install.md](docs/installation-tips/what-should-i-install.md) for the recommended setup.
+
 ## Installation & Setup
 
 1. **Start the Installer**

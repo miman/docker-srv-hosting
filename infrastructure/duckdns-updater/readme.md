@@ -5,6 +5,10 @@ This service updates your domain name with your current IP address.
 
 This docker-compose.yml file installs [DuckDNS updater](https://github.com/linuxserver/docker-duckdns) on your local server.
 
+## Prerequisites
+
+You MUST have created a domain on [DuckDNS](https://www.duckdns.org/) before using this service.
+
 ## Installation
 
 Run the installation script:
