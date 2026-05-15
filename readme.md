@@ -51,6 +51,10 @@ See the [what-should-i-install.md](docs/installation-tips/what-should-i-install.
 
 ## Installation & Setup
 
+> [!IMPORTANT]
+> **Windows Users**: This project uses shell scripts (`.sh`) for installation and management. To run these on Windows, you **must use Git Bash** (included with [Git for Windows](https://git-scm.com/)). 
+> There are no `.bat` files provided; all automation is handled via bash scripts which are compatible with Linux and Git Bash.
+
 1. **Start the Installer**
    Run the main installation script. This serves as a unified entry point for setting up your environment, configuring backups, and installing services.
    ```bash
