@@ -59,6 +59,16 @@ Here is a description on the env variables used in the docker compose file
 | WATCHTOWER_HTTP_API_TOKEN | A security token required to authorize requests to the HTTP API. |
 | WATCHTOWER_DEBUG | When enabled, provides verbose logging for troubleshooting. |
 
+### Configuration
+
+To notify to you Synapse server you need to add an .env file to this folder with the following info
+```
+MATRIX_USER=The username of your bot, e.g. watchtower
+MATRIX_PASS=The password for the bot user
+MATRIX_HOST=The homeserver of your bot, e.g. matrix.example.com
+MATRIX_ROOM_ID=The room id to send the notifications to, e.g. !roomid:matrix.example.com
+```
+
 ## HTTP API & Manual Triggers
 Watchtower is configured with an HTTP API enabled on port `8080` (bound to `localhost`). This allows you to force an update check immediately instead of waiting for the 24-hour timer.
 
