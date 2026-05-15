@@ -1,6 +1,6 @@
 ## Local WebUI for Ollama
 
-Open WebUI is an extensible, self-hosted AI interface that adapts to your workflow, all while operating entirely offline.
+[Open WebUI](https://github.com/open-webui/open-webui) is a open-source AI chat webui, for Ollama (default), LM Studio, Ooba, vLLM, OpenAI, and Anthropic compatible servers. It adapts to your workflow and works entirely offline.
 
 More information can be found here: https://openwebui.com/
 

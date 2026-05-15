@@ -1,10 +1,10 @@
 # Vaultwarden Docker Setup
 
-Vaultwarden is an open-source, lightweight alternative to Bitwarden server, providing secure password management and self-hosting capabilities.
+[Vaultwarden](https://github.com/dani-garcia/vaultwarden) is an open-source, lightweight alternative to Bitwarden server, providing secure password management.
 
-You can use official Bitwarden clients (web, desktop, mobile, browser extensions) to connect to your Vaultwarden instance just like you would with the official Bitwarden service.
+You can use official Bitwarden clients (web, desktop, mobile, browser extensions) to connect to your [Vaultwarden](https://github.com/dani-garcia/vaultwarden) instance just like you would with the official Bitwarden service.
 
-This prj will install a Vaultwarden server as a Docker container
+This prj will install a [Vaultwarden](https://github.com/dani-garcia/vaultwarden) server as a Docker container
 
 ## Quick Start
 

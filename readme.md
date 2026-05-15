@@ -7,27 +7,40 @@ These sub-projects contain docker-compose files used to host servers on your hom
 -  Run services even with no Internet
 
 ### Core idea of this repo
-The core idea is to automatically setup a local cloud with most services you would use cloud services for, like:
--  File storage (Nextcloud)
--  Chat (Synapse)
--  Password manager (Vaultwarden)
--  Document storage (Docmost)
--  Photo/Video storage (Immich)
--  GPS tracking (Traccar)
--  Home automation (Home Assistant)
--  AI (Ollama & ComfyUI)
+The core idea is to automatically setup a local cloud with most services you would use cloud services for:
 
-For this to secure & easy to maintain, it can also install these services:
-- Secure network (Headscale)
-- Giving all services a nice URL & enable HTTPS support (Reverse proxy with Nginx Proxy Manager)
-- Docker management (Portainer)
-- Auto-update Docker images (Watchtower)
+### Services
+
+| Service             | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| [ComfyUI](comfy_ui/ReadMe.md) | Powerful and modular stable diffusion GUI/backend |
+| [Docmost](docmost/readme.md)             | Self-hosted documentation/wiki platform                |
+| [Glance Dashboard](glance-dashboard/readme.md)    | Customizable dashboard/monitoring                      |
+| [Headscale](headscale/readme.md)           | Self-hosted Tailscale secure network server (like VPN) |
+| [Home Assistant](home-assistant/ReadMe.md)      | Home automation platform                               |
+| [Immich](immich/readme.md)              | Self-hosted photo & video backup                       |
+| Linux-in-Docker     | Lightweight Linux desktop in Docker with Web UI        |
+| [Lyra](ai/3d/Lyra/readme.md) | NVIDIA Lyra-2.0 for high-performance AI generation |
+| [Netbird](netbird/readme.md) | Zero-configuration VPN for secure device connectivity |
+| [Nextcloud](nextcloud/readme.md)           | File sync and collaboration suite                      |
+| Nextcloud AIO       | Easy-to-deploy Nextcloud All-in-One version            |
+| [Nginx Reverse Proxy](nginx-reverse-proxy/readme.md) | Reverse proxy for web services                         |
+| [Ollama LLM server](ollama/ReadMe.md)   | Local LLM (AI) server                                  |
+| [Open WebUI for Ollama](open-webui/ReadMe.md)   | Web interface for Ollama LLM                           |
+| [Portainer](portainer/readme.md)           | Docker management srv OR Agent                         |
+| Registry           | Local Docker registry                         |
+| [SearXNG](searxng/readme.md)   | Privacy-respecting metasearch engine (used for web search in local AI)                  |
+| [Synapse](synapse/readme.md) | Matrix homeserver for secure communication (chat/video)  |
+| [Traccar](traccar/readme.md)             | GPS tracking platform                                  |
+| [Vaultwarden](vaultwarden/readme.md)         | Self-hosted password manager                           |
+| [Verdaccio](verdaccio/README.md)         | Local NPM registry                           |
+| [Watchtower](watchtower/readme.md) | Automates Docker container image updates               |
 
 ### Volume folders & Backup
 
 You can decide where the root folder for all volumes should be. This is where all your service data is stored. 
 
-This enables you to recereate teh Docker containers without loosing any data.
+This enables you to recreate the Docker containers without loosing any data.
 
 You can also select to automatically do backup of the volumes to a dedicated backup disk or an existing folder.
 
@@ -77,31 +90,6 @@ Some services support importing config from previous installations:
 1. Copy your config folders to the local `backup` folder.
 2. Go into the specific service folder & run `restore-from-backup.sh` (if available).
 This is supported for: `headscale`, `nginx-reverse-proxy`.
-
-## Services
-
-| Service             | Description                                            |
-| ------------------- | ------------------------------------------------------ |
-| [Docmost](https://docmost.com/)             | Self-hosted documentation/wiki platform                |
-| [Glance Dashboard](https://github.com/glanceapp/glance)    | Customizable dashboard/monitoring                      |
-| [Headscale](https://headscale.net/stable/)           | Self-hosted Tailscale secure network server (like VPN) |
-| [Home Assistant](https://www.home-assistant.io/)      | Home automation platform                               |
-| [Immich](https://immich.app/)              | Self-hosted photo & video backup                       |
-| Linux-in-Docker     | Lightweight Linux desktop in Docker with Web UI        |
-| [Nextcloud](https://nextcloud.com/)           | File sync and collaboration suite                      |
-| Nextcloud AIO       | Easy-to-deploy Nextcloud All-in-One version            |
-| [Nginx Reverse Proxy](https://nginxproxymanager.com/) | Reverse proxy for web services                         |
-| [Ollama LLM server](https://ollama.com/)   | Local LLM (AI) server                                  |
-| [Open WebUI for Ollama](https://github.com/open-webui/open-webui)   | Web interface for Ollama LLM                           |
-| [Portainer](https://portainer.io/)           | Docker management srv OR Agent                         |
-| Registry           | Local Docker registry                         |
-| [SearXNG](https://searxng.github.io/searxng/)   | Privacy-respecting metasearch engine (used for web search in local AI)                  |
-| [Synapse](https://matrix.org/docs/projects/server/synapse) | Matrix homeserver for secure communication (chat/video)  |
-| [Traccar](https://traccar.org/)             | GPS tracking platform                                  |
-| [Vaultwarden](https://github.com/dani-garcia/vaultwarden)         | Self-hosted password manager                           |
-| [Verdaccio](https://www.verdaccio.org/)         | Local NPM registry                           |
-| [Watchtower](https://containrrr.dev/watchtower/) | Automates Docker container image updates               |
-| [ComfyUI](https://github.com/comfyanonymous/ComfyUI) | Powerful and modular stable diffusion GUI/backend |
 
 ### Overview
 

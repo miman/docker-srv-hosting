@@ -1,6 +1,6 @@
 ## ComfyUI
 
-ComfyUI is an powerful and modular diffusion model GUI and backend, used to generate images from text prompts.
+[ComfyUI](https://github.com/comfyanonymous/ComfyUI) is an powerful and modular diffusion model GUI and backend, used to generate images from text prompts.
 
 More information can be found here: https://github.com/comfyanonymous/ComfyUI
 

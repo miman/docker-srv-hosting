@@ -1,6 +1,8 @@
 # Verdaccio
 
-Verdaccio is a lightweight private npm proxy registry built in Node.js
+[Verdaccio](https://www.verdaccio.org/) is a lightweight private npm proxy registry built in Node.js
+
+It is used to host your own private npm registry, for example for your own private npm packages, or for caching public npm packages.
 
 ## Setting up global registry for all projects
 To set the registry for all your local projects in any terminal window run:

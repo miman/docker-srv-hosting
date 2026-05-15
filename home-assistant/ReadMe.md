@@ -1,5 +1,7 @@
 # Home Assistant
 
+[Home Assistant](https://www.home-assistant.io/) is a free and open-source home automation platform that allows you to control and monitor your smart devices from a single interface.
+
 Running **install.sh** will install Home Assistant.
 
 ## Nabu casa Skyconnect

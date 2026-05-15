@@ -1,9 +1,9 @@
 # Watchtower
 
-This docker-compose.yml file installs Watchtower, an essential "set-it-and-forget-it" automation tool for anyone running a Docker-based home lab or server.
+This docker-compose.yml file installs [Watchtower](https://containrrr.dev/watchtower/), an essential "set-it-and-forget-it" automation tool for anyone running a Docker-based home lab or server.
 
 ## 🚀 Project Description: Watchtower
-Watchtower is an open-source utility that automates the lifecycle of your Docker containers. Instead of manually checking for updates, pulling new images, and restarting services, Watchtower handles the entire maintenance pipeline in the background.
+[Watchtower](https://containrrr.dev/watchtower/) is an open-source utility that automates the lifecycle of your Docker containers. Instead of manually checking for updates, pulling new images, and restarting services, Watchtower handles the entire maintenance pipeline in the background.
 
 ### Core Workflow
 **Monitor**: It periodically checks the Docker Hub (or your private registry) to see if a newer version of your running images has been released.

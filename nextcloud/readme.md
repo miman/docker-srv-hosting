@@ -1,5 +1,11 @@
 # Nextcloud
 
+[Nextcloud](https://nextcloud.com/) is a open source software for file hosting and collaboration.
+
+Think of it like a Google Docs or Ofice 365 running locally. 
+
+It also include other useful features like chat, video calls, and more.
+
 ## Post installation config
 
 The following must be added to the config.php file if you want to have nginx in front of your Nextcloud instance

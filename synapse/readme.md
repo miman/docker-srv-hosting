@@ -1,6 +1,12 @@
 # Matrix Synapse - Home Server
 
-Synapse is the reference implementation of a Matrix homeserver. It allows you to host your own decentralized, private secure communication platform.
+[Synapse](https://matrix.org/docs/projects/server/synapse) is the reference implementation of a Matrix homeserver. It allows you to host your own decentralized, private secure communication platform.
+
+It is used for chatting, sending files, and voice and video calls, similar to Signal, Telegram, WhatsApp, or Discord, but it is decentralized and open source.
+
+It is the server behind [Element](https://element.io/), which is the recommended client to use with Synapse. You can of course use other Matrix clients as well.
+
+[Matrix](https://matrix.org/) is a decentralized, open standard for instant messaging, file sharing, voice and video calls. It is designed to be secure and private, and it allows you to host your own homeserver, which means you have full control over your data. Unlike centralized messaging apps like WhatsApp, Telegram, Signal, or Discord, Matrix allows users to choose their own server and client, and to control their own data and privacy.
 
 ## Installation & Running
 

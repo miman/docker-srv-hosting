@@ -1,6 +1,6 @@
 # Immich Self-Hosted Photo & Video Backup
 
-Immich is an open-source, self-hosted solution for backing up and managing your photos and videos. It provides features similar to Google Photos, but runs entirely on your own server for privacy and control.
+[Immich](https://immich.app/) is an open-source, self-hosted solution for backing up and managing your photos and videos. It provides features similar to Google Photos, but runs entirely on your own server for privacy and control.
 
 ## Features
 

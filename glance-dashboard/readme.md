@@ -1,6 +1,6 @@
 # Glance Dashboard Setup
 
-This folder contains scripts and configuration to quickly set up the Glance Dashboard using Docker Compose.
+This folder contains scripts and configuration to quickly set up the [Glance Dashboard](https://github.com/glanceapp/glance) using Docker Compose.
 
 ## Quick Start
 

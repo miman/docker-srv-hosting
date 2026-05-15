@@ -1,8 +1,10 @@
 # NGINX proxy manager
 
-Used to expose one entry point and have subdomains for your servers.
+[NGINX proxy manager](https://nginxproxymanager.com/) is a easy to use reverse proxy manager.
 
-Can also act as an HTTPS endpoint handing your domain certificate
+It is used to expose one entry point and have subdomains for your servers.
+
+It can also act as an HTTPS endpoint handing your domain certificate
 
 ## Local certificate
 

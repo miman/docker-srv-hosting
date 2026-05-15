@@ -1,6 +1,6 @@
 # Ollama
 
-Ollama is a tool for running and managing large language models locally.
+[Ollama](https://ollama.com/) is a tool for running and managing large language models locally.
 
 This folder contains an install script to deploy **_Ollama_** & optionally **_OpenWebUI_** on Docker on your local machine.
 

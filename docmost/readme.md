@@ -1,6 +1,6 @@
 # Docmost Docker Setup
 
-Docmost is an open-source, self-hosted documentation and knowledge management platform. This folder contains scripts to help you quickly deploy Docmost using Docker on Windows or Linux.
+[Docmost](https://docmost.com/)  is an open-source, self-hosted documentation and knowledge management platform. This folder contains scripts to help you quickly deploy Docmost using Docker on Windows or Linux.
 
 ## Quick Start
 

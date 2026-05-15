@@ -1,8 +1,8 @@
 # SearXNG - Privacy-Respecting Metasearch Engine
 
-SearXNG is a free internet metasearch engine which aggregates results from more than 70 search services. It doesn't track its users and doesn't share anything with a third party.
+[SearXNG](https://searxng.github.io/searxng/) is a free internet metasearch engine which aggregates results from more than 70 search services. It doesn't track its users and doesn't share anything with a third party.
 
-In this setup, SearXNG is used as a backend for tools like **Open WebUI** to provide real-time web search capabilities to local LLMs.
+In this setup, [SearXNG](https://searxng.github.io/searxng/) is used as a backend for tools like **Open WebUI** to provide real-time web search capabilities to local LLMs.
 
 ## Installation & Running
 

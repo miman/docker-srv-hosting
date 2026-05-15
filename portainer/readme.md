@@ -1,8 +1,8 @@
 # Portainer
 
-This folder contains docker-compose files used to host Portainer server and/or agent on docker
+This folder contains docker-compose files used to host [Portainer](https://portainer.io/) server and/or agent on Docker.
 
-Link: https://www.portainer.io/
+[Portainer](https://portainer.io/) is a management UI for Docker, like Docker Desktop but a web UI, that runs on your own server.
 
 # Agent
 
