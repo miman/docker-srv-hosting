@@ -1,4 +1,0 @@
-services:
-  open-webui:
-    labels:
-      - com.centurylinklabs.watchtower.enable=true

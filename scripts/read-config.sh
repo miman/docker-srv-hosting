@@ -68,3 +68,33 @@ if [ -z "$BASE_DNS_NAME" ]; then
     fi
 fi
 export BASE_DNS_NAME
+
+# Read and export EXTERNAL_DUCKDNS_NAME
+if [ -z "$EXTERNAL_DUCKDNS_NAME" ]; then
+    if [ -f "$HSC_CONFIG_PATH" ]; then
+        EXTERNAL_DUCKDNS_NAME=$(jq -r '.external_duckdns_name' "$HSC_CONFIG_PATH")
+        if [ "$EXTERNAL_DUCKDNS_NAME" == "null" ]; then
+            EXTERNAL_DUCKDNS_NAME=""
+        fi
+    fi
+fi
+export EXTERNAL_DUCKDNS_NAME
+
+# Helper function to set a value in config.json
+# Usage: set_config_value ".some_key" "some_value"
+set_config_value() {
+    local key=$1
+    local value=$2
+    local tmp_file=$(mktemp)
+    
+    # Ensure config directory exists
+    mkdir -p "$(dirname "$HSC_CONFIG_PATH")"
+    
+    if [ ! -f "$HSC_CONFIG_PATH" ]; then
+        echo "{}" > "$HSC_CONFIG_PATH"
+        chmod 600 "$HSC_CONFIG_PATH"
+    fi
+    
+    jq "$key = \"$value\"" "$HSC_CONFIG_PATH" > "$tmp_file" && mv "$tmp_file" "$HSC_CONFIG_PATH"
+    chmod 600 "$HSC_CONFIG_PATH"
+}

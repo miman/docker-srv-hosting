@@ -12,22 +12,22 @@ if /i "%confirm%" neq "y" (
     exit /b 1
 ) else (
   REM Uninstall the home-assistant Docker container
-  cd home-assistant
-  call cleanup-all.bat
-  cd ..
+  pushd cloud-services\home-assistant
+  if exist cleanup-all.bat call cleanup-all.bat
+  popd
 
   REM Uninstall the ollama Docker container
-  cd ollama
-  call cleanup-all.bat
-  cd ..
+  pushd ai\ollama
+  if exist cleanup-all.bat call cleanup-all.bat
+  popd
 
   REM Uninstall the nextcloud Docker container
-  cd nextcloud
-  call cleanup-all.bat
-  cd ..
+  pushd cloud-services\nextcloud
+  if exist cleanup-all.bat call cleanup-all.bat
+  popd
 
   REM Uninstall the nginx-reverse-proxy Docker container
-  cd nginx-reverse-proxy
-  call cleanup-all.bat
-  cd ..
+  pushd infrastructure\nginx-reverse-proxy
+  if exist cleanup-all.bat call cleanup-all.bat
+  popd
 )

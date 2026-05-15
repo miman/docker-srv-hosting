@@ -10,28 +10,29 @@ BACKUP_PATH=""
 SERVICES_TO_INSTALL=()
 # List of availalble services (folder_name:Display Name)
 AVAILABLE_SERVICES=(
-    "portainer:Portainer"
-    "portainer/portainer-agent:Portainer Agent"
-    "ollama:Ollama"
-    "open-webui:Open WebUI"
-    "watchtower:Watchtower"
-    "docmost:Docmost"
-    "glance-dashboard:Glance Dashboard"
-    "headscale:Headscale"
-    "netbird:Netbird"
-    "home-assistant:Home Assistant"
-    "immich:Immich"
-    "linux-in-docker:Linux in Docker"
-    "nextcloud:Nextcloud"
-    "nextcloud-aio:Nextcloud AIO"
-    "nginx-reverse-proxy:Nginx Reverse Proxy"
-    "registry:Registry"
-    "searxng:SearXNG"
-    "comfy_ui:ComfyUI"
-    "synapse:Synapse"
-    "traccar:Traccar"
-    "vaultwarden:Vaultwarden"
-    "verdaccio:Verdaccio"
+    "infrastructure/portainer:Portainer"
+    "infrastructure/portainer/portainer-agent:Portainer Agent"
+    "ai/ollama:Ollama"
+    "ai/open-webui:Open WebUI"
+    "infrastructure/watchtower:Watchtower"
+    "cloud-services/docmost:Docmost"
+    "cloud-services/glance-dashboard:Glance Dashboard"
+    "infrastructure/headscale:Headscale"
+    "infrastructure/netbird:Netbird"
+    "cloud-services/home-assistant:Home Assistant"
+    "cloud-services/immich:Immich"
+    "cloud-services/linux-in-docker:Linux in Docker"
+    "cloud-services/nextcloud:Nextcloud"
+    "cloud-services/nextcloud-aio:Nextcloud AIO"
+    "infrastructure/nginx-reverse-proxy:Nginx Reverse Proxy"
+    "infrastructure/duckdns-updater:DuckDNS"
+    "infrastructure/registry:Registry"
+    "ai/searxng:SearXNG"
+    "ai/comfy_ui:ComfyUI"
+    "cloud-services/synapse:Synapse"
+    "cloud-services/traccar:Traccar"
+    "cloud-services/vaultwarden:Vaultwarden"
+    "development/verdaccio:Verdaccio"
 )
 
 # --- Helper Functions ---
@@ -242,14 +243,15 @@ function run_service_installation_phase() {
             # Configure Backup for this Service if enabled
             if [ "$BACKUP_MODE" != "none" ]; then
                  # Construct absolute path to the likely data location in DOCKER_ROOT
-                 TARGET_DATA_DIR="$DOCKER_ROOT/$SERVICE_DIR"
+                 SERVICE_NAME=$(basename "$SERVICE_DIR")
+                 TARGET_DATA_DIR="$DOCKER_ROOT/$SERVICE_NAME"
                  
                  # Ensure directory exists (might be owned by root if created by docker daemon)
                  # but we try to create it as user first if it doesn't exist
                  [ ! -d "$TARGET_DATA_DIR" ] && mkdir -p "$TARGET_DATA_DIR" 2>/dev/null || true
 
                  if [ -d "$TARGET_DATA_DIR" ]; then
-                      print_info "Configuring backup for $SERVICE_DIR..."
+                      print_info "Configuring backup for $SERVICE_NAME..."
                       sudo -E "$REPO_ROOT/scripts/backup-utils.sh" configure_service "$TARGET_DATA_DIR" "$BACKUP_PATH"
                  else
                       print_warning "Could not locate service data at $TARGET_DATA_DIR for backup configuration."
