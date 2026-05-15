@@ -21,6 +21,7 @@ mkdir -p "$DOCKER_FOLDER/comfy_ui/custom_nodes"
 mkdir -p "$DOCKER_FOLDER/comfy_ui/input"
 mkdir -p "$DOCKER_FOLDER/comfy_ui/output"
 mkdir -p "$DOCKER_FOLDER/comfy_ui/user"
+mkdir -p "$DOCKER_FOLDER/comfy_ui/templates"
 
 # Deployment
 echo "Deploying ComfyUI Docker container..."

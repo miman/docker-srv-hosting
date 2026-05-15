@@ -3,6 +3,7 @@ services:
     build: .
     container_name: comfy-ui
     restart: unless-stopped
+    shm_size: '4gb' # Critical for Blackwell GPUs
     ports:
       - "4515:8188"
     volumes:
@@ -11,12 +12,17 @@ services:
       - ${DOCKER_FOLDER}/comfy_ui/input:/app/input
       - ${DOCKER_FOLDER}/comfy_ui/output:/app/output
       - ${DOCKER_FOLDER}/comfy_ui/user:/app/user
+      - ${DOCKER_FOLDER}/comfy_ui/templates:/app/templates
     runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      # NOTICE THE DOUBLE $$ BELOW - This fixes your warning
+      - LD_LIBRARY_PATH=/usr/local/lib/python3.10/dist-packages/nvidia/cublas/lib:/usr/local/cuda/lib64:$$LD_LIBRARY_PATH
     networks:
       - local-ai-network
 
 networks:
   local-ai-network:
+    name: local-ai-network # Explicitly naming it helps Docker find it
     external: true
