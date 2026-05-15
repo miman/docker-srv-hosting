@@ -7,6 +7,15 @@ source ../../scripts/read-config.sh
 # Ask if Watchtower should manage this service
 ask_watchtower_label
 
+# --- Check and Install Tailscale client ---
+if ! command -v tailscale >/dev/null 2>&1; then
+    read -p "Tailscale client is not installed. Do you want to install it now? (Required to connect this machine to Headscale) [y/N] " INSTALL_TS
+    if [[ "$INSTALL_TS" =~ ^[Yy]$ ]]; then
+        chmod +x ../../scripts/install-tailscale-client.sh
+        ../../scripts/install-tailscale-client.sh
+    fi
+fi
+
 # --- Check for local Tailscale client and reconfigure port ---
 # This is to avoid a port conflict if a local tailscale client is running,
 # as Headscale also uses port 41641 for coordination.

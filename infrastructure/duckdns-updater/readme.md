@@ -17,5 +17,5 @@ Run the installation script:
 ./install.sh
 ```
 
-The script will automatically use the subdomain from your `base_dns_name` in `config.json` and prompt you for your DuckDNS token. For security, the token is not stored on disk.
+The script will automatically use the subdomain from your `base_dns_name` in `config.yaml` and prompt you for your DuckDNS token. For security, the token is not stored on disk.
 

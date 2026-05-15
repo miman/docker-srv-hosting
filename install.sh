@@ -3,7 +3,7 @@ set -e
 
 # --- Configuration ---
 CONFIG_DIR="$HOME/.hsc"
-CONFIG_FILE="$CONFIG_DIR/config.json"
+CONFIG_FILE="$CONFIG_DIR/config.yaml"
 DEFAULT_DOCKER_ROOT="$HOME/docker_stacks"
 BACKUP_MODE="none" # none, disk, folder
 BACKUP_PATH=""
@@ -60,15 +60,13 @@ function print_error() {
     echo -e "\e[31m[ERROR]\e[0m $1" >&2
 }
 
-function check_jq() {
-     if ! command -v jq &> /dev/null; then
-        print_info "jq not found, installing..."
-        sudo apt-get update && sudo apt-get install -y jq
-    fi
-}
+
 
 function get_config_val() {
-    jq -r ".$1" "$CONFIG_FILE" 2>/dev/null
+    local key="$1"
+    if [ -f "$CONFIG_FILE" ]; then
+        grep "^${key}:" "$CONFIG_FILE" | sed -e "s/^${key}:[[:space:]]*//;s/^[ \'\"]*//;s/[ \'\"]*$//"
+    fi
 }
 
 function run_configuration_phase() {
@@ -78,15 +76,15 @@ function run_configuration_phase() {
 
     EXISTING_CONFIG=false
     if [ -f "$CONFIG_FILE" ]; then
-        check_jq
         EXISTING_DOCKER_ROOT=$(get_config_val "docker_root")
         EXISTING_DNS=$(get_config_val "base_dns_name")
         EXISTING_BACKUP_MODE=$(get_config_val "backup_mode")
-        [ "$EXISTING_BACKUP_MODE" == "null" ] && EXISTING_BACKUP_MODE="none"
+        [ -z "$EXISTING_BACKUP_MODE" ] || [ "$EXISTING_BACKUP_MODE" == "null" ] && EXISTING_BACKUP_MODE="none"
         EXISTING_BACKUP_PATH=$(get_config_val "backup_path")
-        [ "$EXISTING_BACKUP_PATH" == "null" ] && EXISTING_BACKUP_PATH=""
+        [ -z "$EXISTING_BACKUP_PATH" ] || [ "$EXISTING_BACKUP_PATH" == "null" ] && EXISTING_BACKUP_PATH=""
         EXISTING_BACKUP_TIME=$(get_config_val "backup_time")
-        [ "$EXISTING_BACKUP_TIME" == "null" ] && EXISTING_BACKUP_TIME="03:00"
+        [ -z "$EXISTING_BACKUP_TIME" ] || [ "$EXISTING_BACKUP_TIME" == "null" ] && EXISTING_BACKUP_TIME="03:00"
+        EXISTING_EXTERNAL_DUCKDNS=$(get_config_val "external_duckdns_name")
         
         if [ -n "$EXISTING_DOCKER_ROOT" ] && [ "$EXISTING_DOCKER_ROOT" != "null" ]; then
             echo "Existing configuration found:"
@@ -154,7 +152,9 @@ function run_configuration_phase() {
                     
                     # Prepare the disk immediately
                     print_info "Preparing backup disk (requires sudo)..."
-                    sudo ./scripts/backup-utils.sh setup_disk "$BACKUP_DEVICE" "$BACKUP_PATH"
+                    SUDO_CMD="sudo "
+                    case "$(uname -s)" in CYGWIN*|MINGW*|MSYS*) SUDO_CMD="" ;; esac
+                    $SUDO_CMD ./scripts/backup-utils.sh setup_disk "$BACKUP_DEVICE" "$BACKUP_PATH"
                 fi
             elif [ "$BACKUP_TYPE_CHOICE" == "2" ]; then
                 BACKUP_MODE="folder"
@@ -173,16 +173,17 @@ function run_configuration_phase() {
             fi
         fi
 
-        check_jq
-        # Initialize with empty backups array and watchtower_configs if creating new
-        jq -n \
-          --arg dr "$DOCKER_ROOT" \
-          --arg dns "$BASE_DNS_NAME" \
-          --arg bm "$BACKUP_MODE" \
-          --arg bp "$BACKUP_PATH" \
-          --arg bt "$BACKUP_TIME" \
-          --argjson bk "[]" \
-          '{docker_root: $dr, base_dns_name: $dns, backup_mode: $bm, backup_path: $bp, backup_time: $bt, backups: $bk, watchtower_configs: {}}' > "$CONFIG_FILE"
+        # Write config.yaml
+        echo "docker_root: \"$DOCKER_ROOT\"" > "$CONFIG_FILE"
+        echo "base_dns_name: \"$BASE_DNS_NAME\"" >> "$CONFIG_FILE"
+        echo "backup_mode: \"$BACKUP_MODE\"" >> "$CONFIG_FILE"
+        echo "backup_path: \"$BACKUP_PATH\"" >> "$CONFIG_FILE"
+        echo "backup_time: \"$BACKUP_TIME\"" >> "$CONFIG_FILE"
+        if [ -n "$EXISTING_EXTERNAL_DUCKDNS" ] && [ "$EXISTING_EXTERNAL_DUCKDNS" != "null" ]; then
+             echo "external_duckdns_name: \"$EXISTING_EXTERNAL_DUCKDNS\"" >> "$CONFIG_FILE"
+        fi
+        touch "$CONFIG_DIR/backups.yaml"
+        touch "$CONFIG_DIR/watchtower_configs.yaml"
         print_success "Configuration saved."
     fi
 }
@@ -252,7 +253,9 @@ function run_service_installation_phase() {
 
                  if [ -d "$TARGET_DATA_DIR" ]; then
                       print_info "Configuring backup for $SERVICE_NAME..."
-                      sudo -E "$REPO_ROOT/scripts/backup-utils.sh" configure_service "$TARGET_DATA_DIR" "$BACKUP_PATH"
+                      SUDO_CMD="sudo -E "
+                      case "$(uname -s)" in CYGWIN*|MINGW*|MSYS*) SUDO_CMD="" ;; esac
+                      $SUDO_CMD "$REPO_ROOT/scripts/backup-utils.sh" configure_service "$TARGET_DATA_DIR" "$BACKUP_PATH"
                  else
                       print_warning "Could not locate service data at $TARGET_DATA_DIR for backup configuration."
                  fi
@@ -268,7 +271,9 @@ function run_service_installation_phase() {
     # Finalize Backup Schedule
     if [ "$BACKUP_MODE" != "none" ]; then
         print_info "Finalizing backup schedule..."
-        sudo "$REPO_ROOT/scripts/backup-utils.sh" finalize "$BACKUP_TIME"
+        SUDO_CMD="sudo "
+        case "$(uname -s)" in CYGWIN*|MINGW*|MSYS*) SUDO_CMD="" ;; esac
+        $SUDO_CMD "$REPO_ROOT/scripts/backup-utils.sh" finalize "$BACKUP_TIME"
     fi
 
     print_success "Service installation complete!"
@@ -306,8 +311,8 @@ elif ! command -v docker &> /dev/null; then
     
     run_configuration_phase
     
-    print_info "Running Core Installation (Docker, Tailscale, etc.)..."
-    ./install-core.sh
+    print_info "Running Core Installation (Docker, etc.)..."
+    ./scripts/install-core.sh
 
     echo ""
     print_success "Core system setup is complete!"

@@ -71,7 +71,7 @@ See the [what-should-i-install.md](docs/installation-tips/what-should-i-install.
    - Select the services you want to install.
 
 ### Advanced Options
-- **`-askwatchtower`**: By default, the installer remembers your Watchtower preference for each service in `config.json`. If you want to change these settings for already-installed services, run the installer with this flag:
+- **`-askwatchtower`**: By default, the installer remembers your Watchtower preference for each service in `watchtower_configs.yaml`. If you want to change these settings for already-installed services, run the installer with this flag:
   ```bash
   ./install.sh -askwatchtower
   ```
