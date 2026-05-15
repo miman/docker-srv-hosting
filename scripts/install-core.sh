@@ -3,7 +3,7 @@
 # It performs the following tasks:
 # 1. Sets up the Docker root directory and base DNS name in a local config file.
 # 2. Updates and upgrades the system's package list.
-# 3. Installs Docker and the Tailscale client.
+# 3. Installs Docker.
 # 4. Sources the main install.sh script to allow for application-specific setups.
 
 set -e
@@ -55,22 +55,11 @@ fi
 if [ "$is_windows" = false ]; then
     print_info "=======================> Making scripts executable..."
     chmod +x ./scripts/install-docker.sh
-    chmod +x ./scripts/install-tailscale-client.sh
-
     # 4. Install Docker
     ./scripts/install-docker.sh
-
-    # 5. Install Tailscale
-    read -p "Do you want to install the Tailscale client? (only relevant if you plan to use Tailscale or Headscale) [y/N] " INSTALL_TS
-    if [[ "$INSTALL_TS" =~ ^[Yy]$ ]]; then
-        ./scripts/install-tailscale-client.sh
-        print_info "You may need to run 'tailscale up' to connect your machine to your Tailnet."
-    else
-        print_info "Skipping Tailscale installation."
-    fi
 else
-    print_info "=======================> Skipping Docker and Tailscale installation on Windows."
-    print_info "Please ensure Docker Desktop and Tailscale are installed manually."
+    print_info "=======================> Skipping Docker installation on Windows."
+    print_info "Please ensure Docker Desktop is installed manually."
 fi
 
 echo -e "\n\n"

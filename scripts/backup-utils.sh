@@ -128,32 +128,9 @@ function configure_service_backup() {
     cp "$template" "$backup_script_path"
     
     # Replace Placeholders
-    # We need to know: 
-    #   SOURCE_DIR (absolute path to service data) -> usually $DOCKER_ROOT/$service_name/ ?? No, data is usually mapped.
-    #   Assume standard structure: $DOCKER_ROOT/$service_name mapped to local folders.
-    #   Wait, install-services.sh installs to $DOCKER_ROOT/$service_name
-    
-    # We are usually running this from the root of the repo, but the service runs in DOCKER_ROOT.
-    # Wait, the repo is cloned to X, but services are copied? OR does the repo become the DOCKER_ROOT?
-    # Looking at install-core.sh: "mkdir -p $DOCKER_FOLDER", and install-services.sh cd's into `portainer` etc. but 
-    # DOES NOT COPY. It runs `./install.sh` inside the repo.
-    # MOST install.sh scripts in this repo likely do `docker compose up`. 
-    # If they use relative paths (./data), then the data is IN THE REPO FOLDER.
-    # BUT `install-core.sh` defines `DOCKER_FOLDER`. 
-    # Let's check `immich/install.sh` later. 
-    # Assumption: The user wants to backup the RUNNING SERVICE DATA.
-    # If services use named volumes, valid backup is harder (needs `docker run --rm -v volume:/backup ...`).
-    # If bind mounts, we backup the folder.
-    
-    # For now, let's assume we backup the folder where the service is installed.
-    # If the user sets DOCKER_ROOT, usually that's where things live if properly set up?
-    # Actually, `install-core.sh` sets `DOCKER_ROOT` env var, but `install-services.sh` just cd's into the local folders.
-    # IT DOES NOT COPY THEM to DOCKER_ROOT.
-    # So the "Repo" IS the "Docker Root"? No, `install-core` creates a separate folder.
-    # This implies the existing scripts might be creating things in DOCKER_ROOT or using it.
-    
-    # Let's stick to: We backup the current directory of the service.
-    # We need absolute path.
+    # Standard structure:
+    # - service_dir: The data directory in DOCKER_ROOT (e.g., /home/user/docker_stacks/nextcloud)
+    # - backup_root: The destination for backups (e.g., /mnt/backup-drive/nextcloud)
     local service_abs_path="$(cd "$service_dir" && pwd)"
     local backup_dest="$backup_root/$service_name"
     

@@ -311,7 +311,7 @@ elif ! command -v docker &> /dev/null; then
     
     run_configuration_phase
     
-    print_info "Running Core Installation (Docker, Tailscale, etc.)..."
+    print_info "Running Core Installation (Docker, etc.)..."
     ./scripts/install-core.sh
 
     echo ""
