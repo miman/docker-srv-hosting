@@ -19,16 +19,16 @@ The core idea is to automatically setup a local cloud with most services you wou
 | [Headscale](headscale/readme.md)           | Self-hosted Tailscale secure network server (like VPN) |
 | [Home Assistant](home-assistant/ReadMe.md)      | Home automation platform                               |
 | [Immich](immich/readme.md)              | Self-hosted photo & video backup                       |
-| Linux-in-Docker     | Lightweight Linux desktop in Docker with Web UI        |
+| [Linux-in-Docker](linux-in-docker/readme.md)     | Lightweight Linux desktop in Docker with Web UI        |
 | [Lyra](ai/3d/Lyra/readme.md) | NVIDIA Lyra-2.0 for high-performance AI generation |
 | [Netbird](netbird/readme.md) | Zero-configuration VPN for secure device connectivity |
 | [Nextcloud](nextcloud/readme.md)           | File sync and collaboration suite                      |
-| Nextcloud AIO       | Easy-to-deploy Nextcloud All-in-One version            |
+| [Nextcloud AIO](nextcloud-aio/readme.md)       | Easy-to-deploy Nextcloud All-in-One version            |
 | [Nginx Reverse Proxy](nginx-reverse-proxy/readme.md) | Reverse proxy for web services                         |
 | [Ollama LLM server](ollama/ReadMe.md)   | Local LLM (AI) server                                  |
 | [Open WebUI for Ollama](open-webui/ReadMe.md)   | Web interface for Ollama LLM                           |
 | [Portainer](portainer/readme.md)           | Docker management srv OR Agent                         |
-| Registry           | Local Docker registry                         |
+| [Registry](registry/readme.md)           | Local Docker registry                         |
 | [SearXNG](searxng/readme.md)   | Privacy-respecting metasearch engine (used for web search in local AI)                  |
 | [Synapse](synapse/readme.md) | Matrix homeserver for secure communication (chat/video)  |
 | [Traccar](traccar/readme.md)             | GPS tracking platform                                  |
