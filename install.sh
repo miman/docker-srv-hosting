@@ -214,20 +214,20 @@ function run_service_installation_phase() {
     echo ""
     read -p "Press Enter to start installation..."
 
-    if [ ${#SERVICES_TO_INSTALL[@]} -eq 0 ]; then
+    if [ ${#SERVICES_TO_INSTALL[@]} -eq 0 ] && [ "$BACKUP_MODE" == "none" ]; then
         print_info "No services selected. Exiting."
         exit 0
     fi
 
-    print_info "Installing Services..."
-    export DOCKER_FOLDER="$DOCKER_ROOT"
-    export BASE_DNS_NAME="$BASE_DNS_NAME"
-    
     # Capture current repo root to call scripts absolutely
     REPO_ROOT=$(pwd)
-
     export HSC_CONFIG_PATH="$CONFIG_FILE"
-    for SERVICE_DIR in "${SERVICES_TO_INSTALL[@]}"; do
+
+    if [ ${#SERVICES_TO_INSTALL[@]} -gt 0 ]; then
+        print_info "Installing Services..."
+        export DOCKER_FOLDER="$DOCKER_ROOT"
+        export BASE_DNS_NAME="$BASE_DNS_NAME"
+        for SERVICE_DIR in "${SERVICES_TO_INSTALL[@]}"; do
         print_info "Installing $SERVICE_DIR..."
         if [ -d "$SERVICE_DIR" ]; then
             cd "$SERVICE_DIR"
@@ -267,6 +267,7 @@ function run_service_installation_phase() {
             print_error "Directory $SERVICE_DIR not found!"
         fi
     done
+    fi
     
     # Finalize Backup Schedule
     if [ "$BACKUP_MODE" != "none" ]; then
