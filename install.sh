@@ -25,6 +25,7 @@ AVAILABLE_SERVICES=(
     "cloud-services/nextcloud:Nextcloud"
     "cloud-services/nextcloud-aio:Nextcloud AIO"
     "infrastructure/nginx-reverse-proxy:Nginx Reverse Proxy"
+    "infrastructure/duckdns-updater:DuckDNS"
     "infrastructure/registry:Registry"
     "ai/searxng:SearXNG"
     "ai/comfy_ui:ComfyUI"

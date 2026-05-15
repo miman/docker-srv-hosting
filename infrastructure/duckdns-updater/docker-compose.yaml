@@ -1,0 +1,13 @@
+services:
+  duckdns_updater:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: duckdns_updater
+    environment:
+      - PUID=1000 # Valfritt, ditt lokala användar-ID
+      - PGID=1000 # Valfritt, ditt lokala grupp-ID
+      - TZ=Europe/Stockholm
+      - SUBDOMAINS=${EXTERNAL_DUCKDNS_NAME} # Skriv bara själva namnet, INTE ".duckdns.org"
+      - TOKEN=${DUCKDNS_TOKEN}
+      - UPDATE_IP=ipv4 # Ändra till 'both' om du även vill uppdatera IPv6
+      - LOG_FILE=false
+    restart: unless-stopped

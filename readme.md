@@ -25,6 +25,7 @@ The core idea is to automatically setup a local cloud with most services you wou
 | [Nextcloud](cloud-services/nextcloud/readme.md)           | File sync and collaboration suite                      |
 | [Nextcloud AIO](cloud-services/nextcloud-aio/readme.md)       | Easy-to-deploy Nextcloud All-in-One version            |
 | [Nginx Reverse Proxy](infrastructure/nginx-reverse-proxy/readme.md) | Reverse proxy for web services                         |
+| [DuckDNS Updater](infrastructure/duckdns-updater/readme.md) | Dynamic DNS updater for DuckDNS service to keep your domain name updated with your current IP address.                                    | 
 | [Ollama LLM server](ai/ollama/ReadMe.md)   | Local LLM (AI) server                                  |
 | [Open WebUI for Ollama](ai/open-webui/ReadMe.md)   | Web interface for Ollama LLM                           |
 | [Portainer](infrastructure/portainer/readme.md)           | Docker management srv OR Agent                         |
