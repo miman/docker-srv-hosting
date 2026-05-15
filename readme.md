@@ -13,28 +13,28 @@ The core idea is to automatically setup a local cloud with most services you wou
 
 | Service             | Description                                            |
 | ------------------- | ------------------------------------------------------ |
-| [ComfyUI](comfy_ui/ReadMe.md) | Powerful and modular stable diffusion GUI/backend |
-| [Docmost](docmost/readme.md)             | Self-hosted documentation/wiki platform                |
-| [Glance Dashboard](glance-dashboard/readme.md)    | Customizable dashboard/monitoring                      |
-| [Headscale](headscale/readme.md)           | Self-hosted Tailscale secure network server (like VPN) |
-| [Home Assistant](home-assistant/ReadMe.md)      | Home automation platform                               |
-| [Immich](immich/readme.md)              | Self-hosted photo & video backup                       |
-| [Linux-in-Docker](linux-in-docker/readme.md)     | Lightweight Linux desktop in Docker with Web UI        |
+| [ComfyUI](ai/comfy_ui/ReadMe.md) | Powerful and modular stable diffusion GUI/backend |
+| [Docmost](cloud-services/docmost/readme.md)             | Self-hosted documentation/wiki platform                |
+| [Glance Dashboard](cloud-services/glance-dashboard/readme.md)    | Customizable dashboard/monitoring                      |
+| [Headscale](infrastructure/headscale/readme.md)           | Self-hosted Tailscale secure network server (like VPN) |
+| [Home Assistant](cloud-services/home-assistant/ReadMe.md)      | Home automation platform                               |
+| [Immich](cloud-services/immich/readme.md)              | Self-hosted photo & video backup                       |
+| [Linux-in-Docker](cloud-services/linux-in-docker/readme.md)     | Lightweight Linux desktop in Docker with Web UI        |
 | [Lyra](ai/3d/Lyra/readme.md) | NVIDIA Lyra-2.0 for high-performance AI generation |
-| [Netbird](netbird/readme.md) | Zero-configuration VPN for secure device connectivity |
-| [Nextcloud](nextcloud/readme.md)           | File sync and collaboration suite                      |
-| [Nextcloud AIO](nextcloud-aio/readme.md)       | Easy-to-deploy Nextcloud All-in-One version            |
-| [Nginx Reverse Proxy](nginx-reverse-proxy/readme.md) | Reverse proxy for web services                         |
-| [Ollama LLM server](ollama/ReadMe.md)   | Local LLM (AI) server                                  |
-| [Open WebUI for Ollama](open-webui/ReadMe.md)   | Web interface for Ollama LLM                           |
-| [Portainer](portainer/readme.md)           | Docker management srv OR Agent                         |
-| [Registry](registry/readme.md)           | Local Docker registry                         |
-| [SearXNG](searxng/readme.md)   | Privacy-respecting metasearch engine (used for web search in local AI)                  |
-| [Synapse](synapse/readme.md) | Matrix homeserver for secure communication (chat/video)  |
-| [Traccar](traccar/readme.md)             | GPS tracking platform                                  |
-| [Vaultwarden](vaultwarden/readme.md)         | Self-hosted password manager                           |
-| [Verdaccio](verdaccio/README.md)         | Local NPM registry                           |
-| [Watchtower](watchtower/readme.md) | Automates Docker container image updates               |
+| [Netbird](infrastructure/netbird/readme.md) | Zero-configuration VPN for secure device connectivity |
+| [Nextcloud](cloud-services/nextcloud/readme.md)           | File sync and collaboration suite                      |
+| [Nextcloud AIO](cloud-services/nextcloud-aio/readme.md)       | Easy-to-deploy Nextcloud All-in-One version            |
+| [Nginx Reverse Proxy](infrastructure/nginx-reverse-proxy/readme.md) | Reverse proxy for web services                         |
+| [Ollama LLM server](ai/ollama/ReadMe.md)   | Local LLM (AI) server                                  |
+| [Open WebUI for Ollama](ai/open-webui/ReadMe.md)   | Web interface for Ollama LLM                           |
+| [Portainer](infrastructure/portainer/readme.md)           | Docker management srv OR Agent                         |
+| [Registry](infrastructure/registry/readme.md)           | Local Docker registry                         |
+| [SearXNG](ai/searxng/readme.md)   | Privacy-respecting metasearch engine (used for web search in local AI)                  |
+| [Synapse](cloud-services/synapse/readme.md) | Matrix homeserver for secure communication (chat/video)  |
+| [Traccar](cloud-services/traccar/readme.md)             | GPS tracking platform                                  |
+| [Vaultwarden](cloud-services/vaultwarden/readme.md)         | Self-hosted password manager                           |
+| [Verdaccio](development/verdaccio/README.md)         | Local NPM registry                           |
+| [Watchtower](infrastructure/watchtower/readme.md) | Automates Docker container image updates               |
 
 ### Volume folders & Backup
 
@@ -73,7 +73,7 @@ You can also select to automatically do backup of the volumes to a dedicated bac
 
 ### Smart Backups
 This project handles backups automatically for installed services.
-- **Auto-Discovery**: When you install a service via `install.sh`, a dedicated backup script is generated for it in its directory (e.g., `immich/backup.sh`).
+- **Auto-Discovery**: When you install a service via `install.sh`, a dedicated backup script is generated for it in its directory (e.g., `cloud-services/immich/backup.sh`).
 - **Context-Aware**:
   - Services with Databases (Postgres) get a script that dumps the DB + syncs files.
   - Other services get a smart Rsync backup.
