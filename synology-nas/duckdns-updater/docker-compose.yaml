@@ -1,0 +1,15 @@
+services:
+  duckdns_updater:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: duckdns_updater
+    environment:
+      - PUID=1024 # Optional, your local user ID (find by running cmd id in shell on Synology NAS)
+      - PGID=100 # Optional, your local group ID (find by running cmd id in shell on Synology NAS)
+      - TZ=Europe/Stockholm
+      - SUBDOMAINS=REPLACE_ME # Write just the name , NOT ".duckdns.org"
+      - TOKEN=REPLACE_ME # This must be set from you duckdns.org account.
+      - UPDATE_IP=ipv4 # Change to 'both' if you also want to update IPv6
+      - LOG_FILE=false
+    restart: unless-stopped
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
