@@ -1,6 +1,6 @@
 # Local cloud recommended setup
 
-This is what I would recommend if you want to replace most of the commercial cloud services with local alternatives (like your local Google Drive or Office 365)
+This is what I would recommend if you want to replace most of the commercial cloud services with local alternatives (like your local Google Drive or Office 365, Google Photos...)
 
 # Recommended services
 | Service             | Description                                            |

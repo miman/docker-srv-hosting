@@ -2,12 +2,15 @@
 
 The minimal setup of infrastructure services to get a secure network with HTTPS-certificate for you local services.
 
+These are the base services required for running the other services in this repository.
+
 ## Recommended services
 
 These services are required for the minimal setup (Netbird is optional if you use it through LAN only).
 
 | Service             | Description                                            |
 | ------------------- | ------------------------------------------------------ |
+| Docker | Docker is used to run all the services in this project |
 | [Netbird](../../infrastructure/netbird/readme.md) | Zero-configuration VPN for secure device connectivity |
 | [Nginx Reverse Proxy](../../infrastructure/nginx-reverse-proxy/readme.md) | Reverse proxy for web services                         |
 | [Watchtower](../../infrastructure/watchtower/readme.md) | Automates Docker container image updates               |
