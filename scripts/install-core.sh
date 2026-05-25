@@ -3,7 +3,7 @@
 # It performs the following tasks:
 # 1. Sets up the Docker root directory and base DNS name in a local config file.
 # 2. Updates and upgrades the system's package list.
-# 3. Installs Docker.
+# 3. Installs the chosen container engine (Docker or Podman).
 # 4. Sources the main install.sh script to allow for application-specific setups.
 
 set -e
@@ -20,6 +20,10 @@ function print_info() {
 
 function print_success() {
     echo -e "\e[32m[SUCCESS]\e[0m $1"
+}
+
+function print_warning() {
+    echo -e "\e[33m[WARNING]\e[0m $1"
 }
 
 function print_error() {
@@ -54,9 +58,10 @@ fi
 # 3. Make scripts executable
 if [ "$is_windows" = false ]; then
     print_info "=======================> Making scripts executable..."
-    chmod +x ./scripts/install-docker.sh
+    chmod +x ./scripts/install-container-engine.sh
     # 4. Install container engine (Docker or Podman)
-    ./scripts/install-docker.sh
+    print_info "=======================> Installing container engine: $CONTAINER_ENGINE..."
+    ./scripts/install-container-engine.sh
 else
     print_info "=======================> Skipping container engine installation on Windows."
     print_info "Please ensure Docker Desktop or Podman Desktop is installed manually."
@@ -67,7 +72,11 @@ print_success "All core installations are complete!"
 print_warning "------------------------------------------------------------------"
 print_warning " IMPORTANT: You must now log out and log back in."
 print_warning "------------------------------------------------------------------"
-print_info "This is required for Docker permissions to apply correctly."
+if [ "$CONTAINER_ENGINE" == "podman" ]; then
+    print_info "This is required for Podman permissions to apply correctly."
+else
+    print_info "This is required for Docker permissions to apply correctly."
+fi
 print_info "After logging back in, run 'install.sh' again to install services."
 echo ""
 read -n 1 -s -r -p "Press any key to log out now..."
