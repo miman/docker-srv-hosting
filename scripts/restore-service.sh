@@ -1,6 +1,10 @@
 #!/bin/bash
 # Restore Utility for Docker Service Hosting
 
+# Source config for container engine settings
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/read-config.sh"
+
 # --- Helper Functions ---
 function print_info() { echo -e "\e[34m[INFO]\e[0m $1"; }
 function print_success() { echo -e "\e[32m[SUCCESS]\e[0m $1"; }
@@ -65,7 +69,7 @@ print_info "Target Directory: $TARGET_DIR"
 print_info "Stopping service..."
 if [ -f "$TARGET_DIR/docker-compose.yml" ]; then
     cd "$TARGET_DIR" || exit 1
-    docker compose down
+    $COMPOSE_CMD down
     cd - > /dev/null || exit 1
 fi
 
@@ -96,7 +100,7 @@ if [ -d "$DB_DUMP_DIR" ]; then
         # Start only the DB service? hard to know the service name from here without parsing yaml properly.
         # Usually it's 'db' or 'database' or 'postgres'.
         # Fallback: Start all, but detached.
-        docker compose up -d
+        $COMPOSE_CMD up -d
         
         print_info "Waiting for database to initialize..."
         sleep 10 # Crude wait
@@ -104,7 +108,7 @@ if [ -d "$DB_DUMP_DIR" ]; then
         print_info "Restoring Database..."
         # Drop and Re-create??
         # Usually `psql < file.sql` is enough if dump was clean.
-        cat "$LATEST_DUMP" | docker exec -i "$DB_CONTAINER" psql -U postgres
+        cat "$LATEST_DUMP" | $CONTAINER_CMD exec -i "$DB_CONTAINER" psql -U postgres
         
         cd - > /dev/null || exit 1
         print_success "Database restored."
@@ -114,7 +118,7 @@ fi
 # 6. Restart Service
 print_info "Restarting service..."
 cd "$TARGET_DIR" || exit 1
-docker compose up -d
+$COMPOSE_CMD up -d
 cd - > /dev/null || exit 1
 
 print_success "Restore complete for $SERVICE_NAME"

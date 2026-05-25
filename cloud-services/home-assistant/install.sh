@@ -7,8 +7,8 @@ source ../../scripts/read-config.sh
 ask_watchtower_label
 
 # Run the Docker compose file
-docker compose down
-docker compose pull
-docker compose up -d
+$COMPOSE_CMD down
+$COMPOSE_CMD pull
+$COMPOSE_CMD up -d
 
 echo "Home Assistant has been installed and is accessible on http://localhost:8123"

@@ -14,14 +14,14 @@ echo "Using $CONFIG_PATH for Vaultwarden data."
 
 read -p "Enter the domain for Vaultwarden (e.g. https://vw.domain.tld), or leave blank for none: " DOMAIN
 
-docker pull vaultwarden/server:latest
+$CONTAINER_CMD pull vaultwarden/server:latest
 
 DOMAIN_ARG=""
 if [ -n "$DOMAIN" ]; then
   DOMAIN_ARG="--env DOMAIN=$DOMAIN"
 fi
 
-docker run -d \
+$CONTAINER_CMD run -d \
   --name vaultwarden \
   $DOMAIN_ARG \
   -v "$CONFIG_PATH:/data" \

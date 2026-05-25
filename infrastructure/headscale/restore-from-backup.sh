@@ -29,7 +29,7 @@ echo "Setting ownership for ${DOCKER_FOLDER}/headscale"
 sudo chown -R $USER:$USER "${DOCKER_FOLDER}/headscale"
 
 echo "Headscale data restore complete. You may need to restart the Headscale container."
-echo "Example: docker compose restart headscale"
+echo "Example: $COMPOSE_CMD restart headscale"
 
 # Go back to previous folder
 cd -

@@ -8,6 +8,50 @@ DEFAULT_DOCKER_ROOT="$HOME/docker_stacks"
 BACKUP_MODE="none" # none, disk, folder
 BACKUP_PATH=""
 SERVICES_TO_INSTALL=()
+
+# Source read-config.sh to get container engine settings (CONTAINER_CMD, COMPOSE_CMD)
+# This will also prompt the user for container engine choice if not configured.
+# Only source if config already exists (first-run will go through install-core.sh instead)
+if [ -f "$CONFIG_FILE" ] && [ -f "./scripts/read-config.sh" ]; then
+    source ./scripts/read-config.sh
+else
+    # Config doesn't exist yet (first run), but we still need to determine the container engine.
+    # Prompt the user now and save it so install-core.sh and sub-scripts can use it.
+    export HSC_CONFIG_PATH="${HSC_CONFIG_PATH:-$HOME/.hsc/config.yaml}"
+    if [ -z "$CONTAINER_ENGINE" ]; then
+        echo ""
+        echo "No container engine configured. Which container engine do you want to use?"
+        echo "1) docker"
+        echo "2) podman"
+        read -p "Enter your choice [1-2]: " engine_choice
+        case $engine_choice in
+            1) CONTAINER_ENGINE="docker" ;;
+            2) CONTAINER_ENGINE="podman" ;;
+            *) echo "Invalid choice, defaulting to docker."; CONTAINER_ENGINE="docker" ;;
+        esac
+        # Save the choice to config
+        mkdir -p "$(dirname "$HSC_CONFIG_PATH")"
+        if [ ! -f "$HSC_CONFIG_PATH" ]; then
+            echo "container_engine: \"${CONTAINER_ENGINE}\"" > "$HSC_CONFIG_PATH"
+            chmod 600 "$HSC_CONFIG_PATH"
+        elif grep -q "^container_engine:" "$HSC_CONFIG_PATH"; then
+            _tmp_file=$(mktemp)
+            sed "s|^container_engine:.*|container_engine: \"${CONTAINER_ENGINE}\"|" "$HSC_CONFIG_PATH" > "$_tmp_file" && mv "$_tmp_file" "$HSC_CONFIG_PATH"
+        else
+            echo "container_engine: \"${CONTAINER_ENGINE}\"" >> "$HSC_CONFIG_PATH"
+        fi
+        echo "Saved container engine preference: $CONTAINER_ENGINE"
+    fi
+    export CONTAINER_ENGINE
+
+    if [ "$CONTAINER_ENGINE" == "podman" ]; then
+        export CONTAINER_CMD="podman"
+        export COMPOSE_CMD="podman compose"
+    else
+        export CONTAINER_CMD="docker"
+        export COMPOSE_CMD="docker compose"
+    fi
+fi
 # List of availalble services (folder_name:Display Name)
 AVAILABLE_SERVICES=(
     "infrastructure/portainer:Portainer"
@@ -289,30 +333,30 @@ print_header
 if [ -f "/.dockerenv" ]; then
     print_info "Installer is running inside a Docker container."
     
-    if ! command -v docker &> /dev/null; then
-         print_error "Docker command is not available inside this container."
-         echo "Please make sure the container has docker client installed and the docker socket is mounted."
+    if ! command -v docker &> /dev/null && ! command -v podman &> /dev/null; then
+         print_error "Neither docker nor podman command is available inside this container."
+         echo "Please make sure the container has a container client installed and the socket is mounted."
          exit 1
     fi
     
-    if ! docker info >/dev/null 2>&1; then
-        print_error "Cannot connect to the Docker daemon."
-        print_info "If you are running the installer inside a container, you must mount the host's Docker socket."
+    if ! $CONTAINER_CMD info >/dev/null 2>&1; then
+        print_error "Cannot connect to the container daemon ($CONTAINER_CMD)."
+        print_info "If you are running the installer inside a container, you must mount the host's socket."
         print_info "Example: docker run -v /var/run/docker.sock:/var/run/docker.sock ..."
         exit 1
     fi
     
-    print_success "Docker connection is working. Proceeding with service installation."
+    print_success "Container engine connection is working. Proceeding with service installation."
     run_configuration_phase
     run_service_installation_phase
 
-# Case 2: Running on a host, Docker is not installed
-elif ! command -v docker &> /dev/null; then
-    print_info "Docker is not detected on this system. Starting initial setup."
+# Case 2: Running on a host, container engine is not installed
+elif ! command -v docker &> /dev/null && ! command -v podman &> /dev/null; then
+    print_info "No container engine (docker/podman) detected on this system. Starting initial setup."
     
     run_configuration_phase
     
-    print_info "Running Core Installation (Docker, etc.)..."
+    print_info "Running Core Installation (container engine, etc.)..."
     ./scripts/install-core.sh
 
     echo ""
@@ -320,14 +364,14 @@ elif ! command -v docker &> /dev/null; then
     print_warning "------------------------------------------------------------------"
     print_warning " IMPORTANT: You must now log out and log back in."
     print_warning "------------------------------------------------------------------"
-    print_info "This is required for Docker permissions to apply correctly."
+    print_info "This is required for container engine permissions to apply correctly."
     print_info "After logging back in, run this script again ('./install.sh') to install your services."
     echo ""
     exit 0
 
-# Case 3: Running on a host, Docker is already installed
+# Case 3: Running on a host, container engine is already installed
 else
-    print_info "Docker is detected. Proceeding with service installation."
+    print_info "Container engine ($CONTAINER_ENGINE) is detected. Proceeding with service installation."
     
     run_configuration_phase
     run_service_installation_phase

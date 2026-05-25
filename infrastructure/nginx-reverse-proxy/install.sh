@@ -7,9 +7,9 @@ source ../../scripts/read-config.sh
 ask_watchtower_label
 
 # Run the Docker compose file
-docker compose down
-docker compose pull
-docker compose up -d
+$COMPOSE_CMD down
+$COMPOSE_CMD pull
+$COMPOSE_CMD up -d
 
 echo "reverse-proxy has been installed and is accessible on http://localhost:81"
 echo "log in with the following username and password: Default username: admin@example.com. Default password: changeme"

@@ -55,11 +55,11 @@ fi
 if [ "$is_windows" = false ]; then
     print_info "=======================> Making scripts executable..."
     chmod +x ./scripts/install-docker.sh
-    # 4. Install Docker
+    # 4. Install container engine (Docker or Podman)
     ./scripts/install-docker.sh
 else
-    print_info "=======================> Skipping Docker installation on Windows."
-    print_info "Please ensure Docker Desktop is installed manually."
+    print_info "=======================> Skipping container engine installation on Windows."
+    print_info "Please ensure Docker Desktop or Podman Desktop is installed manually."
 fi
 
 echo -e "\n\n"

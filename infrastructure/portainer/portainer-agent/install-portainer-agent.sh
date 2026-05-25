@@ -9,8 +9,8 @@ ask_watchtower_label
 
 echo "Deploying Portainer Agent Docker container..."
 
-docker compose down
-docker compose pull
-docker compose up -d --force-recreate
+$COMPOSE_CMD down
+$COMPOSE_CMD pull
+$COMPOSE_CMD up -d --force-recreate
 
 echo "Portainer Agent has been installed and is accessible on port 9001"

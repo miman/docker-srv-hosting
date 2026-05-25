@@ -58,9 +58,9 @@ EOF
 fi
 
 # Run the Docker compose file
-docker compose down
-docker compose pull
-docker compose up -d
+$COMPOSE_CMD down
+$COMPOSE_CMD pull
+$COMPOSE_CMD up -d
 
 echo "Netbird Control Plane has been installed"
 echo "Access it at https://<your-domain>/setup to create the first admin user."

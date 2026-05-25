@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Ensure DOCKER_FOLDER is set
+source ../../scripts/read-config.sh
+
 # Prompt user for the root folder for Portainer data
 read -p "Enter the absolute path for Portainer data (e.g. /volume1/docker/portainer): " PORTAINER_DATA_ROOT
 
@@ -17,4 +20,4 @@ EOF
 echo "PORTAINER_DATA_ROOT set to: $PORTAINER_DATA_ROOT"
 echo "Installing into Docker..."
 
-docker compose up -d
+$COMPOSE_CMD up -d

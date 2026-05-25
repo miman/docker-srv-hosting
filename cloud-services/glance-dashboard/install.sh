@@ -40,8 +40,8 @@ echo
 read -p "Press Enter to continue..."
 
 # Fetch the latest images
-docker compose pull
+$COMPOSE_CMD pull
 # Start the containers in detached mode
-docker compose up -d
+$COMPOSE_CMD up -d
 
 echo "Glance Dashboard is now running. You can access it at http://localhost:4403"

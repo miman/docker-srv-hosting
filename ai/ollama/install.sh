@@ -9,8 +9,8 @@ source ../../scripts/read-config.sh
 ask_watchtower_label
 
 # Ensure the docker network "local-ai-network" exists
-if ! docker network ls --filter name=local-ai-network --format '{{.Name}}' | grep -q "^local-ai-network$"; then
-  docker network create local-ai-network
+if ! $CONTAINER_CMD network ls --filter name=local-ai-network --format '{{.Name}}' | grep -q "^local-ai-network$"; then
+  $CONTAINER_CMD network create local-ai-network
 else
   echo "The network local-ai-network already exists."
 fi
@@ -37,9 +37,9 @@ fi
 # echo "COMPOSE_PART = $COMPOSE_PART"
 
 # Prompt for Ollama UI installation
-docker compose down
-docker compose pull ollama-container
-docker compose $COMPOSE_PART up -d --force-recreate --build ollama-container
+$COMPOSE_CMD down
+$COMPOSE_CMD pull ollama-container
+$COMPOSE_CMD $COMPOSE_PART up -d --force-recreate --build ollama-container
 
 echo "Ollama has been installed and is accessible on http://localhost:11434"
 echo "Find and download models here: https://ollama.com/library"
@@ -54,11 +54,11 @@ fi
 read -p "Do you want to install granite3.1-dense:2b model into Ollama (y/N)? " answer_model
 if [[ "$answer_model" =~ [Yy]$ ]]; then
   echo "Installing granite3.1-dense:2b as a model in Ollama..."
-  docker exec -it ollama ollama pull granite3.1-dense:2b
+  $CONTAINER_CMD exec -it ollama ollama pull granite3.1-dense:2b
 fi
 
 read -p "Do you want to be able to use image as input and install llava-phi3 model into Ollama (y/N)? " answer_model
 if [[ "$answer_model" =~ [Yy]$ ]]; then
   echo "Installing llava-phi3 as a model in Ollama..."
-  docker exec -it ollama ollama pull llava-phi3
+  $CONTAINER_CMD exec -it ollama ollama pull llava-phi3
 fi
