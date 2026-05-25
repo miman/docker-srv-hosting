@@ -2,7 +2,7 @@
 set -e
 
 # Ensure DOCKER_FOLDER is set
-source ../../scripts/read-config.sh
+source ../../../scripts/read-config.sh
 
 # Ask if Watchtower should manage this service
 ask_watchtower_label
