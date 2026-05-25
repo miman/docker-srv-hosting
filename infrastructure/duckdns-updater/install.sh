@@ -30,8 +30,8 @@ fi
 export DUCKDNS_TOKEN
 
 # Run the Docker compose file
-docker compose down
-docker compose pull
-docker compose up -d
+$COMPOSE_CMD down
+$COMPOSE_CMD pull
+$COMPOSE_CMD up -d
 
 echo "DuckDNS updater has been installed for $DUCKDNS_NAME"

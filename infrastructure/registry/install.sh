@@ -12,7 +12,7 @@ echo "installing registry on port 5000"
 # Create data directory
 mkdir -p "${DOCKER_FOLDER}/registry/data"
 
-docker run -d \
+$CONTAINER_CMD run -d \
   -p 5000:5000 \
   --restart=always \
   --name registry \
@@ -21,7 +21,7 @@ docker run -d \
 
 
 echo "installing joxit/docker-registry-ui on port 6001"
-docker run -d \
+$CONTAINER_CMD run -d \
   -p 6001:80 \
   --name registry-ui \
   --restart=always \

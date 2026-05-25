@@ -83,13 +83,13 @@ echo "HS_VERSION=${HS_VERSION}"
 echo "DOMAIN_NAME=${BASE_DNS_NAME}"
 echo "Headscale data path: $HEADSCALE_DATA_PATH"
 # Ensure the headscale-net network exists
-docker network inspect headscale-net >/dev/null 2>&1 || \
-    docker network create headscale-net
+$CONTAINER_CMD network inspect headscale-net >/dev/null 2>&1 || \
+    $CONTAINER_CMD network create headscale-net
 
 # Run the Docker compose file
-docker compose down
-docker compose pull
-docker compose up -d
+$COMPOSE_CMD down
+$COMPOSE_CMD pull
+$COMPOSE_CMD up -d
 
 echo "Headscale has been installed and is accessible on http://${BASE_DNS_NAME}:8080"
 echo "For more information on how to continue, see: https://headscale.net/stable/setup/install/container/#configure-and-run-headscale"

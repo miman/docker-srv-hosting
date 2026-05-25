@@ -63,9 +63,9 @@ fi
 
 
 # Run the Docker compose file
-docker compose down
-docker compose pull
-docker compose up -d
+$COMPOSE_CMD down
+$COMPOSE_CMD pull
+$COMPOSE_CMD up -d
 
 echo "Immich has been installed ($([ "$IMMICH_PROFILES" = "full" ] && echo "Full" || echo "Minimal") version)."
 echo "You can access it at http://<your-ip>:2283"

@@ -2,8 +2,12 @@
 
 # This script removes all created docker containers, networks & volumes
 
+# Source config for container engine settings
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../../scripts/read-config.sh"
+
 # Uninstall the ollama Docker container
-docker compose down -v --rmi all
+$COMPOSE_CMD down -v --rmi all
 
 # Remove the volume used by the Ollama Docker containers
-docker volume rm ollama 2>/dev/null || true
+$CONTAINER_CMD volume rm ollama 2>/dev/null || true

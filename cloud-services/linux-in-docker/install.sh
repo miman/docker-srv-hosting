@@ -15,14 +15,14 @@ echo "Using $CONFIG_PATH for container's /config volume."
 echo "Removing old container if it exists..."
 # -f stops it if it's running and removes it in one go. 
 # 2>/dev/null hides the error message if the container doesn't exist yet.
-docker rm -f local-linux 2>/dev/null || true
+$CONTAINER_CMD rm -f local-linux 2>/dev/null || true
 
 # The following lines can be removed from the docker run command below if you don't want to test tailscale on the machine:
 #  --privileged \
 #  --cap-add=NET_ADMIN \
 #  --device /dev/net/tun:/dev/net/tun \
 
-docker run -d \
+$CONTAINER_CMD run -d \
   --name=local-linux \
   -p 3000:3000 \
   -p 3001:3001 \

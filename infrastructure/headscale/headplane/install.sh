@@ -2,7 +2,7 @@
 set -e
 
 # Ensure DOCKER_FOLDER is set
-source ../../scripts/read-config.sh
+source ../../../scripts/read-config.sh
 
 # Ask if Watchtower should manage this service
 ask_watchtower_label
@@ -38,13 +38,13 @@ EOF
 fi
 
 # Ensure the headscale-net network exists
-docker network inspect headscale-net >/dev/null 2>&1 || \
-    docker network create headscale-net
+$CONTAINER_CMD network inspect headscale-net >/dev/null 2>&1 || \
+    $CONTAINER_CMD network create headscale-net
 
 # Pull & start the container
 echo "Deploying Headplane..."
-docker compose down
-docker compose pull
-docker compose up -d
+$COMPOSE_CMD down
+$COMPOSE_CMD pull
+$COMPOSE_CMD up -d
 
 echo "Headplane deployment complete."

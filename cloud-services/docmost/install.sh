@@ -57,6 +57,6 @@ echo "Press Enter to continue after you have finished editing..."
 read
 
 # Start the services
-docker compose up -d
+$COMPOSE_CMD up -d
 
 echo "Docmost is now running. Open http://localhost:4412 or your configured domain to complete setup."

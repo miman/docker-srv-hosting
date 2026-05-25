@@ -72,6 +72,49 @@ if [ -z "$EXTERNAL_DUCKDNS_NAME" ]; then
 fi
 export EXTERNAL_DUCKDNS_NAME
 
+# Read and export CONTAINER_ENGINE (docker or podman)
+# This determines which container runtime commands to use throughout the project.
+if [ -z "$CONTAINER_ENGINE" ]; then
+    if [ -f "$HSC_CONFIG_PATH" ]; then
+        CONTAINER_ENGINE=$(grep "^container_engine:" "$HSC_CONFIG_PATH" | sed -e "s/^container_engine:[[:space:]]*//;s/^[ \'\"]*//;s/[ \'\"]*$//")
+    fi
+
+    if [ -z "$CONTAINER_ENGINE" ] || [ "$CONTAINER_ENGINE" == "null" ]; then
+        echo ""
+        echo "No container engine configured. Which container engine do you want to use?"
+        echo "1) docker"
+        echo "2) podman"
+        read -p "Enter your choice [1-2]: " engine_choice
+        case $engine_choice in
+            1) CONTAINER_ENGINE="docker" ;;
+            2) CONTAINER_ENGINE="podman" ;;
+            *) echo "Invalid choice, defaulting to docker."; CONTAINER_ENGINE="docker" ;;
+        esac
+        # Save the choice to config
+        mkdir -p "$(dirname "$HSC_CONFIG_PATH")"
+        if [ ! -f "$HSC_CONFIG_PATH" ]; then
+            echo "container_engine: \"${CONTAINER_ENGINE}\"" > "$HSC_CONFIG_PATH"
+            chmod 600 "$HSC_CONFIG_PATH"
+        elif grep -q "^container_engine:" "$HSC_CONFIG_PATH"; then
+            _tmp_file=$(mktemp)
+            sed "s|^container_engine:.*|container_engine: \"${CONTAINER_ENGINE}\"|" "$HSC_CONFIG_PATH" > "$_tmp_file" && mv "$_tmp_file" "$HSC_CONFIG_PATH"
+        else
+            echo "container_engine: \"${CONTAINER_ENGINE}\"" >> "$HSC_CONFIG_PATH"
+        fi
+        echo "Saved container engine preference: $CONTAINER_ENGINE"
+    fi
+fi
+export CONTAINER_ENGINE
+
+# Set the container command variables based on the chosen engine
+if [ "$CONTAINER_ENGINE" == "podman" ]; then
+    export CONTAINER_CMD="podman"
+    export COMPOSE_CMD="podman compose"
+else
+    export CONTAINER_CMD="docker"
+    export COMPOSE_CMD="docker compose"
+fi
+
 # Helper function to set a value in config.yaml
 # Usage: set_config_value "some_key" "some_value"
 set_config_value() {

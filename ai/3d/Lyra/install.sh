@@ -2,6 +2,10 @@
 
 # --- Lyra 2.0 Auto-Installer for RTX 5070 Ti ---
 
+# Source config for container engine settings
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../../../scripts/read-config.sh"
+
 # 1. Configuration
 REPO_URL="https://github.com/nv-tlabs/lyra.git"
 INSTALL_DIR="Lyra-2.0"
@@ -9,7 +13,7 @@ INSTALL_DIR="Lyra-2.0"
 echo "🚀 Starting Lyra 2.0 Installation..."
 
 # 2. Check for NVIDIA Docker Runtime
-if ! docker info | grep -q "Runtimes: nvidia"; then
+if ! $CONTAINER_CMD info | grep -q "Runtimes: nvidia"; then
     echo "❌ Error: NVIDIA Container Toolkit not found."
     echo "Please install it from: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html"
     exit 1
@@ -58,10 +62,10 @@ EOF
 
 # 6. Build and Start
 echo "🛠️ Building Lyra 2.0 Docker Image (this may take a while)..."
-docker compose up --build -d
+$COMPOSE_CMD up --build -d
 
 echo "------------------------------------------------"
 echo "✅ Installation Complete!"
 echo "🌐 Web UI: http://localhost:7860"
-echo "📜 View Logs: docker logs -f lyra_webui"
+echo "📜 View Logs: $CONTAINER_CMD logs -f lyra_webui"
 echo "------------------------------------------------"

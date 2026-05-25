@@ -27,8 +27,8 @@ read -p "Press Enter to continue after you have finished editing the .env file..
 
 
 # Run the Docker compose file
-docker compose down
-docker compose pull
-docker compose up -d
+$COMPOSE_CMD down
+$COMPOSE_CMD pull
+$COMPOSE_CMD up -d
 
 echo "Nextcloud has been installed and is accessible on http://localhost:4520"
