@@ -9,7 +9,7 @@ services:
          - "8080:8080"   # For NPM to talk to
          - "3478:3478/udp" # STUN (Helps direct connections)
          - "41641:41641/udp" # Optional: For DERP relaying    
-      image: headscale/headscale:${HS_VERSION}
+      image: docker.io/headscale/headscale:${HS_VERSION}
       command: serve
       restart: unless-stopped
       environment:

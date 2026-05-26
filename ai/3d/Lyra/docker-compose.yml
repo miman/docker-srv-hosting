@@ -1,6 +1,6 @@
 services:
   lyra-engine:
-    image: nv-tlabs/lyra-2.0:latest
+    image: docker.io/nv-tlabs/lyra-2.0:latest
     container_name: lyra_webui
     # Your 5070 Ti needs the NVIDIA runtime to access CUDA
     deploy:

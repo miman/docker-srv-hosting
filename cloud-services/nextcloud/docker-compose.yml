@@ -1,6 +1,6 @@
 services:
    nextcloud:
-      image: nextcloud:32.0.2
+      image: docker.io/nextcloud:32.0.2
       container_name: nextcloud
       restart: unless-stopped
       ports:
@@ -24,7 +24,7 @@ services:
          - redis
 
    db:
-      image: postgres:18.1
+      image: docker.io/postgres:18.1
       container_name: nextcloud-db
       restart: unless-stopped
       environment:
@@ -35,14 +35,14 @@ services:
          - ${DOCKER_FOLDER}/nextcloud/db:/var/lib/postgresql
 
    redis:
-      image: redis:8.4.0
+      image: docker.io/redis:8.4.0
       container_name: nextcloud-redis
       restart: unless-stopped
       volumes:
          - ${DOCKER_FOLDER}/nextcloud/redis:/var/lib/redis
 
    collabora:
-      image: collabora/code:latest
+      image: docker.io/collabora/code:latest
       container_name: nextcloud-collabora
       restart: unless-stopped
       environment:

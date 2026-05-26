@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
    nextcloud-aio-mastercontainer:
-      image: nextcloud/all-in-one:latest
+      image: docker.io/nextcloud/all-in-one:latest
       container_name: nextcloud-aio-mastercontainer
       restart: always
       volumes:

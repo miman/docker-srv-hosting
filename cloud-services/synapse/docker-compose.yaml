@@ -1,7 +1,7 @@
 services:
   synapse:
     container_name: synapse
-    image: matrixdotorg/synapse:latest
+    image: docker.io/matrixdotorg/synapse:latest
     restart: always
     environment:
       - SYNAPSE_CONFIG_PATH=/data/homeserver.yaml
@@ -14,7 +14,7 @@ services:
 
   synapse-admin:
     container_name: synapse-admin
-    image: awesometechnologies/synapse-admin:0.10.1
+    image: docker.io/awesometechnologies/synapse-admin:0.10.1
     restart: always
     ports:
       - "4531:80"

@@ -3,7 +3,7 @@
 
 services:
   ollama-container:
-    image: ollama/ollama
+    image: docker.io/ollama/ollama
     container_name: ollama
     networks:
       - local-ai-network

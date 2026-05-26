@@ -1,6 +1,6 @@
 services:
   watchtower:
-    image: containrrr/watchtower:latest
+    image: docker.io/containrrr/watchtower:latest
     container_name: containrrr_watchtower
     restart: unless-stopped
     volumes:

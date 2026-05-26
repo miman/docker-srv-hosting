@@ -1,6 +1,6 @@
 services:
    traccar:
-      image: traccar/traccar
+      image: docker.io/traccar/traccar
       ports:
          - "4411:8082" # Web interface
          - "5055:5055/udp" # GPS device ports (for iOS Traccar Client App)

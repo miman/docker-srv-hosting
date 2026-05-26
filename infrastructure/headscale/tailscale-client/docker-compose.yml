@@ -1,7 +1,7 @@
 services:
    tailscale:
       container_name: tailscale
-      image: tailscale/tailscale:stable
+      image: docker.io/tailscale/tailscale:stable
       hostname: headtailscale
       volumes:
          - /home/ubuntu/docker/tailscale/data:/var/lib/tailscale

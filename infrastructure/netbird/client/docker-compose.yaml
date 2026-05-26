@@ -14,4 +14,4 @@ services:
           - NB_SETUP_KEY=<SETUP KEY>
       volumes:
           - ${DOCKER_FOLDER}/netbird:/var/lib/netbird
-      image: netbirdio/netbird:latest
+      image: docker.io/netbirdio/netbird:latest

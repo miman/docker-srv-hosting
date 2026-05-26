@@ -1,6 +1,6 @@
 services:
   verdaccio:
-    image: verdaccio/verdaccio:latest
+    image: docker.io/verdaccio/verdaccio:latest
     container_name: verdaccio-npm-cache
     restart: unless-stopped
     ports:

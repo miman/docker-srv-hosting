@@ -10,7 +10,7 @@ version:
 
 services:
    portainer:
-      image: portainer/portainer-ce:latest # The Docker image for Portainer Community Edition.
+      image: docker.io/portainer/portainer-ce:latest # The Docker image for Portainer Community Edition.
       container_name: portainer # Assigns a readable name to the container.
       restart:
          always # Ensures the container restarts automatically if it stops,
