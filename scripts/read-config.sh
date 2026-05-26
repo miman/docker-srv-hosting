@@ -60,7 +60,17 @@ if command -v podman &> /dev/null; then
     elif [ -S "/run/podman/podman.sock" ]; then
         export DOCKER_SOCK="/run/podman/podman.sock"
     fi
-    echo "Podman detected. Setting DOCKER_SOCK to: ${DOCKER_SOCK:-Not Found}"
+    
+    # Set dynamic DOCKER_VOLUMES location
+    if [ -d "$HOME/.local/share/containers/storage/volumes" ]; then
+        export DOCKER_VOLUMES="$HOME/.local/share/containers/storage/volumes"
+    elif [ -d "/var/lib/containers/storage/volumes" ]; then
+        export DOCKER_VOLUMES="/var/lib/containers/storage/volumes"
+    fi
+    
+    echo "Podman detected."
+    echo "  -> DOCKER_SOCK set to: ${DOCKER_SOCK:-Not Found}"
+    echo "  -> DOCKER_VOLUMES set to: ${DOCKER_VOLUMES:-Not Found}"
 fi
 
 # Read and export BASE_DNS_NAME
