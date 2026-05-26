@@ -13,7 +13,13 @@ services:
       - ${DOCKER_FOLDER}/comfy_ui/output:/app/output
       - ${DOCKER_FOLDER}/comfy_ui/user:/app/user
       - ${DOCKER_FOLDER}/comfy_ui/templates:/app/templates
-    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility

@@ -1,10 +1,9 @@
-# This file only contains the extra part needed if the computer has an nvidia card (Docker)
-# If you need more help, visit the Docker Compose reference guide at
-# https://docs.docker.com/go/compose-spec-reference/
+# This file only contains the extra part needed if the computer has an nvidia card (Podman)
+# Podman does not support 'runtime: nvidia', it uses CDI (Container Device Interface) instead.
+# Ensure CDI is configured: sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
 
 services:
   ollama-container:
-    runtime: nvidia
     deploy:
       resources:
         reservations:

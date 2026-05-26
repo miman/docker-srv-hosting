@@ -1,0 +1,4 @@
+# Docker-specific override: adds runtime: nvidia (not supported by Podman)
+services:
+  comfy-ui:
+    runtime: nvidia

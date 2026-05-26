@@ -18,12 +18,93 @@ fi
 # Ensure data directory exists
 mkdir -p "$DOCKER_FOLDER/ollama"
 
-# Prompt for Ollama UI installation
+# Prompt for Nvidia GPU usage
 read -p "Do you have an Nvidia GPU you want to use with Ollama (y/N)?  " answerNvidia
-echo "Deploying Docker container..."
+echo "Deploying container..."
 if [[ "$answerNvidia" =~ [Yy]$ ]]; then
   echo "Using Nvidia card in Ollama"
-  COMPOSE_PART="-f docker-compose.yaml -f docker-compose-nvidia.yaml"
+
+  # Check that nvidia-smi is available (driver installed)
+  if ! command -v nvidia-smi &> /dev/null; then
+    echo "Error: nvidia-smi not found. Please install the NVIDIA driver first." >&2
+    exit 1
+  fi
+  echo "  -> NVIDIA driver detected: $(nvidia-smi --query-gpu=driver_version --format=csv,noheader | head -1)"
+
+  # Detect if running on Windows (Git Bash / MSYS / WSL host)
+  IS_WINDOWS=false
+  if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+    IS_WINDOWS=true
+  elif [[ "$(uname -s)" == MINGW* || "$(uname -s)" == MSYS* ]]; then
+    IS_WINDOWS=true
+  fi
+
+  if [ "$IS_WINDOWS" = true ]; then
+    # On Windows, Docker Desktop handles GPU passthrough via WSL2 natively.
+    # No nvidia-container-toolkit or CDI setup needed.
+    echo "  -> Windows detected. Docker Desktop handles GPU passthrough via WSL2."
+    echo "  -> Ensure Docker Desktop has WSL2 backend enabled (Settings > General > Use WSL2)."
+  else
+    # Linux: check that nvidia-container-toolkit is installed
+    if ! command -v nvidia-ctk &> /dev/null; then
+      echo "nvidia-container-toolkit is not installed."
+      read -p "Do you want to install it now? (y/N): " install_ctk
+      if [[ "$install_ctk" =~ [Yy]$ ]]; then
+        echo "Installing nvidia-container-toolkit..."
+        if command -v apt-get &> /dev/null; then
+          # Debian/Ubuntu
+          curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+          curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+            sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+            sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+          sudo apt-get update
+          sudo apt-get install -y nvidia-container-toolkit
+        elif command -v dnf &> /dev/null; then
+          # Fedora/RHEL
+          curl -s -L https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo | \
+            sudo tee /etc/yum.repos.d/nvidia-container-toolkit.repo
+          sudo dnf install -y nvidia-container-toolkit
+        elif command -v pacman &> /dev/null; then
+          # Arch/Manjaro
+          sudo pacman -S --noconfirm nvidia-container-toolkit
+        else
+          echo "Error: Could not detect package manager (apt/dnf/pacman). Please install nvidia-container-toolkit manually." >&2
+          echo "  See: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html"
+          exit 1
+        fi
+      else
+        echo "Error: nvidia-container-toolkit is required for GPU support." >&2
+        exit 1
+      fi
+    fi
+
+    # For Podman: ensure CDI is configured
+    if [ "$CONTAINER_ENGINE" == "podman" ]; then
+      echo "  -> Podman detected, checking CDI (Container Device Interface) configuration..."
+      CDI_SPEC="/etc/cdi/nvidia.yaml"
+      if [ ! -f "$CDI_SPEC" ]; then
+        echo "  -> CDI spec not found at $CDI_SPEC. Generating..."
+        sudo nvidia-ctk cdi generate --output="$CDI_SPEC"
+        echo "  -> CDI spec generated successfully."
+      else
+        echo "  -> CDI spec already exists at $CDI_SPEC."
+      fi
+      # Verify CDI devices are listed
+      echo "  -> Available CDI devices:"
+      nvidia-ctk cdi list 2>/dev/null | head -5
+    else
+      # For Docker: configure the nvidia runtime
+      echo "  -> Docker detected, configuring nvidia runtime..."
+      sudo nvidia-ctk runtime configure --runtime=docker 2>/dev/null || true
+      sudo systemctl restart docker 2>/dev/null || true
+    fi
+  fi
+
+  if [ "$CONTAINER_ENGINE" == "podman" ]; then
+    COMPOSE_PART="-f docker-compose.yaml -f docker-compose-nvidia-podman.yaml"
+  else
+    COMPOSE_PART="-f docker-compose.yaml -f docker-compose-nvidia.yaml"
+  fi
 else
   COMPOSE_PART="-f docker-compose.yaml"
 fi
@@ -36,7 +117,6 @@ elif [ -f "docker-compose.override.yaml" ]; then
 fi
 # echo "COMPOSE_PART = $COMPOSE_PART"
 
-# Prompt for Ollama UI installation
 $COMPOSE_CMD down
 $COMPOSE_CMD pull ollama-container
 $COMPOSE_CMD $COMPOSE_PART up -d --force-recreate --build ollama-container

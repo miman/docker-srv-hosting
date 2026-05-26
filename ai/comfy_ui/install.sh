@@ -24,10 +24,24 @@ mkdir -p "$DOCKER_FOLDER/comfy_ui/user"
 mkdir -p "$DOCKER_FOLDER/comfy_ui/templates"
 
 # Deployment
-echo "Deploying ComfyUI Docker container..."
+echo "Deploying ComfyUI container..."
+
+# Build compose command - Docker needs the runtime: nvidia override
+COMPOSE_PART="-f docker-compose.yaml"
+if [ "$CONTAINER_ENGINE" != "podman" ]; then
+  COMPOSE_PART="$COMPOSE_PART -f docker-compose-nvidia-docker.yaml"
+fi
+
+# Include override if it exists
+if [ -f "docker-compose.override.yml" ]; then
+  COMPOSE_PART="$COMPOSE_PART -f docker-compose.override.yml"
+elif [ -f "docker-compose.override.yaml" ]; then
+  COMPOSE_PART="$COMPOSE_PART -f docker-compose.override.yaml"
+fi
+
 $COMPOSE_CMD down
-$COMPOSE_CMD build
-$COMPOSE_CMD up -d --force-recreate
+$COMPOSE_CMD $COMPOSE_PART build
+$COMPOSE_CMD $COMPOSE_PART up -d --force-recreate
 echo "ComfyUI has been installed and is accessible on http://localhost:4515"
 
 # Prompt the user if they want to download models
