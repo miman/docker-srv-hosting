@@ -40,10 +40,30 @@ if [[ "$answerNvidia" =~ [Yy]$ ]]; then
   fi
 
   if [ "$IS_WINDOWS" = true ]; then
-    # On Windows, Docker Desktop handles GPU passthrough via WSL2 natively.
-    # No nvidia-container-toolkit or CDI setup needed.
-    echo "  -> Windows detected. Docker Desktop handles GPU passthrough via WSL2."
-    echo "  -> Ensure Docker Desktop has WSL2 backend enabled (Settings > General > Use WSL2)."
+    if [ "$CONTAINER_ENGINE" == "podman" ]; then
+      echo "  -> Windows with Podman detected. Setting up GPU support inside the Podman machine..."
+      podman machine ssh '
+        if ! command -v nvidia-ctk &> /dev/null; then
+          echo "  -> Installing nvidia-container-toolkit inside Podman machine..."
+          sudo curl -s -L https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo -o /etc/yum.repos.d/nvidia-container-toolkit.repo
+          sudo dnf install -y nvidia-container-toolkit
+        else
+          echo "  -> nvidia-container-toolkit already installed."
+        fi
+        if [ ! -f /etc/cdi/nvidia.yaml ]; then
+          echo "  -> Generating CDI specification inside Podman machine..."
+          sudo mkdir -p /etc/cdi
+          sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+        else
+          echo "  -> CDI specification already exists."
+        fi
+      '
+    else
+      # On Windows with Docker, Docker Desktop handles GPU passthrough via WSL2 natively.
+      # No nvidia-container-toolkit or CDI setup needed.
+      echo "  -> Windows with Docker detected. Docker Desktop handles GPU passthrough via WSL2."
+      echo "  -> Ensure Docker Desktop has WSL2 backend enabled (Settings > General > Use WSL2)."
+    fi
   else
     # Linux: check that nvidia-container-toolkit is installed
     if ! command -v nvidia-ctk &> /dev/null; then
