@@ -45,6 +45,24 @@ fi
 # Export the variable so it's available to sub-processes like docker-compose
 export DOCKER_FOLDER
 
+# Detect Podman socket for rootless/rootful setups and export DOCKER_SOCK
+if command -v podman &> /dev/null; then
+    # Try to start/enable rootless user socket if using systemd and not active
+    if ! systemctl --user is-active --quiet podman.socket 2>/dev/null; then
+        systemctl --user enable --now podman.socket &>/dev/null || true
+    fi
+
+    # Set dynamic DOCKER_SOCK location
+    if [ -n "$XDG_RUNTIME_DIR" ] && [ -S "$XDG_RUNTIME_DIR/podman/podman.sock" ]; then
+        export DOCKER_SOCK="$XDG_RUNTIME_DIR/podman/podman.sock"
+    elif [ -S "/run/user/$(id -u)/podman/podman.sock" ]; then
+        export DOCKER_SOCK="/run/user/$(id -u)/podman/podman.sock"
+    elif [ -S "/run/podman/podman.sock" ]; then
+        export DOCKER_SOCK="/run/podman/podman.sock"
+    fi
+    echo "Podman detected. Setting DOCKER_SOCK to: ${DOCKER_SOCK:-Not Found}"
+fi
+
 # Read and export BASE_DNS_NAME
 if [ -z "$BASE_DNS_NAME" ]; then
     if [ -f "$HSC_CONFIG_PATH" ]; then
