@@ -66,6 +66,13 @@ if command -v podman &> /dev/null; then
         export DOCKER_VOLUMES="$HOME/.local/share/containers/storage/volumes"
     elif [ -d "/var/lib/containers/storage/volumes" ]; then
         export DOCKER_VOLUMES="/var/lib/containers/storage/volumes"
+    else
+        # If directories don't exist yet (clean install), default based on root/rootless user
+        if [ "$(id -u)" -ne 0 ]; then
+            export DOCKER_VOLUMES="$HOME/.local/share/containers/storage/volumes"
+        else
+            export DOCKER_VOLUMES="/var/lib/containers/storage/volumes"
+        fi
     fi
     
     echo "Podman detected."
