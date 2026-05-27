@@ -12,9 +12,13 @@ CONFIG_PATH="$DOCKER_FOLDER/vaultwarden"
 mkdir -p "$CONFIG_PATH"
 echo "Using $CONFIG_PATH for Vaultwarden data."
 
-read -p "Enter the domain for Vaultwarden (e.g. https://vw.domain.tld), or leave blank for none: " DOMAIN
+read -p "Enter the domain for Vaultwarden (e.g. https://vaultwarden.yourname.duckdns.org), or leave blank for none: " DOMAIN
 
-$CONTAINER_CMD pull vaultwarden/server:latest
+# Stop and remove existing container if it exists to avoid conflicts
+$CONTAINER_CMD stop vaultwarden &>/dev/null || true
+$CONTAINER_CMD rm vaultwarden &>/dev/null || true
+
+$CONTAINER_CMD pull docker.io/vaultwarden/server:latest
 
 DOMAIN_ARG=""
 if [ -n "$DOMAIN" ]; then
@@ -27,6 +31,6 @@ $CONTAINER_CMD run -d \
   -v "$CONFIG_PATH:/data" \
   --restart unless-stopped \
   -p 4410:80 \
-  vaultwarden/server:latest
+  docker.io/vaultwarden/server:latest
 
 echo "Vaultwarden is now running. You can access it at http://localhost:4410"
