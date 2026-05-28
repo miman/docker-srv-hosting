@@ -39,12 +39,13 @@ To enable HTTPS for all subdomains without creating individual certificates:
 2.  Click **Add Certificate** > **Let's Encrypt via DNS**.
 3.  Enter your wildcard domain in "Domain Names": `*.internal.duckdns.org`
 4.  Select your DNS provider (e.g., DuckDNS, Cloudflare)
-5. enter your credentials in the **Credentials File Content** field
-  ```
-  dns_duckdns_token={your-token}
-   ```
-6. write 120 in **Propagation Seconds**
-7.  Agree to the terms and click **Save**.
+5.  Enter your credentials in the **Credentials File Content** field:
+    ```
+    dns_duckdns_token={your-token}
+    ```
+6.  Write `120` in **Propagation Seconds**
+7.  **Key Type:** Select **ECDSA 256** (recommended for modern performance and stronger security) or **RSA 2048** (legacy compatibility).
+8.  Agree to the terms and click **Save**.
 
 ### 5. Create Proxy Hosts
 For each service you want to expose:
