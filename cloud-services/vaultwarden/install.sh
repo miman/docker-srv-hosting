@@ -29,7 +29,7 @@ $CONTAINER_CMD run -d \
   --name vaultwarden \
   $DOMAIN_ARG \
   -v "$CONFIG_PATH:/data" \
-  --restart unless-stopped \
+  --restart $RESTART_POLICY \
   -p 4410:80 \
   docker.io/vaultwarden/server:latest
 

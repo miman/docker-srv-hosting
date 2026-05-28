@@ -17,7 +17,7 @@ services:
       # - WATCHTOWER_DEBUG=true
     ports:
       - "127.0.0.1:8080:8080"
-    restart: unless-stopped
+    restart: $RESTART_POLICY
     logging:
       driver: "json-file"
       options:

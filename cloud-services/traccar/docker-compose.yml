@@ -10,7 +10,7 @@ services:
       volumes:
          - ${DOCKER_FOLDER}/traccar:/opt/traccar
          # - ./traccar.xml:/opt/traccar/conf/traccar.xml #Optional, to override default config.
-      # restart: unless-stopped
+      # restart: $RESTART_POLICY
       environment:
          - TZ=Your_Timezone # Replace with your timezone (e.g., Europe/London)
       #network_mode: host #Alternatively, for easier port access.

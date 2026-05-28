@@ -13,7 +13,7 @@ services:
          - HP_SERVER_PORT=3000
          - HP_SERVER_COOKIE_SECURE=false
          - HP_HEADSCALE_CONFIG_STRICT=false
-      restart: unless-stopped
+      restart: $RESTART_POLICY
       networks:
          - headscale-net
 

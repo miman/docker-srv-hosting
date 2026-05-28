@@ -2,7 +2,7 @@ services:
    nginxproxymgr:
       image: "docker.io/jc21/nginx-proxy-manager:latest"
       container_name: reverse_proxy
-      restart: unless-stopped
+      restart: $RESTART_POLICY
       network_mode: host
       volumes:
          - ${DOCKER_FOLDER}/nginx-pm/data:/data

@@ -13,7 +13,7 @@ services:
       REDIS_URL: 'redis://redis:6379'
     ports:
       - 4412:3000
-    restart: unless-stopped
+    restart: $RESTART_POLICY
     volumes:
       - docmost:/app/data/storage
 
@@ -23,13 +23,13 @@ services:
       POSTGRES_DB: docmost
       POSTGRES_USER: docmost
       POSTGRES_PASSWORD: STRONG_DB_PASSWORD
-    restart: unless-stopped
+    restart: $RESTART_POLICY
     volumes:
       - db_data:/var/lib/postgresql/data
 
   redis:
     image: docker.io/redis:7.2-alpine
-    restart: unless-stopped
+    restart: $RESTART_POLICY
     volumes:
       - redis_data:/data
 

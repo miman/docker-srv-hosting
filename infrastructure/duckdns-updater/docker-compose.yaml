@@ -10,4 +10,4 @@ services:
       - TOKEN=${DUCKDNS_TOKEN}
       - UPDATE_IP=ipv4 # Ändra till 'both' om du även vill uppdatera IPv6
       - LOG_FILE=false
-    restart: unless-stopped
+    restart: $RESTART_POLICY

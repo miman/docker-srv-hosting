@@ -13,4 +13,4 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    restart: unless-stopped
+    restart: $RESTART_POLICY

@@ -47,9 +47,11 @@ else
     if [ "$CONTAINER_ENGINE" == "podman" ]; then
         export CONTAINER_CMD="podman"
         export COMPOSE_CMD="podman compose"
+        export RESTART_POLICY="always"
     else
         export CONTAINER_CMD="docker"
         export COMPOSE_CMD="docker compose"
+        export RESTART_POLICY="unless-stopped"
     fi
 fi
 # List of availalble services (folder_name:Display Name)

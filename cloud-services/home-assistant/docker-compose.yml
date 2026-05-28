@@ -2,7 +2,7 @@ services:
    homeassistant:
       container_name: homeassistant
       image: "ghcr.io/home-assistant/home-assistant:stable"
-      restart: unless-stopped
+      restart: $RESTART_POLICY
       privileged: true
       network_mode: host
       volumes:

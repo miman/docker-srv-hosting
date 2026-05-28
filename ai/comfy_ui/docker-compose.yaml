@@ -2,7 +2,7 @@ services:
   comfy-ui:
     build: .
     container_name: comfy-ui
-    restart: unless-stopped
+    restart: $RESTART_POLICY
     shm_size: '4gb' # Critical for Blackwell GPUs
     ports:
       - "4515:8188"

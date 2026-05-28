@@ -3,7 +3,7 @@ services:
   dashboard:
     image: docker.io/netbirdio/dashboard:latest
     container_name: netbird-dashboard
-    restart: unless-stopped
+    restart: $RESTART_POLICY
     env_file:
       - ./dashboard.env
     logging:
@@ -16,7 +16,7 @@ services:
   netbird-server:
     image: docker.io/netbirdio/netbird-server:latest
     container_name: netbird-server
-    restart: unless-stopped
+    restart: $RESTART_POLICY
     ports:
       - '3478:3478/udp'
     volumes:

@@ -11,7 +11,7 @@ services:
          - "41641:41641/udp" # Optional: For DERP relaying    
       image: docker.io/headscale/headscale:${HS_VERSION}
       command: serve
-      restart: unless-stopped
+      restart: $RESTART_POLICY
       environment:
          - TZ=Europe/Stockholm
       networks:

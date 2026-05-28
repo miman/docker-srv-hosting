@@ -2,7 +2,7 @@ services:
    nextcloud:
       image: docker.io/nextcloud:32.0.2
       container_name: nextcloud
-      restart: unless-stopped
+      restart: $RESTART_POLICY
       ports:
          - "4520:80"
       volumes:
@@ -26,7 +26,7 @@ services:
    db:
       image: docker.io/postgres:18.1
       container_name: nextcloud-db
-      restart: unless-stopped
+      restart: $RESTART_POLICY
       environment:
          - POSTGRES_USER=${POSTGRES_USER}
          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -37,14 +37,14 @@ services:
    redis:
       image: docker.io/redis:8.4.0
       container_name: nextcloud-redis
-      restart: unless-stopped
+      restart: $RESTART_POLICY
       volumes:
          - ${DOCKER_FOLDER}/nextcloud/redis:/var/lib/redis
 
    collabora:
       image: docker.io/collabora/code:latest
       container_name: nextcloud-collabora
-      restart: unless-stopped
+      restart: $RESTART_POLICY
       environment:
          - domain=${NEXTCLOUD_TRUSTED_DOMAINS}
          - username=${COLLABORA_USERNAME}

@@ -2,7 +2,7 @@ services:
   verdaccio:
     image: docker.io/verdaccio/verdaccio:latest
     container_name: verdaccio-npm-cache
-    restart: unless-stopped
+    restart: $RESTART_POLICY
     ports:
       # Port 4873 är standardporten för Verdaccio
       - "4873:4873"
