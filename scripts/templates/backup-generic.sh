@@ -4,19 +4,34 @@
 
 SOURCE="{{SOURCE_DIR}}"
 DESTINATION="{{BACKUP_DEST}}"
+BACKUP_RETENTION={{BACKUP_RETENTION}}
 DATE=$(date +%Y-%m-%d_%H%M%S)
 
 echo "--- Starting Backup $DATE for {{SERVICE_NAME}} ---"
 
-mkdir -p "$DESTINATION"
+# Create date-stamped backup folder
+BACKUP_DIR="$DESTINATION/$DATE"
+mkdir -p "$BACKUP_DIR"
 
 # Sync Data
-echo "Syncing data from $SOURCE to $DESTINATION..."
+echo "Syncing data from $SOURCE to $BACKUP_DIR..."
 # Exclude commonly ignored files
-rsync -av --delete \
+rsync -av \
     --exclude '.git' \
     --exclude 'node_modules' \
     --exclude '*.log' \
-    "$SOURCE/" "$DESTINATION/"
+    "$SOURCE/" "$BACKUP_DIR/"
+
+# Update 'latest' symlink
+ln -sfn "$BACKUP_DIR" "$DESTINATION/latest"
+
+# Prune old backups (keep only the newest $BACKUP_RETENTION)
+echo "Pruning old backups (keeping $BACKUP_RETENTION)..."
+cd "$DESTINATION" || exit 1
+# List date-stamped directories, sorted oldest first, remove excess
+ls -dt */ 2>/dev/null | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}_' | tail -n +$((BACKUP_RETENTION + 1)) | while read -r old_dir; do
+    echo "Removing old backup: $old_dir"
+    rm -rf "$old_dir"
+done
 
 echo "--- Backup Completed ---"

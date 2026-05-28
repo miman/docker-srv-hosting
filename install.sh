@@ -131,6 +131,8 @@ function run_configuration_phase() {
         [ -z "$EXISTING_BACKUP_PATH" ] || [ "$EXISTING_BACKUP_PATH" == "null" ] && EXISTING_BACKUP_PATH=""
         EXISTING_BACKUP_TIME=$(get_config_val "backup_time")
         [ -z "$EXISTING_BACKUP_TIME" ] || [ "$EXISTING_BACKUP_TIME" == "null" ] && EXISTING_BACKUP_TIME="03:00"
+        EXISTING_BACKUP_RETENTION=$(get_config_val "backup_retention")
+        [ -z "$EXISTING_BACKUP_RETENTION" ] || [ "$EXISTING_BACKUP_RETENTION" == "null" ] && EXISTING_BACKUP_RETENTION="5"
         EXISTING_EXTERNAL_DUCKDNS=$(get_config_val "external_duckdns_name")
         
         if [ -n "$EXISTING_DOCKER_ROOT" ] && [ "$EXISTING_DOCKER_ROOT" != "null" ]; then
@@ -138,7 +140,7 @@ function run_configuration_phase() {
             echo "  Docker Root: $EXISTING_DOCKER_ROOT"
             echo "  Base DNS:    $EXISTING_DNS"
             if [ "$EXISTING_BACKUP_MODE" != "none" ] && [ "$EXISTING_BACKUP_MODE" != "null" ]; then
-                 echo "  Backup:      $EXISTING_BACKUP_MODE -> $EXISTING_BACKUP_PATH (@ $EXISTING_BACKUP_TIME)"
+                 echo "  Backup:      $EXISTING_BACKUP_MODE -> $EXISTING_BACKUP_PATH (@ $EXISTING_BACKUP_TIME, keep $EXISTING_BACKUP_RETENTION)"
             fi
             echo ""
             read -p "Do you want to use this configuration? [Y/n] " use_existing
@@ -151,6 +153,7 @@ function run_configuration_phase() {
                  BACKUP_MODE="$EXISTING_BACKUP_MODE"
                  BACKUP_PATH="$EXISTING_BACKUP_PATH"
                  BACKUP_TIME="$EXISTING_BACKUP_TIME"
+                 BACKUP_RETENTION="$EXISTING_BACKUP_RETENTION"
             fi
         fi
     fi
@@ -167,6 +170,7 @@ function run_configuration_phase() {
         BACKUP_MODE="none"
         BACKUP_PATH=""
         BACKUP_TIME="03:00"
+        BACKUP_RETENTION=5
 
         read -p "Do you want to enable automatic backups? [y/N] " ENABLE_BACKUP
         if [[ "$ENABLE_BACKUP" =~ ^[Yy]$ ]]; then
@@ -216,7 +220,9 @@ function run_configuration_phase() {
             if [ "$BACKUP_MODE" != "none" ]; then
                 read -p "Enter daily backup time (HH:MM) [default: 03:00]: " USER_TIME
                 BACKUP_TIME="${USER_TIME:-03:00}"
-                print_success "Backup enabled: $BACKUP_MODE -> $BACKUP_PATH at $BACKUP_TIME"
+                read -p "Max backup snapshots to keep per service [default: 5]: " USER_RETENTION
+                BACKUP_RETENTION="${USER_RETENTION:-5}"
+                print_success "Backup enabled: $BACKUP_MODE -> $BACKUP_PATH at $BACKUP_TIME (keeping $BACKUP_RETENTION snapshots)"
             fi
         fi
 
@@ -226,6 +232,7 @@ function run_configuration_phase() {
         echo "backup_mode: \"$BACKUP_MODE\"" >> "$CONFIG_FILE"
         echo "backup_path: \"$BACKUP_PATH\"" >> "$CONFIG_FILE"
         echo "backup_time: \"$BACKUP_TIME\"" >> "$CONFIG_FILE"
+        echo "backup_retention: \"$BACKUP_RETENTION\"" >> "$CONFIG_FILE"
         if [ -n "$EXISTING_EXTERNAL_DUCKDNS" ] && [ "$EXISTING_EXTERNAL_DUCKDNS" != "null" ]; then
              echo "external_duckdns_name: \"$EXISTING_EXTERNAL_DUCKDNS\"" >> "$CONFIG_FILE"
         fi
@@ -256,7 +263,7 @@ function run_service_installation_phase() {
     echo "Base DNS:    $BASE_DNS_NAME"
     echo "Services:    ${SERVICES_TO_INSTALL[*]}"
     if [ "$BACKUP_MODE" != "none" ]; then
-        echo "Backup:      $BACKUP_MODE -> $BACKUP_PATH (@ $BACKUP_TIME)"
+        echo "Backup:      $BACKUP_MODE -> $BACKUP_PATH (@ $BACKUP_TIME, keep $BACKUP_RETENTION)"
     fi
     echo ""
     read -p "Press Enter to start installation..."

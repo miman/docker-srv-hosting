@@ -29,6 +29,17 @@ function print_info() { echo -e "\e[34m[INFO]\e[0m $1"; }
 function print_success() { echo -e "\e[32m[SUCCESS]\e[0m $1"; }
 function print_error() { echo -e "\e[31m[ERROR]\e[0m $1" >&2; }
 
+function get_backup_retention() {
+    local retention=5
+    if [ -f "$CONFIG_FILE" ]; then
+        local val=$(grep "^backup_retention:" "$CONFIG_FILE" | sed 's/backup_retention:[[:space:]]*"\?\([^"]*\)"\?/\1/')
+        if [ -n "$val" ] && [ "$val" != "null" ]; then
+            retention="$val"
+        fi
+    fi
+    echo "$retention"
+}
+
 # --- Check Root ---
 function check_root() {
     if [ "$EUID" -ne 0 ]; then
@@ -137,6 +148,10 @@ function configure_service_backup() {
     sed -i "s|{{SOURCE_DIR}}|$service_abs_path|g" "$backup_script_path"
     sed -i "s|{{BACKUP_DEST}}|$backup_dest|g" "$backup_script_path"
     sed -i "s|{{SERVICE_NAME}}|$service_name|g" "$backup_script_path"
+    
+    # Retention count from config
+    local retention=$(get_backup_retention)
+    sed -i "s|{{BACKUP_RETENTION}}|$retention|g" "$backup_script_path"
     
     # DB Specific replacements?
     # We might need to parse docker-compose to find container name.

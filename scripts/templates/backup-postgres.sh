@@ -14,33 +14,42 @@ SOURCE="{{SOURCE_DIR}}"
 DESTINATION="{{BACKUP_DEST}}"
 DB_CONTAINER="{{DB_CONTAINER}}"
 DB_USER="postgres" # Default, might need customization
+BACKUP_RETENTION={{BACKUP_RETENTION}}
 DATE=$(date +%Y-%m-%d_%H%M%S)
 
 echo "--- Starting Backup $DATE for {{SERVICE_NAME}} ---"
 
-mkdir -p "$DESTINATION"
-mkdir -p "$DESTINATION/db-dumps"
+# Create date-stamped backup folder
+BACKUP_DIR="$DESTINATION/$DATE"
+mkdir -p "$BACKUP_DIR"
 
 # 1. Dump Database
 echo "Dumping database from $DB_CONTAINER..."
 if $CONTAINER_CMD ps | grep -q "$DB_CONTAINER"; then
-    $CONTAINER_CMD exec -t "$DB_CONTAINER" pg_dumpall -c -U "$DB_USER" > "$DESTINATION/db-dumps/db_dump_$DATE.sql"
-    # Keep latest link
-    cp "$DESTINATION/db-dumps/db_dump_$DATE.sql" "$DESTINATION/db-dumps/latest.sql"
-    
-    # Cleanup old dumps (keep last 7 days)
-    find "$DESTINATION/db-dumps/" -name "db_dump_*.sql" -mtime +7 -delete
+    $CONTAINER_CMD exec -t "$DB_CONTAINER" pg_dumpall -c -U "$DB_USER" > "$BACKUP_DIR/db_dump.sql"
 else
     echo "Warning: Container $DB_CONTAINER not running. Skipping DB dump."
 fi
 
 # 2. Sync Files
-echo "Syncing data from $SOURCE to $DESTINATION..."
-rsync -av --delete \
+echo "Syncing data from $SOURCE to $BACKUP_DIR..."
+rsync -av \
     --exclude '.git' \
     --exclude 'node_modules' \
     --exclude '*.log' \
     --exclude 'postgres-data' \
-    "$SOURCE/" "$DESTINATION/"
+    "$SOURCE/" "$BACKUP_DIR/"
+
+# Update 'latest' symlink
+ln -sfn "$BACKUP_DIR" "$DESTINATION/latest"
+
+# Prune old backups (keep only the newest $BACKUP_RETENTION)
+echo "Pruning old backups (keeping $BACKUP_RETENTION)..."
+cd "$DESTINATION" || exit 1
+# List date-stamped directories, sorted oldest first, remove excess
+ls -dt */ 2>/dev/null | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}_' | tail -n +$((BACKUP_RETENTION + 1)) | while read -r old_dir; do
+    echo "Removing old backup: $old_dir"
+    rm -rf "$old_dir"
+done
 
 echo "--- Backup Completed ---"
