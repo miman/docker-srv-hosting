@@ -57,7 +57,7 @@ services:
       - ./models:/app/models
       - ./outputs:/app/outputs
     shm_size: '16gb'
-    restart: unless-stopped
+    restart: $RESTART_POLICY
 EOF
 
 # 6. Build and Start
