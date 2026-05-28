@@ -9,7 +9,7 @@ services:
       - local-ai-network
     ports:
       - "4512:8080"
-    restart: always
+    restart: $RESTART_POLICY
     volumes:
       - ${DOCKER_FOLDER}/open-webui:/app/backend/data
     extra_hosts:

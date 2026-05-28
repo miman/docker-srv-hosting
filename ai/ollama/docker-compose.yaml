@@ -9,7 +9,7 @@ services:
       - local-ai-network
     ports:
       - "11434:11434"
-    restart: always
+    restart: $RESTART_POLICY
     volumes:
       - ${DOCKER_FOLDER}/ollama:/root/.ollama
 

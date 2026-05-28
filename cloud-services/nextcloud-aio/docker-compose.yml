@@ -4,7 +4,7 @@ services:
    nextcloud-aio-mastercontainer:
       image: docker.io/nextcloud/all-in-one:latest
       container_name: nextcloud-aio-mastercontainer
-      restart: always
+      restart: $RESTART_POLICY
       volumes:
          - nextcloud_aio_mastercontainer:/mnt/docker-aio-config # Keep this line as is
          - /var/run/docker.sock:/var/run/docker.sock:ro # Keep this line as is

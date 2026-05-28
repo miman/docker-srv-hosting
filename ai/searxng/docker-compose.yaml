@@ -2,7 +2,7 @@ services:
   searxng:
     container_name: searxng
     image: docker.io/searxng/searxng:latest
-    restart: always
+    restart: $RESTART_POLICY
     ports:
       - "4522:8080"
     volumes:
