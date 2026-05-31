@@ -7,4 +7,23 @@ search:
   formats:
     - html
     - json # This is required for Open WebUI to understand the answers
+
+engines:
+  - name: google
+    disabled: true         # Turn off entirely to protect your personal IP
+
+  - name: duckduckgo
+    disabled: true         # Avoids the Cloudflare barrier entirely
+
+  - name: bing
+    disabled: false        # Leave on as a main driver (good balance)
+    timeout: 4.0
+
+  - name: brave
+    disabled: false        # High tolerance, independent index
+    weight: 2.0            # Prioritize Brave results
+
+  - name: wikipedia
+    disabled: false        # Completely safe, high speed
+
     
