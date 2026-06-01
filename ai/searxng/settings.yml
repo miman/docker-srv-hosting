@@ -16,7 +16,7 @@ engines:
     disabled: true         # Avoids the Cloudflare barrier entirely
 
   - name: bing
-    disabled: false        # Leave on as a main driver (good balance)
+    disabled: true        # Leave on as a main driver (good balance)
     timeout: 4.0
 
   - name: brave
@@ -24,6 +24,6 @@ engines:
     weight: 2.0            # Prioritize Brave results
 
   - name: wikipedia
-    disabled: false        # Completely safe, high speed
+    disabled: true        # Completely safe, high speed
 
     

@@ -88,6 +88,19 @@ This project handles backups automatically for installed services.
   - Other services get a smart Rsync backup.
 - **Master Schedule**: All active services are added to a master backup schedule (`backup/master-backup.sh`).
 
+### Manual On-Demand Backups
+If you want to perform manual, on-demand backups for any installed service (even if it was not originally installed with auto-backup enabled), you can run:
+```bash
+./run_backups.sh
+```
+This interactive utility will:
+1. Scan your configured Docker root for all installed services.
+2. Present a menu to select which services to back up (supports selecting specific services or `all`).
+3. Automatically generate the appropriate backup scripts (Rsync or Database Dump) on-demand if they don't already exist.
+4. Execute the backups immediately to your target backup destination.
+5. Ask whether you'd like to keep the newly generated `backup.sh` scripts in your service directories for future manual runs.
+6. Automatically clean up the central schedule registry afterward to keep your daily automatic crontab schedule exactly as it was.
+
 ### Adding More Services Later
 Want to install another service later? Just run `./install.sh` again!
 - It detects your existing configuration.
