@@ -62,13 +62,21 @@ echo -e "${COLOR_INFO}[INFO] Docker Stacks Root: ${COLOR_RESET}$DOCKER_FOLDER"
 echo -e "${COLOR_INFO}[INFO] Backup Destination: ${COLOR_RESET}$BACKUP_PATH"
 echo ""
 
-# Scan DOCKER_FOLDER for installed stacks (subfolders containing docker-compose files)
+# Setup elevated privileges command if not running as root
+SUDO_CMD=""
+if [ "$EUID" -ne 0 ]; then
+    SUDO_CMD="sudo -E "
+fi
+
+# Scan DOCKER_FOLDER for first-level subdirectories (representing installed services)
 INSTALLED_SERVICES=()
-while IFS= read -r -d $'\0' compose_path; do
-    service_dir=$(dirname "$compose_path")
-    service_name=$(basename "$service_dir")
-    INSTALLED_SERVICES+=("$service_name")
-done < <(find "$DOCKER_FOLDER" -maxdepth 2 -name "docker-compose.yml" -o -name "docker-compose.yaml" -print0 2>/dev/null | sort -z)
+while IFS= read -r -d $'\0' service_path; do
+    service_name=$(basename "$service_path")
+    # Exclude hidden directories and standard system directories like lost+found
+    if [[ "$service_name" != .* && "$service_name" != "lost+found" ]]; then
+        INSTALLED_SERVICES+=("$service_name")
+    fi
+done < <($SUDO_CMD find "$DOCKER_FOLDER" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null | sort -z)
 
 if [ ${#INSTALLED_SERVICES[@]} -eq 0 ]; then
     echo -e "${COLOR_WARNING}[WARNING] No installed services/containers detected in $DOCKER_FOLDER.${COLOR_RESET}"
@@ -124,12 +132,6 @@ fi
 echo ""
 echo -e "${COLOR_INFO}Starting manual backup process...${COLOR_RESET}"
 echo -e "${COLOR_HEADER}==================================================================${COLOR_RESET}"
-
-# Setup elevated privileges command if not running as root
-SUDO_CMD=""
-if [ "$EUID" -ne 0 ]; then
-    SUDO_CMD="sudo -E "
-fi
 
 # Identify the backups registration file path
 BACKUPS_FILE=""
