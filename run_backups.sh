@@ -25,10 +25,16 @@ echo ""
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# Determine the target user's home (handles running via sudo)
+TARGET_USER="${SUDO_USER:-$USER}"
+TARGET_HOME=$(eval echo "~$TARGET_USER")
+export HSC_CONFIG_PATH="$TARGET_HOME/.hsc/config.yaml"
+
 # Source read-config to get central configuration environment variables
 if [ -f "./scripts/read-config.sh" ]; then
     # Sourcing this will automatically setup DOCKER_FOLDER, CONTAINER_CMD, CONTAINER_ENGINE, etc.
-    source "./scripts/read-config.sh" > /dev/null 2>&1
+    # We redirect only stdout to keep it clean, but let stderr print any configuration errors.
+    source "./scripts/read-config.sh" > /dev/null
 else
     echo -e "${COLOR_ERROR}[ERROR] Could not find scripts/read-config.sh.${COLOR_RESET}"
     exit 1
@@ -50,12 +56,12 @@ fi
 # Fallback/Prompt if backup path is not defined
 if [ -z "$BACKUP_PATH" ] || [ "$BACKUP_PATH" == "null" ]; then
     echo -e "${COLOR_WARNING}[WARNING] No default backup path found in config.yaml.${COLOR_RESET}"
-    read -p "Enter backup destination directory [default: $HOME/backups]: " USER_BACKUP_PATH
-    BACKUP_PATH="${USER_BACKUP_PATH:-$HOME/backups}"
+    read -p "Enter backup destination directory [default: $TARGET_HOME/backups]: " USER_BACKUP_PATH
+    BACKUP_PATH="${USER_BACKUP_PATH:-$TARGET_HOME/backups}"
 fi
 
 # Expand home tilde, create destination folder
-BACKUP_PATH="${BACKUP_PATH/#\~/$HOME}"
+BACKUP_PATH="${BACKUP_PATH/#\~/$TARGET_HOME}"
 mkdir -p "$BACKUP_PATH"
 
 echo -e "${COLOR_INFO}[INFO] Docker Stacks Root: ${COLOR_RESET}$DOCKER_FOLDER"
