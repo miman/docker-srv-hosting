@@ -25,7 +25,7 @@ if [ ! -f "$DATA_DIR/homeserver.yaml" ]; then
         -v "$DATA_DIR:/data" \
         -e SYNAPSE_SERVER_NAME="$BASE_DNS_NAME" \
         -e SYNAPSE_REPORT_STATS=yes \
-        matrixdotorg/synapse:latest generate
+        docker.io/matrixdotorg/synapse:latest generate
     
     echo "Configuration generated. Please review $DATA_DIR/homeserver.yaml before deployment."
 fi
