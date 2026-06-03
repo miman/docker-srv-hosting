@@ -31,6 +31,45 @@ docker compose up -d
 Once running, Synapse will be accessible at: `http://localhost:4530`
 Synapse Admin will be accessible at: `http://localhost:4531`
 
+### First-Time Setup & Usage
+
+#### 1. Creating an Admin User
+
+By default, registration via the client is closed for security. You need to create your first administrative user via the command line. Run the following command in your terminal while the containers are running:
+
+```bash
+podman-compose exec synapse register_new_matrix_user -c /data/homeserver.yaml http://localhost:8008
+```
+
+If you use Docker, change `podman-compose` to `docker compose` in the command above.
+
+Follow the interactive prompts:
+
+    Username: Choose your desired username (e.g., admin).
+
+    Password: Choose a secure password.
+
+    Make admin? Type yes.
+
+    Note on Initial Credentials: There are no default pre-configured usernames or passwords. You must create your own account using the step above before you can log in.
+
+#### 2. Logging In via Element Client
+
+Once your user is created, open your Element client (or go to https://app.element.io if using the web version) and configure your connection:
+
+    On the login screen, click Edit next to the default "Homeserver" field (which defaults to matrix.org).
+
+    Select Other Homeserver.
+
+    In the Homeserver URL field, enter your server's address:
+
+        Local testing: http://localhost:4530 (or http://YOUR_SERVER_IP:4530)
+
+        Production: https://matrix.yourdomain.com (if you have set up the reverse proxy)
+
+    Enter the Username and Password you created in Step 1.
+
+    Click Sign In.
 ---
 
 ## Reverse Proxy Integration
