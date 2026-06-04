@@ -1,0 +1,17 @@
+services:
+  element-web:
+    container_name: element-web
+    image: docker.io/vectorim/element-web:latest
+    restart: $RESTART_POLICY
+    environment:
+      - ELEMENT_WEB_PORT=8080
+    volumes:
+      - ${DOCKER_FOLDER}/synapse/element-web/config.json:/app/config.json:ro
+    ports:
+      - "4532:8080"
+    networks:
+      - local-ai-network
+
+networks:
+  local-ai-network:
+    external: true

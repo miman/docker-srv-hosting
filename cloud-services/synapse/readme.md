@@ -78,5 +78,13 @@ If you are using the Nginx Reverse Proxy included in this project, you should ad
 
 ## Client
 
+### Element Web (Self-Hosted)
+
+During installation, you can choose to deploy a self-hosted Element Web client alongside Synapse. This gives you a full web UI at `http://localhost:4532` that is pre-configured to connect to your Synapse instance.
+
+The configuration is stored at `$DOCKER_FOLDER/synapse/element-web/config.json`. You can edit this file to customize the client (e.g., update the homeserver URL for production use behind a reverse proxy).
+
+### Desktop & Mobile Clients
+
 Clients can be downloaded here:
 https://element.io/sv/download
