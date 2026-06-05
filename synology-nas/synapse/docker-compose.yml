@@ -11,6 +11,8 @@ services:
       - /volume1/docker/synapse/data:/data
     ports:
       - "4530:8008"
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
 
   synapse-admin:
     container_name: synapse-admin
@@ -18,3 +20,18 @@ services:
     restart: always
     ports:
       - "4531:80"
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+
+  element-web:
+    container_name: element-web
+    image: docker.io/vectorim/element-web:latest
+    restart: always
+    environment:
+      - ELEMENT_WEB_PORT=8080
+    volumes:
+      - /volume1/docker/synapse/element-web/config.json:/app/config.json:ro
+    ports:
+      - "4532:8080"
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
