@@ -80,8 +80,9 @@ if [ "$INSTALL_ELEMENT_WEB" == "yes" ]; then
 fi
 
 # First-time admin user creation
-# Check if admin setup has already been completed by looking for our marker in homeserver.yaml
-if ! grep -q "^# hsc_admin_setup_completed: true" "$DATA_DIR/homeserver.yaml"; then
+# Check if admin setup has already been completed
+TASKS_DONE_FILE="$(dirname "$HSC_CONFIG_PATH")/tasks_done.yaml"
+if [ ! -f "$TASKS_DONE_FILE" ] || ! grep -q "^synapse_admin_setup_completed: true" "$TASKS_DONE_FILE"; then
     echo ""
     echo "=== First-Time Admin User Setup ==="
     echo "No admin user has been created yet. Let's create one now."
@@ -117,9 +118,13 @@ if ! grep -q "^# hsc_admin_setup_completed: true" "$DATA_DIR/homeserver.yaml"; t
 
     if [ $REGISTER_EXIT -eq 0 ]; then
         echo "Admin user '$ADMIN_USER' created successfully!"
-        # Mark admin setup as completed in homeserver.yaml
-        echo "" >> "$DATA_DIR/homeserver.yaml"
-        echo "# hsc_admin_setup_completed: true" >> "$DATA_DIR/homeserver.yaml"
+        # Mark admin setup as completed in tasks_done.yaml
+        mkdir -p "$(dirname "$TASKS_DONE_FILE")"
+        if [ ! -f "$TASKS_DONE_FILE" ]; then
+          echo "synapse_admin_setup_completed: true" > "$TASKS_DONE_FILE"
+        else
+          echo "synapse_admin_setup_completed: true" >> "$TASKS_DONE_FILE"
+        fi
     else
         echo "Error: Failed to create admin user."
         echo "You can try again manually with:"

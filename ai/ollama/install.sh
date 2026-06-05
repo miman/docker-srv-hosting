@@ -41,23 +41,36 @@ if [[ "$answerNvidia" =~ [Yy]$ ]]; then
 
   if [ "$IS_WINDOWS" = true ]; then
     if [ "$CONTAINER_ENGINE" == "podman" ]; then
-      echo "  -> Windows with Podman detected. Setting up GPU support inside the Podman machine..."
-      podman machine ssh '
-        if ! command -v nvidia-ctk &> /dev/null; then
-          echo "  -> Installing nvidia-container-toolkit inside Podman machine..."
-          sudo curl -s -L https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo -o /etc/yum.repos.d/nvidia-container-toolkit.repo
-          sudo dnf install -y nvidia-container-toolkit
+      TASKS_DONE_FILE="$(dirname "$HSC_CONFIG_PATH")/tasks_done.yaml"
+      if [ -f "$TASKS_DONE_FILE" ] && grep -q "^podman_machine_gpu_setup: true" "$TASKS_DONE_FILE"; then
+        echo "  -> Windows Podman GPU setup already completed (skipping)."
+      else
+        echo "  -> Windows with Podman detected. Setting up GPU support inside the Podman machine..."
+        podman machine ssh '
+          if ! command -v nvidia-ctk &> /dev/null; then
+            echo "  -> Installing nvidia-container-toolkit inside Podman machine..."
+            sudo curl -s -L https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo -o /etc/yum.repos.d/nvidia-container-toolkit.repo
+            sudo dnf install -y nvidia-container-toolkit
+          else
+            echo "  -> nvidia-container-toolkit already installed."
+          fi
+          if [ ! -f /etc/cdi/nvidia.yaml ]; then
+            echo "  -> Generating CDI specification inside Podman machine..."
+            sudo mkdir -p /etc/cdi
+            sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+          else
+            echo "  -> CDI specification already exists."
+          fi
+        '
+        # Mark this task as done
+        mkdir -p "$(dirname "$TASKS_DONE_FILE")"
+        if [ ! -f "$TASKS_DONE_FILE" ]; then
+          echo "podman_machine_gpu_setup: true" > "$TASKS_DONE_FILE"
         else
-          echo "  -> nvidia-container-toolkit already installed."
+          echo "podman_machine_gpu_setup: true" >> "$TASKS_DONE_FILE"
         fi
-        if [ ! -f /etc/cdi/nvidia.yaml ]; then
-          echo "  -> Generating CDI specification inside Podman machine..."
-          sudo mkdir -p /etc/cdi
-          sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
-        else
-          echo "  -> CDI specification already exists."
-        fi
-      '
+        echo "  -> Recorded GPU setup as completed in $TASKS_DONE_FILE"
+      fi
     else
       # On Windows with Docker, Docker Desktop handles GPU passthrough via WSL2 natively.
       # No nvidia-container-toolkit or CDI setup needed.
