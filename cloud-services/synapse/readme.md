@@ -88,3 +88,45 @@ The configuration is stored at `$DOCKER_FOLDER/synapse/element-web/config.json`.
 
 Clients can be downloaded here:
 https://element.io/sv/download
+
+## Rate limiting
+If you have issues with rate limiting, you can set some of these depending on in which area.
+
+```
+# Ignore frequent logins
+rc_login:
+  account:
+    per_second: 100
+    burst_count: 100
+
+rc_login:
+  address:
+    per_second: 1000
+    burst_count: 1000
+  account:
+    per_second: 1000
+    burst_count: 1000
+  failed_attempts:
+    per_second: 1000
+    burst_count: 1000
+
+rc_message:
+  per_second: 1000
+  burst_count: 1000
+
+rc_registration:
+  per_second: 1000
+  burst_count: 1000
+
+rc_admin_redaction:
+  per_second: 1000
+  burst_count: 1000
+
+rc_joins:
+  local:
+    per_second: 1000
+    burst_count: 1000
+  remote:
+    per_second: 1000
+    burst_count: 1000
+```
