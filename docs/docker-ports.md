@@ -11,6 +11,7 @@ This document lists the default ports used by each service installed via Docker 
 | Nextcloud        | 80, 443           | 8081, 8443   | Nextcloud, similar to Google Drive                                 |
 | Nginx Proxy      | 80, 443           | 80, 443      | Reverse proxy, for network routing                                 |
 | Ollama           | 11434             | 11434        | Ollama API, for running local LLM's (AI)                           |
+| Open WebUI       | 8080              | 4512         | Open WebUI, a web UI for running local LLM's (AI)                 |
 | Portainer        | 8000, 9000        | 8000, 9000   | Portainer, for controlling focker containers (Like Docker desktop) |
 | Traccar          | 8082              | 4411         | Traccar, for geo-tracking of mobile devices                        |
 | Vaultwarden      | 80                | 4410         | Vaultwarden password manager, like Bitwarden                       |
@@ -25,6 +26,10 @@ This document lists the default ports used by each service installed via Docker 
 | Linux in Docker  | 3000, 3001        | 3000, 3001   | webtop (Ubuntu XFCE) in Docker                                     |
 | Watchtower       | N/A               | N/A          | Automation for Docker container images                              |
 | ComfyUI         | 8188              | 4515         | ComfyUI, a powerful and modular stable diffusion GUI/backend        |
+| Open Wearables   | 8000              | 4416         | Open Wearables API                                                  |
+| Open Wearables   | 3000              | 4415         | Open Wearables Frontend Dashboard                                   |
+| Open Wearables   | 5555              | 4417         | Open Wearables Celery Flower Dashboard                              |
+
 
 **Note:**
 

@@ -4,6 +4,8 @@ headscale/.env
 immich/library
 immich/postgres
 docmost/docmost
+cloud-services/open-wearables/src
+cloud-services/open-wearables/.env
 
 backup/*
 !backup/readme.md

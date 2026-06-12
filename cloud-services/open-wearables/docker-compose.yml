@@ -1,0 +1,147 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: open-wearables_postgres
+    environment:
+      POSTGRES_DB: open-wearables
+      POSTGRES_USER: open-wearables
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U open-wearables -d open-wearables"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ${DOCKER_FOLDER}/open-wearables/postgres-data:/var/lib/postgresql/data
+    restart: $RESTART_POLICY
+
+  redis:
+    container_name: open-wearables_redis
+    image: redis:7-alpine
+    volumes:
+      - ${DOCKER_FOLDER}/open-wearables/redis:/data
+    restart: $RESTART_POLICY
+
+  app:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+    container_name: open-wearables_backend
+    image: open-wearables-platform:latest
+    pull_policy: never
+    command: scripts/start/app.sh
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+    ports:
+      - "4416:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: $RESTART_POLICY
+
+  celery-worker:
+    container_name: open-wearables_celery_worker
+    image: open-wearables-platform:latest
+    pull_policy: never
+    command: scripts/start/worker.sh
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+      - db
+      - app
+    restart: $RESTART_POLICY
+
+  celery-beat:
+    container_name: open-wearables_celery_beat
+    image: open-wearables-platform:latest
+    pull_policy: never
+    command: scripts/start/beat.sh
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+      - db
+      - app
+    restart: $RESTART_POLICY
+
+  flower:
+    container_name: open-wearables_flower
+    image: open-wearables-platform:latest
+    pull_policy: never
+    command: scripts/start/flower.sh
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+    ports:
+      - "4417:5555"
+    depends_on:
+      - redis
+      - db
+      - app
+    restart: $RESTART_POLICY
+
+  svix-server:
+    container_name: open-wearables_svix_server
+    image: svix/svix-server:v1
+    entrypoint:
+      - sh
+      - -c
+      - |
+        : "$${SVIX_JWT_SECRET:=$$SECRET_KEY}"
+        export SVIX_JWT_SECRET
+        exec svix-server "$$@"
+      - --
+    command: ["--run-migrations"]
+    env_file:
+      - .env
+    environment:
+      SVIX_DB_DSN: "postgresql://${DB_USER:-open-wearables}:${DB_PASSWORD:-open-wearables}@${DB_HOST:-db}:${DB_PORT:-5432}/svix"
+      SVIX_QUEUE_TYPE: "redis"
+      SVIX_REDIS_DSN: "redis://redis:6379/1"
+      SVIX_CACHE_TYPE: "redis"
+    expose:
+      - "8071"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      app:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "svix-server", "healthcheck", "http://localhost:8071"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: $RESTART_POLICY
+
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    container_name: open-wearables_frontend
+    image: open-wearables-frontend:latest
+    pull_policy: never
+    ports:
+      - "4415:3000"
+    depends_on:
+      - app
+    restart: $RESTART_POLICY
+
