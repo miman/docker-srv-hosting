@@ -113,56 +113,57 @@ run_compose() {
     local cmd=()
     if [ "$CONTAINER_ENGINE" == "podman" ]; then
         cmd=("podman" "compose")
-        local args=()
-        local has_f=false
         
-        # Parse arguments to find any explicit compose file (-f or --file)
+        # Logic: Choose ONLY the podman file if it exists, otherwise fallback to yaml
+        local main_file="docker-compose.yaml"
+        local podman_file="docker-compose.podman.yaml"
+
+        if [ -f "$podman_file" ]; then
+            cmd+=("-f" "$podman_file")
+        elif [ -f "$main_file" ]; then
+            cmd+=("-f" "$main_file")
+        fi
+
+        # Handle arguments (skip the ones we already handled)
+        local args=()
         local i=1
         while [ $i -le $# ]; do
             local arg="${!i}"
             if [ "$arg" == "-f" ] || [ "$arg" == "--file" ]; then
-                has_f=true
                 local next_idx=$((i + 1))
                 local file="${!next_idx}"
                 args+=("$arg" "$file")
-                
-                # Check if there is a podman override file for this specific compose file
-                # e.g., docker-compose.yml -> docker-compose.podman.yml
-                local ext="${file##*.}"
-                local base="${file%.*}"
-                local podman_file="${base}.podman.${ext}"
-                if [ -f "$podman_file" ]; then
-                    args+=("-f" "$podman_file")
-                fi
                 i=$((i + 2))
             else
                 args+=("$arg")
                 i=$((i + 1))
             fi
         done
-        
-        # If no explicit -f flag was passed, look for default compose files and their overrides
-        if [ "$has_f" = false ]; then
-            local main_file=""
-            local podman_file=""
-            if [ -f "docker-compose.yml" ]; then
-                main_file="docker-compose.yml"
-                [ -f "docker-compose.podman.yml" ] && podman_file="docker-compose.podman.yml"
-            elif [ -f "docker-compose.yaml" ]; then
-                main_file="docker-compose.yaml"
-                [ -f "docker-compose.podman.yaml" ] && podman_file="docker-compose.podman.yaml"
-            fi
-            
-            if [ -n "$main_file" ]; then
-                cmd+=("-f" "$main_file")
-                [ -n "$podman_file" ] && cmd+=("-f" "$podman_file")
-            fi
-        fi
-        
         cmd+=("${args[@]}")
     else
+        # Standard Docker logic: Just use the main file
         cmd=("docker" "compose")
-        cmd+=("$@")
+        local main_file="docker-compose.yaml"
+        if [ -f "$main_file" ]; then
+            cmd+=("-f" "$main_file")
+        fi
+        
+        # Add remaining arguments
+        local args=()
+        local i=1
+        while [ $i -le $# ]; do
+            local arg="${!i}"
+            if [ "$arg" == "-f" ] || [ "$arg" == "--file" ]; then
+                local next_idx=$((i + 1))
+                local file="${!next_idx}"
+                args+=("$arg" "$file")
+                i=$((i + 2))
+            else
+                args+=("$arg")
+                i=$((i + 1))
+            fi
+        done
+        cmd+=("${args[@]}")
     fi
     
     # Execute actual command
