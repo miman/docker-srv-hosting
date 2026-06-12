@@ -1,0 +1,9 @@
+services:
+  portainer-agent:
+    security_opt:
+      - "label=disable"
+    logging:
+      driver: "k8s-file"
+    volumes:
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:Z
+      - ${DOCKER_VOLUMES:-/var/lib/docker/volumes}:/var/lib/docker/volumes:Z

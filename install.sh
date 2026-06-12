@@ -44,13 +44,73 @@ else
     fi
     export CONTAINER_ENGINE
 
+    # Define a wrapper function for Compose commands to support dynamic Podman overrides
+    run_compose() {
+        local cmd=()
+        if [ "$CONTAINER_ENGINE" == "podman" ]; then
+            cmd=("podman" "compose")
+            local args=()
+            local has_f=false
+            
+            # Parse arguments to find any explicit compose file (-f or --file)
+            local i=1
+            while [ $i -le $# ]; do
+                local arg="${!i}"
+                if [ "$arg" == "-f" ] || [ "$arg" == "--file" ]; then
+                    has_f=true
+                    local next_idx=$((i + 1))
+                    local file="${!next_idx}"
+                    args+=("$arg" "$file")
+                    
+                    # Check if there is a podman override file for this specific compose file
+                    # e.g., docker-compose.yml -> docker-compose.podman.yml
+                    local ext="${file##*.}"
+                    local base="${file%.*}"
+                    local podman_file="${base}.podman.${ext}"
+                    if [ -f "$podman_file" ]; then
+                        args+=("-f" "$podman_file")
+                    fi
+                    i=$((i + 2))
+                else
+                    args+=("$arg")
+                    i=$((i + 1))
+                fi
+            done
+            
+            # If no explicit -f flag was passed, look for default compose files and their overrides
+            if [ "$has_f" = false ]; then
+                local main_file=""
+                local podman_file=""
+                if [ -f "docker-compose.yml" ]; then
+                    main_file="docker-compose.yml"
+                    [ -f "docker-compose.podman.yml" ] && podman_file="docker-compose.podman.yml"
+                elif [ -f "docker-compose.yaml" ]; then
+                    main_file="docker-compose.yaml"
+                    [ -f "docker-compose.podman.yaml" ] && podman_file="docker-compose.podman.yaml"
+                fi
+                
+                if [ -n "$main_file" ]; then
+                    cmd+=("-f" "$main_file")
+                    [ -n "$podman_file" ] && cmd+=("-f" "$podman_file")
+                fi
+            fi
+            
+            cmd+=("${args[@]}")
+        else
+            cmd=("docker" "compose")
+            cmd+=("$@")
+        fi
+        "${cmd[@]}"
+    }
+    export -f run_compose
+
     if [ "$CONTAINER_ENGINE" == "podman" ]; then
         export CONTAINER_CMD="podman"
-        export COMPOSE_CMD="podman compose"
+        export COMPOSE_CMD="run_compose"
         export RESTART_POLICY="always"
     else
         export CONTAINER_CMD="docker"
-        export COMPOSE_CMD="docker compose"
+        export COMPOSE_CMD="run_compose"
         export RESTART_POLICY="unless-stopped"
     fi
 fi

@@ -1,0 +1,8 @@
+services:
+  element-web:
+    security_opt:
+      - "label=disable"
+    logging:
+      driver: "k8s-file"
+    volumes:
+      - ${DOCKER_FOLDER}/synapse/element-web/config.json:/app/config.json:ro,Z

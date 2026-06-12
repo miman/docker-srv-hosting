@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   portainer-agent:
     image: docker.io/portainer/agent:latest
@@ -7,13 +5,6 @@ services:
     restart: always
     ports:
       - "9001:9001"
-    # security_opt is ignored by Docker but required by Podman to allow socket access
-    security_opt:
-      - "label=disable"
-    logging:
-      driver: "k8s-file"
     volumes:
-      # If XDG_RUNTIME_DIR is not set, it falls back to /var/run/docker.sock
-      - ${XDG_RUNTIME_DIR:-/var/run}/podman/podman.sock:/var/run/docker.sock:Z
-      # If HOME is not set (or running as root in Docker), it falls back to standard docker volumes
-      - ${HOME:-/var/lib/docker}/.local/share/containers/storage/volumes:/var/lib/docker/volumes:Z
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock
+      - ${DOCKER_VOLUMES:-/var/lib/docker/volumes}:/var/lib/docker/volumes
