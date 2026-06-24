@@ -1,29 +1,31 @@
 use_default_settings: true
 server:
-  secret_key: "replace-with-your-passw" # Write your wanted password
-  limiter: false # Disable limitations for local use
-  image_proxy: true
+  secret_key: "replace-with-your-passw" # Secure internal token for instance communication
+  limiter: false # Required: Disables security rate-limiting for rapid-fire AI queries
+  image_proxy: true # Proxies images through your server to prevent leaking client details
+  proxies:
+    - 127.0.0.1
+    - 172.16.0.0/12  # Instructs SearXNG to trust internal Docker network traffic
 search:
   formats:
     - html
-    - json # This is required for Open WebUI to understand the answers
+    - json # Critical: Required for Open WebUI to properly parse search results
 
 engines:
-  - name: google
-    disabled: true         # Turn off entirely to protect your personal IP
-
-  - name: duckduckgo
-    disabled: true         # Avoids the Cloudflare barrier entirely
+  - name: qwant
+    disabled: false        # Active: Stable European privacy engine, highly resilient to AI queries
 
   - name: bing
-    disabled: true        # Leave on as a main driver (good balance)
-    timeout: 4.0
-
-  - name: brave
-    disabled: false        # High tolerance, independent index
-    weight: 2.0            # Prioritize Brave results
+    disabled: true         # Optional: Set to 'false' if Qwant needs a backup global index
 
   - name: wikipedia
-    disabled: true        # Completely safe, high speed
+    disabled: false        # Active: Fast, reliable, and immune to scraping blocks
 
-    
+  - name: google
+    disabled: true         # Disabled: Highly prone to blocking data center and local IPs
+
+  - name: duckduckgo
+    disabled: true         # Disabled: Triggers aggressive Cloudflare anti-bot walls
+
+  - name: brave
+    disabled: true         # Disabled: Strict anti-bot limits will instantly ban AI query patterns
