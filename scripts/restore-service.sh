@@ -17,6 +17,12 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # --- Main Logic ---
+AUTO_CONFIRM=false
+if [ "$1" == "-y" ]; then
+    AUTO_CONFIRM=true
+    shift
+fi
+
 SERVICE_NAME=$1
 BACKUP_SOURCE=$2
 
@@ -43,31 +49,38 @@ if [ -z "$BACKUP_SOURCE" ] || [ ! -d "$BACKUP_SOURCE" ]; then
 fi
 
 echo "--- Restoring $SERVICE_NAME from $BACKUP_SOURCE ---"
-echo "WARNING: This will overwrite current data for $SERVICE_NAME."
-read -p "Are you sure? [y/N] " CONFIRM
-if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
-    exit 0
+if [ "$AUTO_CONFIRM" = false ]; then
+    echo "WARNING: This will overwrite current data for $SERVICE_NAME."
+    read -p "Are you sure? [y/N] " CONFIRM
+    if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+        exit 0
+    fi
 fi
 
-# 2. Determine Service Directory (Assume local to where script is run, or check running containers?)
-# For now, assume we are in the repo root and service folders match names.
-if [ -d "$SERVICE_NAME" ]; then
+# 2. Determine Service Directory
+if [ -n "$DOCKER_FOLDER" ]; then
+    TARGET_DIR="$DOCKER_FOLDER/$SERVICE_NAME"
+elif [ -d "$SERVICE_NAME" ]; then
     TARGET_DIR="$PWD/$SERVICE_NAME"
 else
-    # Try finding it?
     TARGET_DIR=$(find . -maxdepth 2 -type d -name "$SERVICE_NAME" | head -n 1)
 fi
 
-if [ -z "$TARGET_DIR" ] || [ ! -d "$TARGET_DIR" ]; then
-    print_error "Could not locate service directory for $SERVICE_NAME locally."
+if [ -z "$TARGET_DIR" ]; then
+    print_error "Could not determine target directory for $SERVICE_NAME."
     exit 1
+fi
+
+if [ ! -d "$TARGET_DIR" ]; then
+    print_info "Target directory does not exist. Creating it at $TARGET_DIR..."
+    mkdir -p "$TARGET_DIR"
 fi
 
 print_info "Target Directory: $TARGET_DIR"
 
 # 3. Stop Service
-print_info "Stopping service..."
 if [ -f "$TARGET_DIR/docker-compose.yml" ] || [ -f "$TARGET_DIR/docker-compose.yaml" ]; then
+    print_info "Stopping existing service..."
     cd "$TARGET_DIR" || exit 1
     $COMPOSE_CMD down
     cd - > /dev/null || exit 1
@@ -75,11 +88,11 @@ fi
 
 # 4. Restore Files
 print_info "Restoring files..."
-rsync -av --no-HARDLINKS "$BACKUP_SOURCE/" "$TARGET_DIR/"
+rsync -av --no-HARDLINKS "$BACKUP_SOURCE/latest/" "$TARGET_DIR/"
 
 # 5. Database Restore (Postgres specific)
 if [ -f "$TARGET_DIR/docker-compose.yml" ] || [ -f "$TARGET_DIR/docker-compose.yaml" ]; then
-    LATEST_DUMP="$BACKUP_SOURCE/db_dump.sql"
+    LATEST_DUMP="$BACKUP_SOURCE/latest/db_dump.sql"
     if [ -f "$LATEST_DUMP" ]; then
         print_info "Database dump found: $LATEST_DUMP"
         

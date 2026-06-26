@@ -25,7 +25,7 @@ mkdir -p "$BACKUP_DIR"
 
 # 1. Dump Database
 echo "Dumping database from $DB_CONTAINER..."
-if $CONTAINER_CMD ps | grep -q "$DB_CONTAINER"; then
+if $CONTAINER_CMD ps --format '{{.Names}}' | grep -Eq "^${DB_CONTAINER}$"; then
     if ! $CONTAINER_CMD exec -t "$DB_CONTAINER" pg_dumpall -c -U "$DB_USER" > "$BACKUP_DIR/db_dump.sql"; then
         echo "ERROR: Database dump failed!" >&2
         exit 1
