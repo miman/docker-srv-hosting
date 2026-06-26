@@ -92,6 +92,15 @@ Want to install another service later? Just run `./install.sh` again!
 - It asks if you want to use the existing settings.
 - It skips directly to the service selection menu so you can add new apps quickly.
 
+### Upgrading Installed Scripts
+When you pull new updates from this repository (e.g. via `git pull`), the templates for backend scripts (such as the auto-generated `backup.sh` scripts for each service) may contain bug fixes or new features. 
+
+To safely apply these updates to your already-installed services without having to reinstall them, simply run:
+```bash
+./scripts/update-installed-scripts.sh
+```
+This utility will scan your configured Docker root, extract your original customized paths, and regenerate the underlying scripts to ensure they are fully up-to-date.
+
 ### Restoring Data (Legacy Support)
 Some services support importing config from previous installations:
 1. Copy your config folders to the local `backup` folder.
