@@ -140,6 +140,7 @@ AVAILABLE_SERVICES=(
     "cloud-services/traccar:Traccar"
     "cloud-services/vaultwarden:Vaultwarden"
     "development/verdaccio:Verdaccio"
+    "infrastructure/uptime-kuma:Uptime Kuma"
 )
 
 # --- Helper Functions ---

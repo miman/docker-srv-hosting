@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  uptime-kuma:
+    volumes:
+      # Append :Z for podman volume permissions
+      - ${UPTIME_KUMA_DATA_ROOT}/data:/app/data:Z
+    logging:
+      # Override to podman's native logger
+      driver: "k8s-file"
