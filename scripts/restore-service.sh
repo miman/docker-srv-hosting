@@ -92,7 +92,8 @@ rsync -av --no-HARDLINKS "$BACKUP_SOURCE/latest/" "$TARGET_DIR/"
 
 # 5. Database Restore (Postgres specific)
 if [ -f "$TARGET_DIR/docker-compose.yml" ] || [ -f "$TARGET_DIR/docker-compose.yaml" ]; then
-    LATEST_DUMP="$BACKUP_SOURCE/latest/db_dump.sql"
+    # Gör sökvägen absolut så den inte går sönder efter 'cd'
+    LATEST_DUMP=$(readlink -f "$BACKUP_SOURCE/latest/db_dump.sql")
     if [ -f "$LATEST_DUMP" ]; then
         print_info "Database dump found: $LATEST_DUMP"
         
