@@ -16,7 +16,6 @@ function print_error() {
 }
 
 # --- Main Logic ---
-
 # Determine which container engine to install based on config
 # CONTAINER_ENGINE should already be set by read-config.sh (sourced by install-core.sh)
 if [ "$CONTAINER_ENGINE" == "podman" ]; then
