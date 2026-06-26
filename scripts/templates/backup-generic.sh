@@ -16,7 +16,15 @@ mkdir -p "$BACKUP_DIR"
 # Sync Data
 echo "Syncing data from $SOURCE to $BACKUP_DIR..."
 # Exclude commonly ignored files
-rsync -av \
+# Update / Check incremental base via 'latest' symlink
+LINK_DEST_ARG=""
+if [ -d "$DESTINATION/latest" ]; then
+    LINK_DEST_ARG="--link-dest=$DESTINATION/latest"
+fi
+
+# Sync Data
+echo "Syncing data from $SOURCE to $BACKUP_DIR..."
+rsync -av $LINK_DEST_ARG \
     --exclude '.git' \
     --exclude 'node_modules' \
     --exclude '*.log' \
@@ -26,12 +34,20 @@ rsync -av \
 ln -sfn "$BACKUP_DIR" "$DESTINATION/latest"
 
 # Prune old backups (keep only the newest $BACKUP_RETENTION)
-echo "Pruning old backups (keeping $BACKUP_RETENTION)..."
-cd "$DESTINATION" || exit 1
-# List date-stamped directories, sorted oldest first, remove excess
-ls -dt */ 2>/dev/null | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}_' | tail -n +$((BACKUP_RETENTION + 1)) | while read -r old_dir; do
-    echo "Removing old backup: $old_dir"
-    rm -rf "$old_dir"
-done
+if [[ "$BACKUP_RETENTION" =~ ^[0-9]+$ ]] && [ "$BACKUP_RETENTION" -gt 0 ]; then
+    echo "Pruning old backups (keeping $BACKUP_RETENTION)..."
+    cd "$DESTINATION" || exit 1
+    
+    # Säkrare sätt att lista mappar sorterat på tid utan ls-pipe:
+    find . -maxdepth 1 -type d -name "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_*" -printf '%T@ %p\n' | \
+    sort -nr | tail -n +$((BACKUP_RETENTION + 1)) | cut -d' ' -f2- | while read -r old_dir; do
+        if [ -d "$old_dir" ]; then
+            echo "Removing old backup: $old_dir"
+            rm -rf "$old_dir"
+        fi
+    done
+else
+    echo "Warning: Invalid BACKUP_RETENTION ($BACKUP_RETENTION). Skipping pruning for safety."
+fi
 
 echo "--- Backup Completed ---"

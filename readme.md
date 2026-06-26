@@ -88,6 +88,24 @@ This project handles backups automatically for installed services.
   - Other services get a smart Rsync backup.
 - **Master Schedule**: All active services are added to a master backup schedule (`backup/master-backup.sh`).
 
+### Backup Storage Requirements (Crucial)
+
+The backup system uses `rsync` with hard links (`--link-dest`) to create efficient, incremental daily backups. This ensures that unchanged files (like large Immich media or raw data) do not take up additional space.
+
+To make this work, **your backup destination/external drive MUST be formatted with a Linux native file system**.
+
+| File System | Supported | Notes |
+| :--- | :--- | :--- |
+| **ext4** | **Yes (Recommended)** | Standard Linux format. Rock-solid, preserves permissions, and supports hard links out of the box. |
+| **btrfs** | **Yes** | Advanced format. Supports hard links and features built-in transparent compression (great for saving space on DB dumps). |
+| **exFAT / FAT32** | NO | Windows/Universal formats. **Do not use.** They do not support Linux hard links or file permissions. Using these will cause backups to copy everything every time, quickly filling up your drive. |
+| **NTFS** | NO | Windows format. Poor performance and permission mapping issues under Linux. |
+
+#### Preparing an External USB Drive (Example for ext4)
+If you are mounting an external drive for backups, format it to `ext4` using:
+```bash
+sudo mkfs.ext4 /dev/sdX1 # Replace sdX1 with your actual drive partition
+
 ### Manual On-Demand Backups
 If you want to perform manual, on-demand backups for any installed service (even if it was not originally installed with auto-backup enabled), you can run:
 ```bash
