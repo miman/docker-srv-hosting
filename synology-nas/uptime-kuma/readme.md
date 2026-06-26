@@ -4,10 +4,6 @@ This folder contains docker-compose files used to host [Uptime Kuma](https://upt
 
 [Uptime Kuma](https://uptimekuma.org/) is a web UI for monitoring services running on your own server.
 
-## Synology
-
-Under the folder **{prj-root}synology-nas/uptime-kuma** there is a script tuned for use on a Synology NAS.
-
 ## Notifications (Matrix)
 
 Unlike some other services in this repository (like Watchtower), Uptime Kuma does not support configuring notification providers via environment variables. Instead, they must be configured manually through its Web UI.
