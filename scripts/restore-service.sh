@@ -67,7 +67,7 @@ print_info "Target Directory: $TARGET_DIR"
 
 # 3. Stop Service
 print_info "Stopping service..."
-if [ -f "$TARGET_DIR/docker-compose.yml" ]; then
+if [ -f "$TARGET_DIR/docker-compose.yml" ] || [ -f "$TARGET_DIR/docker-compose.yaml" ]; then
     cd "$TARGET_DIR" || exit 1
     $COMPOSE_CMD down
     cd - > /dev/null || exit 1
@@ -75,50 +75,63 @@ fi
 
 # 4. Restore Files
 print_info "Restoring files..."
-rsync -av "$BACKUP_SOURCE/" "$TARGET_DIR/"
+rsync -av --no-HARDLINKS "$BACKUP_SOURCE/" "$TARGET_DIR/"
 
-# 5. Restore Database if dump exists
-DB_DUMP_DIR="$TARGET_DIR/db-dumps" # Assuming rsync copied it back here
-if [ -d "$DB_DUMP_DIR" ]; then
-    LATEST_DUMP=$(find "$DB_DUMP_DIR" -name "*.sql" -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ")
-    
+# 5. Database Restore (Postgres specific)
+if [ -f "$TARGET_DIR/docker-compose.yml" ] || [ -f "$TARGET_DIR/docker-compose.yaml" ]; then
+    LATEST_DUMP="$BACKUP_SOURCE/db_dump.sql"
     if [ -f "$LATEST_DUMP" ]; then
         print_info "Database dump found: $LATEST_DUMP"
         
-        # We need to start the DB container first!
-        # This is tricky because `docker compose up` might start everything.
-        # Let's try to find the Postgres container name from docker-compose.
-        
-        DB_CONTAINER=$(grep -oE "container_name:.*postgres.*" "$TARGET_DIR/docker-compose.yml" | head -n 1 | awk '{print $2}')
-        if [ -z "$DB_CONTAINER" ]; then
-             DB_CONTAINER="${SERVICE_NAME}_postgres" # Guess
-        fi
-        
-        print_info "Starting database container ($DB_CONTAINER) for restore..."
+        # Starta stacken temporärt för att få igång DB
         cd "$TARGET_DIR" || exit 1
-        
-        # Start only the DB service? hard to know the service name from here without parsing yaml properly.
-        # Usually it's 'db' or 'database' or 'postgres'.
-        # Fallback: Start all, but detached.
         $COMPOSE_CMD up -d
         
-        print_info "Waiting for database to initialize..."
-        sleep 10 # Crude wait
+        # Hitta container-namnet dynamiskt via Docker/Podman
+        DB_CONTAINER=$($CONTAINER_CMD ps --filter "label=com.docker.compose.project=${SERVICE_NAME}" --filter "ancestor=*postgres*" --format "{{.Names}}" | head -n 1)
+        if [ -z "$DB_CONTAINER" ]; then
+            DB_CONTAINER=$($CONTAINER_CMD ps --format "{{.Names}}" | grep -E "${SERVICE_NAME}.*db|postgres" | head -n 1)
+        fi
         
-        print_info "Restoring Database..."
-        # Drop and Re-create??
-        # Usually `psql < file.sql` is enough if dump was clean.
-        cat "$LATEST_DUMP" | $CONTAINER_CMD exec -i "$DB_CONTAINER" psql -U postgres
+        if [ -z "$DB_CONTAINER" ]; then
+            print_error "Could not find Postgres container for $SERVICE_NAME automatically."
+            print_warning "Attempting fallback guess..."
+            DB_CONTAINER="${SERVICE_NAME}_postgres"
+        fi
+        
+        print_info "Found database container: $DB_CONTAINER"
+        
+        # Vänta på att Postgres har initierat den tomma mappen
+        print_info "Waiting for database to become ready..."
+        for i in {1..30}; do
+            if $CONTAINER_CMD exec "$DB_CONTAINER" pg_isready -U postgres &>/dev/null; then
+                break
+            fi
+            sleep 1
+        done
+        
+        # Stoppa resten av applikationen så att ingen låser databasen under restore
+        print_info "Stopping application containers, leaving DB online..."
+        # Vi stoppar allt utom DB (eller stoppar allt och startar enbart DB-containern)
+        $COMPOSE_CMD stop
+        $CONTAINER_CMD start "$DB_CONTAINER"
+        sleep 2
+        
+        print_info "Restoring Database dump..."
+        if $CONTAINER_CMD exec -i "$DB_CONTAINER" psql -U postgres -d template1 < "$LATEST_DUMP"; then
+            print_success "Database SQL dump successfully restored."
+        else
+            print_error "Database restore failed!"
+        fi
         
         cd - > /dev/null || exit 1
-        print_success "Database restored."
     fi
 fi
 
-# 6. Restart Service
-print_info "Restarting service..."
+# 6. Restart Service (Starta allt ordentligt igen)
+print_info "Starting full service stack..."
 cd "$TARGET_DIR" || exit 1
 $COMPOSE_CMD up -d
 cd - > /dev/null || exit 1
 
-print_success "Restore complete for $SERVICE_NAME"
+print_success "Restore process for $SERVICE_NAME completed successfully!"
