@@ -36,6 +36,10 @@ The core idea is to automatically setup a local cloud with most services you wou
 | [Vaultwarden](cloud-services/vaultwarden/readme.md)         | Self-hosted password manager                           |
 | [Verdaccio](development/verdaccio/README.md)         | Local NPM registry                           |
 | [Watchtower](infrastructure/watchtower/readme.md) | Automates Docker container image updates               |
+| [Uptime-Kuma](cloud-services/uptime-kuma/readme.md) | Uptime monitoring               |
+| [Beszel](infrastructure/beszel/readme.md) | Dashboard for monitoring your services               |
+
+
 
 ### Volume folders & Backup
 

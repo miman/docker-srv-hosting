@@ -141,6 +141,7 @@ AVAILABLE_SERVICES=(
     "cloud-services/vaultwarden:Vaultwarden"
     "development/verdaccio:Verdaccio"
     "infrastructure/uptime-kuma:Uptime Kuma"
+    "infrastructure/beszel:Beszel"
 )
 
 # --- Helper Functions ---

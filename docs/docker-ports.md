@@ -30,6 +30,7 @@ This document lists the default ports used by each service installed via Docker 
 | Open Wearables   | 3000              | 4415         | Open Wearables Frontend Dashboard                                   |
 | Open Wearables   | 5555              | 4417         | Open Wearables Celery Flower Dashboard                              |
 | Uptime Kuma      | 3001              | 4532         | Uptime Kuma, for monitoring your services                             |
+| Beszel           | 8090              | 4533         | Beszel, for monitoring your services                             |
 
 
 **Note:**
