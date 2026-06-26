@@ -16,6 +16,8 @@ services:
       volumes:
          - /volume1/docker/beszel/data:/beszel_data
          - /volume1/docker/beszel/socket:/beszel_socket
+      labels:
+         - com.centurylinklabs.watchtower.enable=true
       # healthcheck:
       #   test: ['CMD', '/beszel', 'health', '--url', 'http://localhost:8090']
       #   interval: 120s
@@ -36,6 +38,8 @@ services:
          HUB_URL: http://localhost:4533
          TOKEN: <token>
          KEY: "<key>"
+      labels:
+         - com.centurylinklabs.watchtower.enable=true
       # healthcheck:
       #   test: ['CMD', '/agent', 'health']
       #   interval: 120s
