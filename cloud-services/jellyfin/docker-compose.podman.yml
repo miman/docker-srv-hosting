@@ -1,0 +1,11 @@
+services:
+  jellyfin:
+    security_opt:
+      - "label=disable"
+    logging:
+      driver: "k8s-file"
+    volumes:
+      - ${JELLYFIN_DATA_ROOT}/config:/config:Z
+      - ${JELLYFIN_DATA_ROOT}/cache:/cache:Z
+      - ${JELLYFIN_DATA_ROOT}/media:/media:Z
+      - ${JELLYFIN_DATA_ROOT}/media2:/media2:ro,Z

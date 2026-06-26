@@ -31,7 +31,7 @@ This document lists the default ports used by each service installed via Docker 
 | Open Wearables   | 5555              | 4417         | Open Wearables Celery Flower Dashboard                              |
 | Uptime Kuma      | 3001              | 4532         | Uptime Kuma, for monitoring your services                             |
 | Beszel           | 8090              | 4533         | Beszel, for monitoring your services                             |
-
+| Jellyfin         | 8096              | 4534         | Jellyfin, for streaming media                                    |
 
 **Note:**
 
