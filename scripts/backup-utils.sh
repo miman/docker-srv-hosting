@@ -27,8 +27,14 @@ if [ -z "$DOCKER_FOLDER" ] && [ -f "$CONFIG_FILE" ]; then
     DOCKER_FOLDER=$(grep -E "^docker_root:" "$CONFIG_FILE" | sed -e "s/^docker_root:[[:space:]]*//;s/^[ \'\"]*//;s/[ \'\"]*$//")
 fi
 
+# --- 2b. Extract central backup path from config.yaml ---
+if [ -f "$CONFIG_FILE" ] && [ -z "$BACKUP_PATH_CONFIG" ]; then
+    BACKUP_PATH_CONFIG=$(grep -E "^backup_path:" "$CONFIG_FILE" | sed -e "s/^backup_path:[[:space:]]*//;s/^[ \'\"]*//;s/[ \'\"]*$//")
+fi
+
 # Fallback to standard home directory if lookup fails
 PERMANENT_STACKS_DIR="${DOCKER_FOLDER:-$HOME/docker_stacks}"
+SYSTEM_BACKUP_DIR="${BACKUP_PATH_CONFIG:-$HOME/backups}" # <--- Add this fallback path
 
 # Set the final absolute master script path automatically
 MASTER_BACKUP_SCRIPT="$PERMANENT_STACKS_DIR/master-backup.sh"
@@ -120,24 +126,22 @@ function configure_service_backup() {
     local service_dir=$1
     local backup_root=$2
     
+    # 1. Define the service name and script targets first
     local service_name=$(basename "$service_dir")
     local backup_script_path="$service_dir/backup.sh"
+    
+    # 2. Determine the safe fallback path using the extracted $SYSTEM_BACKUP_DIR
+    local destination_dir="${backup_root:-$SYSTEM_BACKUP_DIR/$service_name}"
     
     # Determine type of backup
     local template="$BACKUP_SCRIPT_TEMPLATE_GENERIC"
     
-    # Simple heuristic: check for docker-compose.yml content or directory structure
-    # If it has a postgres container, use postgres template.
-    # ideally we check specific services known to use postgres.
     local compose_file="$service_dir/docker-compose.yml"
     [ ! -f "$compose_file" ] && compose_file="$service_dir/docker-compose.yaml"
 
     if [ -f "$compose_file" ] && grep -q "postgres" "$compose_file" 2>/dev/null; then
          template="$BACKUP_SCRIPT_TEMPLATE_POSTGRES"
     fi
-    
-    # Check if templates exist, if not, create dummy content or error out?
-    # We will assume templates are created in next steps.
     
     if [ ! -f "$template" ]; then
         print_error "Template $template not found. Skipping backup gen for $service_name"
@@ -148,29 +152,22 @@ function configure_service_backup() {
     cp "$template" "$backup_script_path"
     
     # Replace Placeholders
-    # Standard structure:
-    # - service_dir: The data directory in DOCKER_ROOT (e.g., /home/user/docker_stacks/nextcloud)
-    # - backup_root: The destination for backups (e.g., /mnt/backup-drive/nextcloud)
     local service_abs_path="$(cd "$service_dir" && pwd)"
-    local backup_dest="$backup_root/$service_name"
     
     sed -i "s|{{SOURCE_DIR}}|$service_abs_path|g" "$backup_script_path"
-    sed -i "s|{{BACKUP_DEST}}|$backup_dest|g" "$backup_script_path"
+    sed -i "s|{{BACKUP_DEST}}|$destination_dir|g" "$backup_script_path" # <--- Fixed to use destination_dir
     sed -i "s|{{SERVICE_NAME}}|$service_name|g" "$backup_script_path"
     
     # Retention count from config
     local retention=$(get_backup_retention)
     sed -i "s|{{BACKUP_RETENTION}}|$retention|g" "$backup_script_path"
     
-    # DB Specific replacements?
-    # We might need to parse docker-compose to find container name.
-    # Fallback: prompt or simple "grep"
+    # DB Specific replacements
     local db_container=$(grep -oE "container_name:.*postgres.*" "$compose_file" 2>/dev/null | head -n 1 | awk '{print $2}')
     if [ -z "$db_container" ]; then
-         # Try to guess based on service name
          db_container="${service_name}_postgres"
     fi
-     sed -i "s|{{DB_CONTAINER}}|$db_container|g" "$backup_script_path"
+    sed -i "s|{{DB_CONTAINER}}|$db_container|g" "$backup_script_path"
      
     chmod +x "$backup_script_path"
     if [ -n "$SUDO_USER" ]; then
