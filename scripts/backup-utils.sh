@@ -7,10 +7,8 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
 BACKUP_SCRIPT_TEMPLATE_GENERIC="$REPO_ROOT/scripts/templates/backup-generic.sh"
 BACKUP_SCRIPT_TEMPLATE_POSTGRES="$REPO_ROOT/scripts/templates/backup-postgres.sh"
-# Use absolute path for the master backup script to avoid ambiguity in cron
-MASTER_BACKUP_SCRIPT="$REPO_ROOT/backup/master-backup.sh"
 
-
+# --- 1. First, establish the core config file paths ---
 if [ -n "$HSC_CONFIG_PATH" ]; then
     CONFIG_FILE="$HSC_CONFIG_PATH"
     BACKUPS_FILE="$(dirname "$HSC_CONFIG_PATH")/backups.yaml"
@@ -23,6 +21,17 @@ else
     BACKUPS_FILE="$TARGET_HOME/.hsc/backups.yaml"
 fi
 
+# --- 2. Now it is safe to dynamically extract the operational directory ---
+if [ -z "$DOCKER_FOLDER" ] && [ -f "$CONFIG_FILE" ]; then
+    # Look up 'docker_root' as designated by the setup configuration
+    DOCKER_FOLDER=$(grep -E "^docker_root:" "$CONFIG_FILE" | sed -e "s/^docker_root:[[:space:]]*//;s/^[ \'\"]*//;s/[ \'\"]*$//")
+fi
+
+# Fallback to standard home directory if lookup fails
+PERMANENT_STACKS_DIR="${DOCKER_FOLDER:-$HOME/docker_stacks}"
+
+# Set the final absolute master script path automatically
+MASTER_BACKUP_SCRIPT="$PERMANENT_STACKS_DIR/master-backup.sh"
 
 # --- Helper Functions ---
 function print_info() { echo -e "\e[34m[INFO]\e[0m $1"; }
