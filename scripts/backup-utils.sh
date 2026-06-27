@@ -233,45 +233,32 @@ current_data=""
 
 while IFS= read -r line || [ -n "\$line" ]; do
     if [[ \$line =~ ^([a-zA-Z0-9_-]+):$ ]]; then
-        if [ -n "\$current_service" ] && [ -n "\$current_script" ]; then
-            echo "--- Backing up \$current_service ---"
-            if [ -f "\$current_script" ]; then
-                if "\$current_script"; then
-                     echo "SUCCESS: \$current_service backup completed."
-                else
-                     echo "ERROR: \$current_service backup failed."
-                fi
-            else
-                echo "WARNING: Backup script not found for \$current_service at \$current_script"
-            fi
-            echo ""
-        fi
-        
         current_service="\${BASH_REMATCH[1]}"
+    elif [[ \$line =~ ^[[:space:]]+script_path:[[:space:]]*\"([^#\"]*)\" ]]; then
+        current_script="\${BASH_REMATCH[1]}"
+    elif [[ \$line =~ ^[[:space:]]+data_path:[[:space:]]*\"([^#\"]*)\" ]]; then
+        current_data="\${BASH_REMATCH[1]}"
+    fi
+
+    # Execute as soon as we have the pair, then clear them
+    if [ -n "\$current_service" ] && [ -n "\$current_script" ]; then
+        echo "--- Backing up \$current_service ---"
+        if [ -f "\$current_script" ]; then
+            if "\$current_script"; then
+                    echo "SUCCESS: \$current_service backup completed."
+            else
+                    echo "ERROR: \$current_service backup failed."
+            fi
+        else
+            echo "WARNING: Backup script not found for \$current_service at \$current_script"
+        fi
+        echo ""
+        # Reset variables for the next block
+        current_service=""
         current_script=""
         current_data=""
-    elif [[ \$line =~ ^[[:space:]]+script_path:[[:space:]]*\"?(.*)\"?$ ]]; then
-        current_script="\${BASH_REMATCH[1]}"
-        current_script="\${current_script%\"}"
-    elif [[ \$line =~ ^[[:space:]]+data_path:[[:space:]]*\"?(.*)\"?$ ]]; then
-        current_data="\${BASH_REMATCH[1]}"
-        current_data="\${current_data%\"}"
     fi
 done < "\$BACKUPS_FILE"
-
-if [ -n "\$current_service" ] && [ -n "\$current_script" ]; then
-    echo "--- Backing up \$current_service ---"
-    if [ -f "\$current_script" ]; then
-        if "\$current_script"; then
-             echo "SUCCESS: \$current_service backup completed."
-        else
-             echo "ERROR: \$current_service backup failed."
-        fi
-    else
-        echo "WARNING: Backup script not found for \$current_service at \$current_script"
-    fi
-    echo ""
-fi
 
 echo "Master Backup Completed at \$(date)"
 echo "=========================================="
