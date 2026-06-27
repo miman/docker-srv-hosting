@@ -32,7 +32,9 @@ for service_dir in "$DOCKER_FOLDER"/*; do
             
             echo "Updating backup.sh for $service_name..."
             # Run the backup utility configure_service command
-            "$SCRIPT_DIR/backup-utils.sh" configure_service "$service_dir" "$backup_root"
+            SUDO_CMD="sudo -E "
+            case "$(uname -s)" in CYGWIN*|MINGW*|MSYS*) SUDO_CMD="" ;; esac
+            $SUDO_CMD "$SCRIPT_DIR/backup-utils.sh" configure_service "$service_dir" "$backup_root"
             UPDATED_COUNT=$((UPDATED_COUNT + 1))
         else
             echo "Warning: Could not determine original backup destination for $service_name. Skipping."
@@ -44,7 +46,9 @@ echo "=========================================================="
 if [ $UPDATED_COUNT -gt 0 ]; then
     echo "Successfully updated scripts for $UPDATED_COUNT services!"
     echo "Finalizing master backup schedule..."
-    "$SCRIPT_DIR/backup-utils.sh" finalize
+    SUDO_CMD="sudo -E "
+    case "$(uname -s)" in CYGWIN*|MINGW*|MSYS*) SUDO_CMD="" ;; esac
+    $SUDO_CMD "$SCRIPT_DIR/backup-utils.sh" finalize
 else
     echo "No services with existing backup scripts were found."
 fi
