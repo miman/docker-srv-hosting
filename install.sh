@@ -142,6 +142,7 @@ AVAILABLE_SERVICES=(
     "development/verdaccio:Verdaccio"
     "infrastructure/uptime-kuma:Uptime Kuma"
     "infrastructure/beszel:Beszel"
+    "infrastructure/beszel/beszel-agent:Beszel Agent"
     "cloud-services/jellyfin:Jellyfin"
 )
 
