@@ -178,9 +178,6 @@ function configure_service_backup() {
     fi
     
     local tmp_file=$(mktemp)
-    if [ -n "$SUDO_USER" ]; then
-        chown "$SUDO_USER:$SUDO_USER" "$tmp_file" 2>/dev/null || true
-    fi
     
     awk -v name="$service_name" '
         $0 ~ "^"name":" { skip=1; next }
