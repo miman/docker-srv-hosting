@@ -22,7 +22,13 @@ echo "=================================================================="
 echo ""
 
 # 1. Get Backup Path
-CONFIG_FILE="$HOME/.hsc/config.yaml"
+if [ -n "$HSC_CONFIG_PATH" ]; then
+    CONFIG_FILE="$HSC_CONFIG_PATH"
+else
+    TARGET_USER="${SUDO_USER:-$USER}"
+    TARGET_HOME=$(eval echo "~$TARGET_USER")
+    CONFIG_FILE="$TARGET_HOME/.hsc/config.yaml"
+fi
 BACKUP_ROOT=""
 
 if [ -f "$CONFIG_FILE" ]; then

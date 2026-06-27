@@ -164,14 +164,23 @@ function configure_service_backup() {
      sed -i "s|{{DB_CONTAINER}}|$db_container|g" "$backup_script_path"
      
     chmod +x "$backup_script_path"
+    if [ -n "$SUDO_USER" ]; then
+        chown "$SUDO_USER:$SUDO_USER" "$backup_script_path" 2>/dev/null || true
+    fi
     print_success "Created backup script for $service_name"
     
     # Update backups.yaml with this service backup
     if [ ! -f "$BACKUPS_FILE" ]; then
          touch "$BACKUPS_FILE"
+         if [ -n "$SUDO_USER" ]; then
+             chown "$SUDO_USER:$SUDO_USER" "$BACKUPS_FILE" 2>/dev/null || true
+         fi
     fi
     
     local tmp_file=$(mktemp)
+    if [ -n "$SUDO_USER" ]; then
+        chown "$SUDO_USER:$SUDO_USER" "$tmp_file" 2>/dev/null || true
+    fi
     
     awk -v name="$service_name" '
         $0 ~ "^"name":" { skip=1; next }
@@ -184,6 +193,9 @@ function configure_service_backup() {
     echo "  data_path: \"${service_abs_path}\"" >> "$tmp_file"
     
     mv "$tmp_file" "$BACKUPS_FILE"
+    if [ -n "$SUDO_USER" ]; then
+        chown "$SUDO_USER:$SUDO_USER" "$BACKUPS_FILE" 2>/dev/null || true
+    fi
     print_success "Registered $service_name in backup configuration."
 }
 
@@ -195,7 +207,11 @@ function finalize_backup() {
     fi
     
     # Generate the Dynamic Master Backup Script
-    mkdir -p "$(dirname "$MASTER_BACKUP_SCRIPT")"
+    local master_dir="$(dirname "$MASTER_BACKUP_SCRIPT")"
+    mkdir -p "$master_dir"
+    if [ -n "$SUDO_USER" ]; then
+        chown "$SUDO_USER:$SUDO_USER" "$master_dir" 2>/dev/null || true
+    fi
     
     cat > "$MASTER_BACKUP_SCRIPT" <<EOF
 #!/bin/bash
@@ -265,6 +281,9 @@ echo "=========================================="
 EOF
 
     chmod +x "$MASTER_BACKUP_SCRIPT"
+    if [ -n "$SUDO_USER" ]; then
+        chown "$SUDO_USER:$SUDO_USER" "$MASTER_BACKUP_SCRIPT" 2>/dev/null || true
+    fi
     print_success "Master backup script updated at $MASTER_BACKUP_SCRIPT"
 
     # Convert HH:MM to Cron (assuming daily)

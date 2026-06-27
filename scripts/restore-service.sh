@@ -33,7 +33,13 @@ if [ -z "$SERVICE_NAME" ]; then
 fi
 
 # 1. Get Backup Path from Config if not provided
-CONFIG_FILE="$HOME/.hsc/config.yaml"
+if [ -n "$HSC_CONFIG_PATH" ]; then
+    CONFIG_FILE="$HSC_CONFIG_PATH"
+else
+    TARGET_USER="${SUDO_USER:-$USER}"
+    TARGET_HOME=$(eval echo "~$TARGET_USER")
+    CONFIG_FILE="$TARGET_HOME/.hsc/config.yaml"
+fi
 if [ -z "$BACKUP_SOURCE" ]; then
     if [ -f "$CONFIG_FILE" ]; then
         BACKUP_ROOT=$(grep "^backup_path:" "$CONFIG_FILE" | sed -e "s/^backup_path:[[:space:]]*//;s/^[ \'\"]*//;s/[ \'\"]*$//")
