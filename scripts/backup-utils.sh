@@ -126,13 +126,17 @@ function configure_service_backup() {
     local service_dir=$1
     local backup_root=$2
     
+    # SÄKERHETSSPÄRR: Kontrollera att servicemappen faktiskt existerar!
+    if [ -z "$service_dir" ] || [ ! -d "$service_dir" ]; then
+        print_error "Sökvägen '$service_dir' är inte en giltig mapp. Avbryter konfigurering."
+        exit 1
+    fi
+    
     # 1. Define the service name and script targets first
     local service_name=$(basename "$service_dir")
     local backup_script_path="$service_dir/backup.sh"
     
     # 2. Determine the safe fallback path using the extracted $SYSTEM_BACKUP_DIR
-    # Determine the safe fallback path using the extracted $SYSTEM_BACKUP_DIR
-    # If backup_root is empty OR contains a legacy tilde (~), use the absolute path variable
     if [ -z "$backup_root" ] || [[ "$backup_root" == "~"* ]]; then
         local destination_dir="$SYSTEM_BACKUP_DIR/$service_name"
     else
@@ -161,7 +165,7 @@ function configure_service_backup() {
     local service_abs_path="$(cd "$service_dir" && pwd)"
     
     sed -i "s|{{SOURCE_DIR}}|$service_abs_path|g" "$backup_script_path"
-    sed -i "s|{{BACKUP_DEST}}|$destination_dir|g" "$backup_script_path" # <--- Fixed to use destination_dir
+    sed -i "s|{{BACKUP_DEST}}|$destination_dir|g" "$backup_script_path"
     sed -i "s|{{SERVICE_NAME}}|$service_name|g" "$backup_script_path"
     
     # Retention count from config
