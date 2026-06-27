@@ -131,7 +131,13 @@ function configure_service_backup() {
     local backup_script_path="$service_dir/backup.sh"
     
     # 2. Determine the safe fallback path using the extracted $SYSTEM_BACKUP_DIR
-    local destination_dir="${backup_root:-$SYSTEM_BACKUP_DIR/$service_name}"
+    # Determine the safe fallback path using the extracted $SYSTEM_BACKUP_DIR
+    # If backup_root is empty OR contains a legacy tilde (~), use the absolute path variable
+    if [ -z "$backup_root" ] || [[ "$backup_root" == "~"* ]]; then
+        local destination_dir="$SYSTEM_BACKUP_DIR/$service_name"
+    else
+        local destination_dir="$backup_root/$service_name"
+    fi
     
     # Determine type of backup
     local template="$BACKUP_SCRIPT_TEMPLATE_GENERIC"
