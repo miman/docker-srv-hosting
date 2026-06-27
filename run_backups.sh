@@ -168,7 +168,7 @@ for service in "${SELECTED_SERVICES[@]}"; do
     if [ ! -f "$backup_script" ]; then
         had_existing_script=false
         echo -e "${COLOR_INFO}[INFO] Automatically configuring smart backup script...${COLOR_RESET}"
-        $SUDO_CMD "$SCRIPT_DIR/scripts/backup-utils.sh" configure_service "$service_dir" "$BACKUP_PATH"
+        $SUDO_CMD "$SCRIPT_DIR/backup-utils.sh" configure_service "$service_dir" "$BACKUP_PATH"
         
         # Store for cleanup if requested
         if [ "$CLEANUP_SCRIPTS" = true ]; then
