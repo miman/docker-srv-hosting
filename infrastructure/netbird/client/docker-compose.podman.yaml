@@ -5,6 +5,7 @@ services:
         restart: $RESTART_POLICY
         cap_add:
             - NET_ADMIN
+            - NET_RAW
             - SYS_ADMIN
             - SYS_RESOURCE
         devices:
