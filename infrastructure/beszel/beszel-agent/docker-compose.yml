@@ -6,7 +6,7 @@ services:
    beszel-agent:
       image: henrygd/beszel-agent:latest
       container_name: beszel-agent
-      restart: unless-stopped
+      restart: ${RESTART_POLICY}
       network_mode: host
       volumes:
          - ${BESZEL_DATA_ROOT}/agent_data:/var/lib/beszel-agent
