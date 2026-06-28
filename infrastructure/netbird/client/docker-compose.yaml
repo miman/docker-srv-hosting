@@ -1,7 +1,7 @@
 services:
     netbird-client:
         container_name: netbird-client
-        hostname: <HOSTNAME>
+        hostname: ${NETBIRD_HOSTNAME}
         restart: $RESTART_POLICY
         cap_add:
             - NET_ADMIN
@@ -12,7 +12,7 @@ services:
             - /dev/net/tun
         network_mode: host
         environment:
-            - NB_SETUP_KEY=<SETUP KEY>
+            - NB_SETUP_KEY=${NETBIRD_SETUP_KEY}
             # Allows Podman to run completely within user privileges without needing to modify host network interfaces or routing tables directly via the kernel.
             - NB_WT_USERSPACE=true
         volumes:
