@@ -66,16 +66,22 @@ for i in "${!INSTALLED_SERVICES[@]}"; do
         [yY][eE][sS]|[yY])
             print_warning "Stopping and removing containers for $service_name..."
             
-            # Find the exact compose configuration file inside the Git repository workspace
+            # Locate the correct compose file in the repo (prioritize Podman variant if engine is Podman)
             GIT_COMPOSE_FILE=""
-            if [ -f "$REPO_ROOT_DIR/$repo_service_path/docker-compose.yml" ]; then
-                GIT_COMPOSE_FILE="$REPO_ROOT_DIR/$repo_service_path/docker-compose.yml"
-            elif [ -f "$REPO_ROOT_DIR/$repo_service_path/compose.yaml" ]; then
-                GIT_COMPOSE_FILE="$REPO_ROOT_DIR/$repo_service_path/compose.yaml"
+            TARGET_DIR="$REPO_ROOT_DIR/$repo_service_path"
+            
+            if [ "$CONTAINER_ENGINE" == "podman" ] && [ -f "$TARGET_DIR/docker-compose.podman.yaml" ]; then
+                GIT_COMPOSE_FILE="$TARGET_DIR/docker-compose.podman.yaml"
+            elif [ -f "$TARGET_DIR/docker-compose.yaml" ]; then
+                GIT_COMPOSE_FILE="$TARGET_DIR/docker-compose.yaml"
+            elif [ -f "$TARGET_DIR/docker-compose.yml" ]; then
+                GIT_COMPOSE_FILE="$TARGET_DIR/docker-compose.yml"
+            elif [ -f "$TARGET_DIR/compose.yaml" ]; then
+                GIT_COMPOSE_FILE="$TARGET_DIR/compose.yaml"
             fi
 
             if [ -n "$GIT_COMPOSE_FILE" ]; then
-                # Navigate into the target app's data directory so relative volume mounts resolve there if needed
+                # Navigate into the target app's data directory so volumes map correctly
                 if [ -d "$DOCKER_FOLDER/$flat_folder_name" ]; then
                     pushd "$DOCKER_FOLDER/$flat_folder_name" > /dev/null
                     
@@ -86,7 +92,7 @@ for i in "${!INSTALLED_SERVICES[@]}"; do
                     popd > /dev/null
                 fi
             else
-                print_error "Could not find a compose configuration file inside the repository path: $repo_service_path"
+                print_error "Could not find a valid compose file (*.yaml/*.yml) inside the repository path: $repo_service_path"
             fi
             
             # Safe separation: Prompt before wiping permanent configurations out of your directory
