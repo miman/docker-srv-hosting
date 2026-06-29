@@ -25,23 +25,26 @@ else
     print_error "Shared services definition file missing at './scripts/services.sh'."
 fi
 
+# Store the absolute path of the Git repository root before switching directories
+REPO_ROOT_DIR=$(pwd)
+
 print_info "=======================> Starting Service Removal Phase..."
 
 # Track what is actually found dynamically on the drive
 INSTALLED_SERVICES=()
 INSTALLED_PATHS=()
 
-# 3. Detect which services from the shared array have active directories inside ~/docker_stacks
+# 3. Detect which services from the shared array have active data directories inside ~/docker_stacks
 for service_info in "${AVAILABLE_SERVICES[@]}"; do
     IFS=":" read -r service_path service_name <<< "$service_info"
     
-    # FIX: Extract the base folder name (e.g., converts "cloud-services/immich" -> "immich")
+    # Extract the base folder name (e.g., converts "cloud-services/immich" -> "immich")
     flat_folder_name=$(basename "$service_path")
     
-    # Checks directly in your flat root folder (e.g., /home/stenman/docker_stacks/immich)
+    # Checks directly in your flat data root folder
     if [ -d "$DOCKER_FOLDER/$flat_folder_name" ]; then
         INSTALLED_SERVICES+=("$service_name")
-        INSTALLED_PATHS+=("$flat_folder_name")
+        INSTALLED_PATHS+=("$service_path") # Keep repo path track intact
     fi
 done
 
@@ -54,7 +57,8 @@ fi
 # 4. Prompt user dynamically for each detected service
 for i in "${!INSTALLED_SERVICES[@]}"; do
     service_name="${INSTALLED_SERVICES[$i]}"
-    service_path="${INSTALLED_PATHS[$i]}"
+    repo_service_path="${INSTALLED_PATHS[$i]}"
+    flat_folder_name=$(basename "$repo_service_path")
     
     echo ""
     read -p "Do you want to completely remove '$service_name'? (y/N): " remove_choice
@@ -62,34 +66,38 @@ for i in "${!INSTALLED_SERVICES[@]}"; do
         [yY][eE][sS]|[yY])
             print_warning "Stopping and removing containers for $service_name..."
             
-            if [ -d "$DOCKER_FOLDER/$service_path" ]; then
-                pushd "$DOCKER_FOLDER/$service_path" > /dev/null
-                
-                # Dynamic detection: Look for any available compose configuration file
-                COMPOSE_FILE=$(ls -1 *.yml *.yaml 2>/dev/null | head -n 1 || true)
-                
-                if [ -n "$COMPOSE_FILE" ]; then
-                    print_info "Using compose configurations found in: $COMPOSE_FILE"
-                    $COMPOSE_CMD -f "$COMPOSE_FILE" down -v || true
-                else
-                    # Fallback strategy if custom matching parameters are handled directly by the engine
-                    print_warning "No explicit compose configuration layout found. Executing standard teardown..."
-                    $COMPOSE_CMD down -v || true
-                fi
-                
-                popd > /dev/null
-                
-                # Safe separation: Prompt before wiping permanent configurations out of your directory
-                read -p "Do you also want to delete all configuration/data folders for $service_name? (y/N): " purge_data
-                if [[ "$purge_data" =~ ^[yY]$ ]]; then
-                    sudo rm -rf "$DOCKER_FOLDER/$service_path"
-                    print_success "Data folder cleared."
-                fi
-                
-                print_success "Successfully uninstalled $service_name."
-            else
-                print_error "Target folder went missing mid-execution."
+            # Find the exact compose configuration file inside the Git repository workspace
+            GIT_COMPOSE_FILE=""
+            if [ -f "$REPO_ROOT_DIR/$repo_service_path/docker-compose.yml" ]; then
+                GIT_COMPOSE_FILE="$REPO_ROOT_DIR/$repo_service_path/docker-compose.yml"
+            elif [ -f "$REPO_ROOT_DIR/$repo_service_path/compose.yaml" ]; then
+                GIT_COMPOSE_FILE="$REPO_ROOT_DIR/$repo_service_path/compose.yaml"
             fi
+
+            if [ -n "$GIT_COMPOSE_FILE" ]; then
+                # Navigate into the target app's data directory so relative volume mounts resolve there if needed
+                if [ -d "$DOCKER_FOLDER/$flat_folder_name" ]; then
+                    pushd "$DOCKER_FOLDER/$flat_folder_name" > /dev/null
+                    
+                    print_info "Using Git repository configuration: $GIT_COMPOSE_FILE"
+                    # -p forces podman/docker to target the specific project name matching your flat folder
+                    $COMPOSE_CMD -f "$GIT_COMPOSE_FILE" -p "$flat_folder_name" down -v || true
+                    
+                    popd > /dev/null
+                fi
+            else
+                print_error "Could not find a compose configuration file inside the repository path: $repo_service_path"
+            fi
+            
+            # Safe separation: Prompt before wiping permanent configurations out of your directory
+            echo ""
+            read -p "Do you also want to delete all configuration/data folders for $service_name? (y/N): " purge_data
+            if [[ "$purge_data" =~ ^[yY]$ ]]; then
+                sudo rm -rf "$DOCKER_FOLDER/$flat_folder_name"
+                print_success "Data folder cleared."
+            fi
+            
+            print_success "Successfully uninstalled $service_name."
             ;;
         *)
             print_info "Skipping removal for $service_name."
