@@ -114,37 +114,12 @@ else
         export RESTART_POLICY="unless-stopped"
     fi
 fi
-# List of availalble services (folder_name:Display Name)
-AVAILABLE_SERVICES=(
-    "infrastructure/portainer:Portainer"
-    "infrastructure/portainer/portainer-agent:Portainer Agent"
-    "ai/ollama:Ollama"
-    "ai/open-webui:Open WebUI"
-    "infrastructure/watchtower:Watchtower"
-    "cloud-services/docmost:Docmost"
-    "cloud-services/glance-dashboard:Glance Dashboard"
-    "infrastructure/headscale:Headscale"
-    "infrastructure/netbird/client:Netbird Client"
-    "infrastructure/netbird/server:Netbird Server"
-    "cloud-services/home-assistant:Home Assistant"
-    "cloud-services/immich:Immich"
-    "cloud-services/linux-in-docker:Linux in Docker"
-    "cloud-services/nextcloud:Nextcloud"
-    "cloud-services/nextcloud-aio:Nextcloud AIO"
-    "infrastructure/nginx-reverse-proxy:Nginx Reverse Proxy"
-    "infrastructure/duckdns-updater:DuckDNS"
-    "infrastructure/registry:Registry"
-    "ai/searxng:SearXNG"
-    "ai/comfy_ui:ComfyUI"
-    "cloud-services/synapse:Synapse"
-    "cloud-services/traccar:Traccar"
-    "cloud-services/vaultwarden:Vaultwarden"
-    "development/verdaccio:Verdaccio"
-    "infrastructure/uptime-kuma:Uptime Kuma"
-    "infrastructure/beszel:Beszel"
-    "infrastructure/beszel/beszel-agent:Beszel Agent"
-    "cloud-services/jellyfin:Jellyfin"
-)
+# Source the shared services definition file (One Source of Truth)
+if [ -f "./scripts/services.sh" ]; then
+    source "./scripts/services.sh"
+else
+    print_error "Shared services definition file missing at './scripts/services.sh'."
+fi
 
 # --- Helper Functions ---
 function print_header() {
