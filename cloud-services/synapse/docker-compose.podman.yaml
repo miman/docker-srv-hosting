@@ -4,8 +4,6 @@ services:
       - "label=disable"
     logging:
       driver: "k8s-file"
-    volumes:
-      - ${DOCKER_FOLDER}/synapse/data:/data:Z
 
   synapse-admin:
     security_opt:

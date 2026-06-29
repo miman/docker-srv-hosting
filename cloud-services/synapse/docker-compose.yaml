@@ -6,7 +6,7 @@ services:
     environment:
       - SYNAPSE_CONFIG_PATH=/data/homeserver.yaml
     volumes:
-      - ${DOCKER_FOLDER}/synapse/data:/data
+      - ${DOCKER_FOLDER}/synapse/data:/data:Z
     networks:
       - local-ai-network
     ports:
