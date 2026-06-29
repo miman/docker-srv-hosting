@@ -35,10 +35,13 @@ INSTALLED_PATHS=()
 for service_info in "${AVAILABLE_SERVICES[@]}"; do
     IFS=":" read -r service_path service_name <<< "$service_info"
     
-    # Checks directly in your flat root folder
-    if [ -d "$DOCKER_FOLDER/$service_path" ]; then
+    # FIX: Extract the base folder name (e.g., converts "cloud-services/immich" -> "immich")
+    flat_folder_name=$(basename "$service_path")
+    
+    # Checks directly in your flat root folder (e.g., /home/stenman/docker_stacks/immich)
+    if [ -d "$DOCKER_FOLDER/$flat_folder_name" ]; then
         INSTALLED_SERVICES+=("$service_name")
-        INSTALLED_PATHS+=("$service_path")
+        INSTALLED_PATHS+=("$flat_folder_name")
     fi
 done
 
