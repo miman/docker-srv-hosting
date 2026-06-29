@@ -19,6 +19,7 @@ This document lists the default ports used by each service installed via Docker 
 | SearXNG          | 8080              | 4522         | SearXNG, a privacy-respecting metasearch engine                    |
 | Synapse          | 8008              | 4530         | Synapse, a Matrix homeserver for private messaging                 |
 | Synapse Admin    | 80                | 4531         | Web UI for managing Synapse homeservers                            |
+| Synapse Web Client| 8080              | 4535         | Web Client for Synapse                                             |
 | Nextcloud AIO    | 8080              | 4504         | Nextcloud All-in-One admin interface                               |
 | Verdaccio        | 4873              | 4873         | Verdaccio, local NPM registry                                      |
 | Registry         | 5000              | 5000         | Local Docker registry                                              |

@@ -76,7 +76,7 @@ $COMPOSE_CMD $COMPOSE_FILES up -d --force-recreate
 echo "Synapse has been installed and is accessible on http://localhost:4530"
 echo "Synapse Admin is accessible on http://localhost:4531"
 if [ "$INSTALL_ELEMENT_WEB" == "yes" ]; then
-    echo "Element Web is accessible on http://localhost:4532"
+    echo "Element Web is accessible on http://localhost:4535"
 fi
 
 # First-time admin user creation

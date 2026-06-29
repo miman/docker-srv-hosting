@@ -32,6 +32,6 @@ services:
     volumes:
       - /volume1/docker/synapse/element-web/config.json:/app/config.json:ro
     ports:
-      - "4532:8080"
+      - "4535:8080"
     labels:
       - com.centurylinklabs.watchtower.enable=true
