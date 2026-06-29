@@ -65,11 +65,16 @@ for i in "${!INSTALLED_SERVICES[@]}"; do
             if [ -d "$DOCKER_FOLDER/$service_path" ]; then
                 pushd "$DOCKER_FOLDER/$service_path" > /dev/null
                 
-                # Use your config's engine profile (Podman-compose vs Docker compose)
-                if [ "$CONTAINER_ENGINE" == "podman" ]; then
-                    podman-compose down -v || true
+                # Dynamic detection: Look for any available compose configuration file
+                COMPOSE_FILE=$(ls -1 *.yml *.yaml 2>/dev/null | head -n 1 || true)
+                
+                if [ -n "$COMPOSE_FILE" ]; then
+                    print_info "Using compose configurations found in: $COMPOSE_FILE"
+                    $COMPOSE_CMD -f "$COMPOSE_FILE" down -v || true
                 else
-                    docker compose down -v || true
+                    # Fallback strategy if custom matching parameters are handled directly by the engine
+                    print_warning "No explicit compose configuration layout found. Executing standard teardown..."
+                    $COMPOSE_CMD down -v || true
                 fi
                 
                 popd > /dev/null
