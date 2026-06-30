@@ -19,7 +19,7 @@ else
 fi
 
 # Define your exact USB targets
-USB_MOUNT_DIR="/media/backup_usb"                  
+USB_MOUNT_DIR="/mnt/backup_usb"                  
 USB_BACKUP_TARGET="${USB_MOUNT_DIR}/immich_backups"
 
 echo "Checking if USB Backup disk is mounted..."
