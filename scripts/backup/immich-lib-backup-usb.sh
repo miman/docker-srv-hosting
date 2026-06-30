@@ -24,7 +24,15 @@ USB_BACKUP_TARGET="${USB_MOUNT_DIR}/immich_backups"
 
 echo "Checking if USB Backup disk is mounted..."
 
-# Verify if the folder is an active mountpoint
+# 1. Check if the folder is already an active mountpoint
+if ! mountpoint -q "$USB_MOUNT_DIR"; then
+    echo "[INFO] USB Disk not active at $USB_MOUNT_DIR. Triggering system mount refresh..."
+    
+    # Force Linux to process storage targets mapped in /etc/fstab
+    sudo mount -a > /dev/null 2>&1 || true
+fi
+
+# 2. Check again to see if it successfully mounted after the refresh
 if mountpoint -q "$USB_MOUNT_DIR"; then
     echo "[SUCCESS] USB Drive detected. Backing up from: $IMMICH_MEDIA_DIR"
     
