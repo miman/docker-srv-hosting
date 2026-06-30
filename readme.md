@@ -38,6 +38,7 @@ The core idea is to automatically setup a local cloud with most services you wou
 | [Watchtower](infrastructure/watchtower/readme.md) | Automates Docker container image updates               |
 | [Uptime-Kuma](cloud-services/uptime-kuma/readme.md) | Uptime monitoring               |
 | [Beszel](infrastructure/beszel/readme.md) | Dashboard for monitoring your services               |
+| [Open Wearables](cloud-services/open-wearables/readme.md) | Local service for your health info               |
 
 
 
