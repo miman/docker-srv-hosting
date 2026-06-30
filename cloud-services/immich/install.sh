@@ -112,5 +112,18 @@ $COMPOSE_CMD down
 $COMPOSE_CMD pull
 $COMPOSE_CMD up -d
 
+# Copy USB backup script to the docker_stacks/immich folder for persistent backup functionality
+# Target destination folder inside docker_stacks
+IMMICH_STACK_DIR="${DOCKER_FOLDER}/immich"
+BACKUP_SCRIPT_DEST="${IMMICH_STACK_DIR}/immich-lib-backup-usb.sh"
+
+echo "Deploying persistent backup script to ${IMMICH_STACK_DIR}..."
+
+# Copy the script from your source repo folder into the stack destination
+cp "../../scripts/backup/immich-lib-backup-usb.sh" "$BACKUP_SCRIPT_DEST"
+
+# Ensure the script remains fully executable in its new home
+chmod +x "$BACKUP_SCRIPT_DEST"
+
 echo "Immich has been installed ($([ "$IMMICH_PROFILES" = "full" ] && echo "Full" || echo "Minimal") version)."
 echo "You can access it at http://<your-ip>:2283"
