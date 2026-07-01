@@ -121,6 +121,7 @@ echo "Deploying persistent backup script to ${IMMICH_STACK_DIR}..."
 
 # Copy the script from your source repo folder into the stack destination
 cp "../../scripts/backup/immich-lib-backup-usb.sh" "$BACKUP_SCRIPT_DEST"
+cp "../../scripts/backup/immich-lib-backup-nas.sh" "$BACKUP_SCRIPT_DEST"
 
 # Ensure the script remains fully executable in its new home
 chmod +x "$BACKUP_SCRIPT_DEST"
