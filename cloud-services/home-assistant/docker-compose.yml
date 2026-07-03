@@ -7,6 +7,7 @@ services:
       network_mode: host
       volumes:
          - ${DOCKER_FOLDER}/home-assistant/config:/config
+         - ${DOCKER_FOLDER}/home-assistant/backups:/backups
          - /etc/localtime:/etc/localtime:ro
          - /run/dbus:/run/dbus:ro
       cap_add:
