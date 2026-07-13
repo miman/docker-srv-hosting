@@ -99,7 +99,7 @@ DB_PASSWORD=changeme
 DB_DATABASE_NAME=immich
 
 # The version of Immich to use
-IMMICH_VERSION=release
+IMMICH_VERSION=v3
 
 # Profiles to run (empty for minimal, 'full' for machine learning)
 COMPOSE_PROFILES=${IMMICH_PROFILES}
