@@ -18,17 +18,17 @@ services:
       - docmost:/app/data/storage
 
   db:
-    image: docker.io/postgres:16-alpine
+    image: docker.io/postgres:18
     environment:
       POSTGRES_DB: docmost
       POSTGRES_USER: docmost
       POSTGRES_PASSWORD: STRONG_DB_PASSWORD
     restart: $RESTART_POLICY
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql
 
   redis:
-    image: docker.io/redis:7.2-alpine
+    image: docker.io/redis:8
     restart: $RESTART_POLICY
     volumes:
       - redis_data:/data

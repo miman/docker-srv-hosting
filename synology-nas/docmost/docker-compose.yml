@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  docmost:
+    image: docker.io/docmost/docmost:latest
+    depends_on:
+      - docmost_db
+      - docmost_redis
+    environment:
+      APP_URL: 'http://localhost:3000'
+      APP_SECRET: 'e2bced7459a84c26b9e0523717b2188aa1e0e9006e8c42a0'
+      DATABASE_URL: 'postgresql://docmost:STRONG_DB_PASSWORD@docmost_db:5432/docmost?schema=public'
+      REDIS_URL: 'redis://docmost_redis:6379'
+    ports:
+      - 4412:3000
+    restart: unless-stopped
+    volumes:
+      - /volume1/docker/datadocmost/storage:/app/data/storage
+
+  docmost_db:
+    image: docker.io/postgres:18
+    environment:
+      POSTGRES_DB: docmost
+      POSTGRES_USER: docmost
+      POSTGRES_PASSWORD: STRONG_DB_PASSWORD
+    restart: unless-stopped
+    volumes:
+      - /volume1/docker/datadocmost/db_data:/var/lib/postgresql
+
+  docmost_redis:
+    image: docker.io/redis:8
+    restart: unless-stopped
+    volumes:
+      - /volume1/docker/datadocmost/redis_data:/data
