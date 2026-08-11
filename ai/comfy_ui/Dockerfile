@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-RUN git clone https://github.com/comfyanonymous/ComfyUI.git .
+RUN git clone https://github.com/Comfy-Org/ComfyUI.git .
 
 # FIX: Use --extra-index-url and force the Blackwell-compatible version (2.12+)
 RUN pip install --no-cache-dir --upgrade pip && \
