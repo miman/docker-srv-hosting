@@ -31,4 +31,5 @@ AVAILABLE_SERVICES=(
     "infrastructure/beszel:Beszel"
     "infrastructure/beszel/beszel-agent:Beszel Agent"
     "cloud-services/jellyfin:Jellyfin"
+    "cloud-services/open-notebook:Open Notebook"
 )

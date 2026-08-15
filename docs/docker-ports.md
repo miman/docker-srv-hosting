@@ -27,6 +27,8 @@ This document lists the default ports used by each service installed via Docker 
 | Linux in Docker  | 3000, 3001        | 3000, 3001   | webtop (Ubuntu XFCE) in Docker                                     |
 | Watchtower       | N/A               | N/A          | Automation for Docker container images                              |
 | ComfyUI         | 8188              | 4515         | ComfyUI, a powerful and modular stable diffusion GUI/backend        |
+| Open Notebook    | 8502              | 4510         | Open Notebook, self-hosted NotebookLM alternative (Web UI)          |
+| Open Notebook    | 5055              | 4511         | Open Notebook API                                                   |
 | Open Wearables   | 8000              | 4416         | Open Wearables API                                                  |
 | Open Wearables   | 3000              | 4415         | Open Wearables Frontend Dashboard                                   |
 | Open Wearables   | 5555              | 4417         | Open Wearables Celery Flower Dashboard                              |

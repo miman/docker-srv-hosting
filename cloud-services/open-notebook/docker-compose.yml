@@ -1,0 +1,35 @@
+services:
+  surrealdb:
+    image: surrealdb/surrealdb:v2
+    container_name: open-notebook_surrealdb
+    command: start --user root --pass ${SURREAL_PASSWORD:-root} rocksdb:/mydata/mydatabase.db
+    user: "1000:1000"
+    volumes:
+      - ${DOCKER_FOLDER}/open-notebook/surreal_data:/mydata
+    restart: $RESTART_POLICY
+
+  open-notebook:
+    image: lfnovo/open_notebook:v1-latest
+    container_name: open-notebook_app
+    pull_policy: always
+    ports:
+      - "4510:8502"
+      - "4511:5055"
+    environment:
+      - OPEN_NOTEBOOK_ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - SURREAL_URL=ws://surrealdb:8000/rpc
+      - SURREAL_USER=root
+      - SURREAL_PASSWORD=${SURREAL_PASSWORD:-root}
+      - SURREAL_NAMESPACE=open_notebook
+      - SURREAL_DATABASE=open_notebook
+      - OLLAMA_API_BASE=${OLLAMA_API_BASE:-}
+      - API_URL=${API_URL:-http://localhost:4511}
+    env_file:
+      - .env
+    volumes:
+      - ${DOCKER_FOLDER}/open-notebook/notebook_data:/app/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - surrealdb
+    restart: $RESTART_POLICY
