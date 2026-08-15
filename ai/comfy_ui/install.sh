@@ -40,7 +40,7 @@ elif [ -f "docker-compose.override.yaml" ]; then
 fi
 
 $COMPOSE_CMD down
-$COMPOSE_CMD $COMPOSE_PART build
+$COMPOSE_CMD $COMPOSE_PART build --no-cache
 $COMPOSE_CMD $COMPOSE_PART up -d --force-recreate
 echo "ComfyUI has been installed and is accessible on http://localhost:4515"
 
