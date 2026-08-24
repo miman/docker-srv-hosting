@@ -16,6 +16,7 @@ This document lists the default ports used by each service installed via Docker 
 | Traccar          | 8082              | 4411         | Traccar, for geo-tracking of mobile devices                        |
 | Vaultwarden      | 80                | 4410         | Vaultwarden password manager, like Bitwarden                       |
 | Docmost          | 3000              | 4412         | Docmost, for documentation like a Wiki                             |
+| Mealie           | 9000              | 4418         | Mealie recipe manager & meal planner                               |
 | SearXNG          | 8080              | 4522         | SearXNG, a privacy-respecting metasearch engine                    |
 | Synapse          | 8008              | 4530         | Synapse, a Matrix homeserver for private messaging                 |
 | Synapse Admin    | 80                | 4531         | Web UI for managing Synapse homeservers                            |

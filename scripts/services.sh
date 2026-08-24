@@ -16,6 +16,7 @@ AVAILABLE_SERVICES=(
     "cloud-services/home-assistant:Home Assistant"
     "cloud-services/immich:Immich"
     "cloud-services/linux-in-docker:Linux in Docker"
+    "cloud-services/mealie:Mealie"
     "cloud-services/nextcloud:Nextcloud"
     "cloud-services/nextcloud-aio:Nextcloud AIO"
     "infrastructure/nginx-reverse-proxy:Nginx Reverse Proxy"
