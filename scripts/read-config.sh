@@ -245,3 +245,53 @@ set_config_value() {
     fi
     chmod 600 "$HSC_CONFIG_PATH"
 }
+
+ensure_nvidia_drivers() {
+    if ! command -v nvidia-smi &> /dev/null; then
+        echo "NVIDIA GPU support enabled, but nvidia-smi (driver) is not found."
+        echo "Attempting to install NVIDIA drivers..."
+        if command -v ubuntu-drivers &> /dev/null; then
+            sudo apt-get update
+            sudo ubuntu-drivers install
+        elif command -v apt-get &> /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y nvidia-driver-535 || sudo apt-get install -y nvidia-headless-535
+        elif command -v dnf &> /dev/null; then
+            sudo dnf install -y akmod-nvidia xorg-x11-drv-nvidia
+        else
+            echo "Error: Could not automatically install NVIDIA drivers. Please install them manually." >&2
+            exit 1
+        fi
+
+        if ! command -v nvidia-smi &> /dev/null; then
+            echo "NVIDIA driver installation initiated. A system reboot may be required before nvidia-smi becomes active."
+        fi
+    fi
+}
+
+# Read and export USE_NVIDIA_GPU
+check_nvidia_gpu_config() {
+    if [ -z "$USE_NVIDIA_GPU" ]; then
+        if [ -f "$HSC_CONFIG_PATH" ]; then
+            USE_NVIDIA_GPU=$(grep "^use_nvidia_gpu:" "$HSC_CONFIG_PATH" | sed -e "s/^use_nvidia_gpu:[[:space:]]*//;s/^[ \'\"]*//;s/[ \'\"]*$//")
+        fi
+
+        if [ -z "$USE_NVIDIA_GPU" ] || [ "$USE_NVIDIA_GPU" == "null" ]; then
+            read -p "Do any of the images use an NVIDIA graphics card? [y/N] " nvidia_choice
+            if [[ "$nvidia_choice" =~ ^[Yy]$ ]]; then
+                USE_NVIDIA_GPU="true"
+            else
+                USE_NVIDIA_GPU="false"
+            fi
+            set_config_value "use_nvidia_gpu" "$USE_NVIDIA_GPU"
+            echo "Saved NVIDIA GPU preference: $USE_NVIDIA_GPU"
+        fi
+    fi
+    export USE_NVIDIA_GPU
+
+    if [ "$USE_NVIDIA_GPU" == "true" ]; then
+        ensure_nvidia_drivers
+    fi
+}
+
+check_nvidia_gpu_config

@@ -18,13 +18,22 @@ fi
 # Ensure data directory exists
 mkdir -p "$DOCKER_FOLDER/ollama"
 
-# Prompt for Nvidia GPU usage
-read -p "Do you have an Nvidia GPU you want to use with Ollama (y/N)?  " answerNvidia
+# Prompt for Nvidia GPU usage if not pre-configured
+if [ -n "$USE_NVIDIA_GPU" ]; then
+  if [ "$USE_NVIDIA_GPU" == "true" ]; then
+    answerNvidia="y"
+  else
+    answerNvidia="n"
+  fi
+else
+  read -p "Do you have an Nvidia GPU you want to use with Ollama (y/N)?  " answerNvidia
+fi
+
 echo "Deploying container..."
 if [[ "$answerNvidia" =~ [Yy]$ ]]; then
   echo "Using Nvidia card in Ollama"
 
-  # Check that nvidia-smi is available (driver installed)
+  # Ensure nvidia-smi is available
   if ! command -v nvidia-smi &> /dev/null; then
     echo "Error: nvidia-smi not found. Please install the NVIDIA driver first." >&2
     exit 1
