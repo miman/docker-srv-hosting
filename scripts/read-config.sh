@@ -250,21 +250,33 @@ ensure_nvidia_drivers() {
     if ! command -v nvidia-smi &> /dev/null; then
         echo "NVIDIA GPU support enabled, but nvidia-smi (driver) is not found."
         echo "Attempting to install NVIDIA drivers..."
+        local installed=false
+
         if command -v ubuntu-drivers &> /dev/null; then
             sudo apt-get update
-            sudo ubuntu-drivers install
-        elif command -v apt-get &> /dev/null; then
-            sudo apt-get update
-            sudo apt-get install -y nvidia-driver-535 || sudo apt-get install -y nvidia-headless-535
-        elif command -v dnf &> /dev/null; then
-            sudo dnf install -y akmod-nvidia xorg-x11-drv-nvidia
-        else
-            echo "Error: Could not automatically install NVIDIA drivers. Please install them manually." >&2
-            exit 1
+            if sudo ubuntu-drivers install; then
+                installed=true
+            fi
         fi
 
+        # Fallback to standard apt packages if ubuntu-drivers didn't make nvidia-smi available
+        if ! command -v nvidia-smi &> /dev/null && command -v apt-get &> /dev/null; then
+            echo "Installing standard NVIDIA drivers via apt..."
+            sudo apt-get update
+            sudo apt-get install -y nvidia-driver-535 || sudo apt-get install -y nvidia-driver-550 || sudo apt-get install -y nvidia-headless-535
+        elif ! command -v nvidia-smi &> /dev/null && command -v dnf &> /dev/null; then
+            sudo dnf install -y akmod-nvidia xorg-x11-drv-nvidia
+        fi
+
+        # Re-check after installation attempt
         if ! command -v nvidia-smi &> /dev/null; then
-            echo "NVIDIA driver installation initiated. A system reboot may be required before nvidia-smi becomes active."
+            echo ""
+            echo -e "\e[33m[WARNING] NVIDIA driver installation completed, but 'nvidia-smi' is not active yet.\e[0m"
+            echo "A system reboot is usually required to load the NVIDIA kernel modules."
+            echo "Please reboot your system ('sudo reboot') and re-run the installer."
+            echo ""
+            read -p "Press Enter to exit..." _
+            exit 1
         fi
     fi
 }

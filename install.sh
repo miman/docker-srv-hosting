@@ -123,7 +123,6 @@ fi
 
 # --- Helper Functions ---
 function print_header() {
-    clear
     echo "=================================================================="
     echo "       Home Server Center - Streamlined Installer"
     echo "=================================================================="
