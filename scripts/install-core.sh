@@ -33,9 +33,11 @@ function print_error() {
 
 # --- Main Logic ---
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # 1. Source configuration
 # This script reads from ~/.hsc/config.yaml and ensures DOCKER_FOLDER and BASE_DNS_NAME are set.
-source ./scripts/read-config.sh
+source "$SCRIPT_DIR/read-config.sh"
 
 print_success "Docker root folder set to: $DOCKER_FOLDER"
 print_success "Base DNS name set to: $BASE_DNS_NAME"
@@ -58,10 +60,10 @@ fi
 # 3. Make scripts executable
 if [ "$is_windows" = false ]; then
     print_info "=======================> Making scripts executable..."
-    chmod +x ./scripts/install-container-engine.sh
+    chmod +x "$SCRIPT_DIR/install-container-engine.sh"
     # 4. Install container engine (Docker or Podman)
     print_info "=======================> Installing container engine: $CONTAINER_ENGINE..."
-    ./scripts/install-container-engine.sh
+    "$SCRIPT_DIR/install-container-engine.sh"
 else
     print_info "=======================> Skipping container engine installation on Windows."
     print_info "Please ensure Docker Desktop or Podman Desktop is installed manually."
